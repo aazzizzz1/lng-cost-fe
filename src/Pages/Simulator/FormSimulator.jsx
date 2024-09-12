@@ -1,54 +1,44 @@
-import {React, useState} from "react";
+import { React } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateWaypoint, validationData } from "../../Provider/simulatorSlice"; // Import the action to add a waypoint
+import {
+  updateWaypoint,
+  updateFormInput,
+  validationData,
+} from "../../Provider/simulatorSlice"; // Import the action to add a waypoint
 
 const FormSimulator = () => {
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.simulator); // Fetch data from Redux store
-  const waypoints = useSelector((state) => state.simulator.waypoints); // Fetch waypoints
+  const { temperaturemin,
+    temperaturemax,
+    humidity,
+    windDirection,
+    windVelocity,
+    airPressure,
+    heading,
+    headingRate,
+    roll,
+    pitch,
+    angularVelocity,
+    speedofShipThroughWater,
+    waterCurrentSpeed,
+    waterDepth,
+    headingMagnetic,
+    headingDeviation,
+    headingVariation,
+    // latitude,
+    // longitude,
+    waypoints,
+    errors,
+    isFormValid, } = useSelector(
+    (state) => state.simulator
+  );
 
-  // State to manage errors
-  const [errors, setErrors] = useState({});
-
-  // Validation function
-  const validateField = (name, value) => {
-    let error = "";
-
-    switch (name) {
-      case "temperaturemin":
-      case "temperaturemax":
-        if (isNaN(value) || value < -50 || value > 50) {
-          error = "Temperature must be between -50°C and 50°C.";
-        }
-        break;
-      case "humidity":
-        if (isNaN(value) || value < 0 || value > 100) {
-          error = "Humidity must be between 0% and 100%.";
-        }
-        break;
-      case "windVelocity":
-        if (isNaN(value) || value < 0) {
-          error = "Wind velocity must be a positive number.";
-        }
-        break;
-      // Add similar cases for other fields
-      default:
-        break;
-    }
-
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: error,
-    }));
-
-    return error;
-  };
-
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    validateField(name, value);
+    dispatch(updateFormInput({ field: name, value }));
   };
-  
+
   // Handle updating an existing waypoint
   const handleWaypointChange = (index, field, value) => {
     const updatedWaypoints = waypoints.map((waypoint, i) =>
@@ -59,17 +49,19 @@ const FormSimulator = () => {
     dispatch(updateWaypoint({ index, waypoint: updatedWaypoints[index] }));
   };
 
+  // Handle form submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(validationData()); // Validasi data sebelum mengirim
-    if (!errors) {
-      // Lanjutkan dengan pengiriman data jika tidak ada error
-      console.log("Data submitted successfully!");
-    } else {
-      console.log("Validation errors:", errors);
-    }
-  };
+    dispatch(validationData());
 
+    if (!isFormValid) {
+      alert('Form contains errors. Please fix them before submitting.');
+      return;
+    }
+
+    // Perform submit actions here if the form is valid
+    alert('Form submitted successfully.');
+  };
 
   return (
     <div className="">
@@ -84,6 +76,9 @@ const FormSimulator = () => {
                         message={successMessage}
                       />
                     )} */}
+            {errors && (
+              <div className="text-red-500 text-sm mb-4">{errors}</div>
+            )}
             <h1 className="text-xl font-bold eading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Simulator Form
             </h1>
@@ -101,26 +96,30 @@ const FormSimulator = () => {
                   </label>
                   <div className="flex flex-row gap-2">
                     <input
-                      type="text"
+                      type="number"
                       name="temperaturemin"
-                      value={data.temperaturemin}
+                      value={temperaturemin}
                       onChange={handleInputChange}
                       id="temperaturemin"
                       className={`bg-gray-50 border ${
-                        errors.temperaturemin ? "border-red-500" : "border-gray-300"
+                        parseFloat(temperaturemin) > 40
+                          ? "border-red-500"
+                          : "border-gray-300"
                       } text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
                       placeholder="Min Temperature"
                       required=""
                       disabled
                     />
                     <input
-                      type="text"
+                      type="number"
                       name="temperaturemax"
-                      value={data.temperaturemax}
-                      onChange={handleInputChange}
                       id="temperaturemax"
+                      value={temperaturemax}
+                      onChange={handleInputChange}
                       className={`bg-gray-50 border ${
-                        errors.temperaturemax ? "border-red-500" : "border-gray-300"
+                        parseFloat(temperaturemax) > 70
+                          ? "border-red-500"
+                          : "border-gray-300"
                       } text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
                       placeholder="Type product name"
                       required=""
@@ -138,18 +137,26 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="humidity"
-                      value={data.humidity}
+                      value={humidity}
                       id="name"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      className={`bg-gray-50 border ${
+                        parseFloat(humidity) > 70
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
                       placeholder="Type product name"
                       required=""
                     />
                     <input
                       type="text"
                       name="humidity"
-                      value={data.humidity}
+                      value={humidity}
                       id="name"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      className={`bg-gray-50 border ${
+                        parseFloat(humidity) > 70
+                          ? "border-red-500"
+                          : "border-gray-300"
+                      } text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
                       placeholder="Type product name"
                       required=""
                     />
@@ -165,7 +172,7 @@ const FormSimulator = () => {
                   <input
                     type="text"
                     name="windDirection"
-                    value={data.windDirection}
+                    value={windDirection}
                     id="brand"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Product brand"
@@ -183,7 +190,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="windVelocity"
-                      value={data.windVelocity}
+                      value={windVelocity}
                       id="price"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="wind velocity"
@@ -192,7 +199,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="windVelocity"
-                      value={data.windVelocity}
+                      value={windVelocity}
                       id="price"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="wind velocity"
@@ -211,7 +218,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="temperaturemin"
-                      value={data.temperaturemin}
+                      value={temperaturemin}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -221,7 +228,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="price"
-                      value={data.airPressure}
+                      value={airPressure}
                       id="price"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="$2999"
@@ -240,27 +247,27 @@ const FormSimulator = () => {
                     Heading
                   </label>
                   <div className="flex flex-row gap-2">
-                  <div className="flex flex-row gap-2">
-                    <input
-                      type="text"
-                      name="temperaturemin"
-                      value={data.temperaturemin}
-                      id="name"
-                      className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Type product name"
-                      required=""
-                      disabled
-                    />
-                    <input
-                      type="text"
-                      name="name"
-                      value={data.heading}
-                      id="name"
-                      className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Type product name"
-                      required=""
-                      disabled
-                    />
+                    <div className="flex flex-row gap-2">
+                      <input
+                        type="text"
+                        name="temperaturemin"
+                        value={temperaturemin}
+                        id="name"
+                        className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Type product name"
+                        required=""
+                        disabled
+                      />
+                      <input
+                        type="text"
+                        name="name"
+                        value={heading}
+                        id="name"
+                        className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Type product name"
+                        required=""
+                        disabled
+                      />
                     </div>
                   </div>
                 </div>
@@ -272,27 +279,27 @@ const FormSimulator = () => {
                     Heading Rate
                   </label>
                   <div className="flex flex-row gap-2">
-                  <div className="flex flex-row gap-2">
-                    <input
-                      type="text"
-                      name="temperaturemin"
-                      value={data.temperaturemin}
-                      id="name"
-                      className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Type product name"
-                      required=""
-                      disabled
-                    />
-                    <input
-                      type="text"
-                      name="name"
-                      value={data.headingRate}
-                      id="name"
-                      className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Type product name"
-                      required=""
-                      disabled
-                    />
+                    <div className="flex flex-row gap-2">
+                      <input
+                        type="text"
+                        name="temperaturemin"
+                        value={temperaturemin}
+                        id="name"
+                        className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Type product name"
+                        required=""
+                        disabled
+                      />
+                      <input
+                        type="text"
+                        name="name"
+                        value={headingRate}
+                        id="name"
+                        className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Type product name"
+                        required=""
+                        disabled
+                      />
                     </div>
                   </div>
                 </div>
@@ -304,27 +311,27 @@ const FormSimulator = () => {
                     roll
                   </label>
                   <div className="flex flex-row gap-2">
-                  <div className="flex flex-row gap-2">
-                    <input
-                      type="text"
-                      name="temperaturemin"
-                      value={data.temperaturemin}
-                      id="name"
-                      className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Type product name"
-                      required=""
-                      disabled
-                    />
-                    <input
-                      type="text"
-                      name="name"
-                      value={data.roll}
-                      id="name"
-                      className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Type product name"
-                      required=""
-                      disabled
-                    />
+                    <div className="flex flex-row gap-2">
+                      <input
+                        type="text"
+                        name="temperaturemin"
+                        value={temperaturemin}
+                        id="name"
+                        className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Type product name"
+                        required=""
+                        disabled
+                      />
+                      <input
+                        type="text"
+                        name="name"
+                        value={roll}
+                        id="name"
+                        className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Type product name"
+                        required=""
+                        disabled
+                      />
                     </div>
                   </div>
                 </div>
@@ -339,7 +346,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="pitch"
-                      value={data.pitch}
+                      value={pitch}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -367,7 +374,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="angularVelocities"
-                      value={data.angularVelocity}
+                      value={angularVelocity}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -398,7 +405,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="speedofShipThroughWater"
-                      value={data.speedofShipThroughWater}
+                      value={speedofShipThroughWater}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -426,7 +433,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="waterCurrentSpeed"
-                      value={data.waterCurrentSpeed}
+                      value={waterCurrentSpeed}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -458,7 +465,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="waterDepth"
-                      value={data.waterDepth}
+                      value={waterDepth}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -489,7 +496,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="headingMagnetic"
-                      value={data.headingMagnetic}
+                      value={headingMagnetic}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -499,7 +506,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="headingMagnetic"
-                      value={data.headingMagnetic}
+                      value={headingMagnetic}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -519,7 +526,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="headingDeviation"
-                      value={data.headingDeviation}
+                      value={headingDeviation}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -529,7 +536,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="headingDeviation"
-                      value={data.headingDeviation}
+                      value={headingDeviation}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -549,7 +556,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="headingVariation"
-                      value={data.headingVariation}
+                      value={headingVariation}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -559,7 +566,7 @@ const FormSimulator = () => {
                     <input
                       type="text"
                       name="headingVariation"
-                      value={data.headingVariation}
+                      value={headingVariation}
                       id="name"
                       className="cursor-not-allowed bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       placeholder="Type product name"
@@ -610,7 +617,7 @@ const FormSimulator = () => {
                 </div>
                 {/* Waypoint Latitude*/}
                 <div className="grid gap-4 col-span-5 md:gap-6 grid-cols-5">
-                  {data.waypoints.map((waypoint, index) => (
+                  {waypoints.map((waypoint, index) => (
                     <div key={index}>
                       <label
                         htmlFor="weight"
@@ -630,7 +637,7 @@ const FormSimulator = () => {
                           )
                         }
                         id="weight"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        className={`bg-gray-50 border ${waypoint.latitude < -90 || waypoint.latitude > 90 ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
                         placeholder="Longitude"
                       />
                     </div>
@@ -641,7 +648,7 @@ const FormSimulator = () => {
                 </div>
                 {/* Waypoint Longitude*/}
                 <div className="grid gap-4 col-span-5 md:gap-6 grid-cols-5">
-                  {data.waypoints.map((waypoint, index) => (
+                  {waypoints.map((waypoint, index) => (
                     <div key={index}>
                       <label
                         htmlFor="weight"
@@ -661,7 +668,7 @@ const FormSimulator = () => {
                           )
                         }
                         id="weight"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        className={`bg-gray-50 border ${waypoint.longitude < -180 || waypoint.longitude > 180 ? 'border-red-500' : 'border-gray-300'} text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
                         placeholder={12}
                         required=""
                       />
@@ -672,7 +679,6 @@ const FormSimulator = () => {
               <div className="items-center flex space-y-0 space-x-4">
                 <button
                   type="submit"
-                  onClick={handleSubmit}
                   className=" w-auto justify-center text-white inline-flex bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
                   Start Simulation
