@@ -13,7 +13,9 @@ import "../Style/CustomScrollbar.css";
 import SimulatorIcon from "../Assets/Svg/Sidebar/SimulatorIcon";
 import SensorIcon from "../Assets/Svg/Sidebar/SensorIcon";
 import AccountIcon from "../Assets/Svg/Sidebar/AccountIcon";
+import SeltTestIcon from "../Assets/Svg/Sidebar/SeltTestIcon";
 import NdduIcon from "../Assets/Svg/Sidebar/NdduIcon";
+import IconLogOut from "../Assets/Svg/Sidebar/IconLogOut";
 
 const HomeLayout = (props) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +29,7 @@ const HomeLayout = (props) => {
     gyroscope: GyroscopeSensorIcon,
     barometer: BarometerSensorIcon,
     "speed sensor": SpeedSensorIcon,
-    "temperature": TemperatureSensorIcon,
+    temperature: TemperatureSensorIcon,
   };
 
   // Data dummy statis untuk sensor
@@ -129,6 +131,12 @@ const HomeLayout = (props) => {
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
                 >
                   Account Setting
+                </Link>
+                <Link
+                  to="/selftest"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                >
+                  Selft Test
                 </Link>
                 {/* <Link
                 to="/settings"
@@ -271,18 +279,18 @@ const HomeLayout = (props) => {
       <div className="px-2 py-10 md:py-[81px] dark:bg-darkmode">
         {/* Time Position Sensor Mobile */}
         <div className="md:hidden pb-2 w-full grid grid-cols-2 gap-0 md:grid-cols-6">
-          <div className="h-full w-full rounded border-[1px] bg-white dark:bg-gray-80 p-1">
+          <div className="h-full w-full rounded border-[1px] bg-white dark:bg-gray-800 p-1">
             <div className="flex flex-col justify-start items-start">
               <div className="flex flex-col ml-5 justify-start items-start">
-                <p className="text-3xl font-bold text-gray-900">Time</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">Time</p>
                 <Clock />
               </div>
             </div>
           </div>
-          <div className="h-full w-full rounded border-[1px] bg-white dark:bg-gray-80 p-1">
+          <div className="h-full w-full rounded border-[1px] bg-white dark:bg-gray-800 p-1">
             <div className="flex flex-col justify-start items-start">
               <div className="flex flex-col ml-5 justify-start items-start">
-                <p className="text-3xl font-bold text-gray-900">Position</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">Position</p>
                 <CurrentPosition />
               </div>
             </div>
@@ -413,6 +421,23 @@ const HomeLayout = (props) => {
               <p className="text-maincolor dark:text-white"> Account Setting</p>
             </Link>
           </li>
+          <li>
+            <Link
+              to="/selftest"
+              className="me-4 md:me-6 flex flex-col items-center"
+            >
+              <SeltTestIcon />
+              <p className="text-maincolor dark:text-white mt-1"> Selft Test</p>
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="me-4 md:me-6 flex flex-col items-center"
+            >
+              <IconLogOut />
+              <p className="text-maincolor dark:text-white mt-2"> Log Out</p>
+            </Link>
+          </li>
           {/* <li>
             <Link
               to="/simulator"
@@ -427,7 +452,7 @@ const HomeLayout = (props) => {
           <ul className="flex flex-row">
             <li>
               <p
-                className={`me-4 md:me-6 ${
+                className={`me-4 md:me-6 mt-3 ${
                   mode === "Simulation Mode" ? "text-red-500" : "text-green-500"
                 }`}
               >
@@ -437,18 +462,30 @@ const HomeLayout = (props) => {
             <li>
               {/* dark mode */}
               <button
-                className="w-10 h-10 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                className="w-10 h-10 mt-1 mr-4 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 onClick={() => {
                   document.body.classList.toggle("dark");
                 }}
               >
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
+                  width="40"
+                  height="41"
+                  viewBox="0 0 40 41"
                   fill="currentColor"
-                  className="w-6 h-6"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path d="M12 2a1 1 0 01.993.883L13 3v2a1 1 0 01-1.993.117L11 5V3a1 1 0 011-1zm5.657 2.343a1 1 0 011.32-.083l.094.083 1.414 1.414a1 1 0 01-1.32 1.497l-.094-.083-1.414-1.414a1 1 0 010-1.414zm-11.314 0a1 1 0 01.083 1.32l-.083.094L4.343 7.071a1 1 0 01-1.497-1.32l.083-.094L4.343 4.343a1 1 0 011.414 0zM12 17a5 5 0 110-10 5 5 0 010 10zm-8 3a1 1 0 01.117 1.993L4 22H2a1 1 0 01-.117-1.993L2 20h2zm16 0a1 1 0 01.117 1.993L20 22h-2a1 1 0 01-.117-1.993L18 20h2zM5.636 18.364a1 1 0 011.497-1.32l.094.083 1.414 1.414a1 1 0 01-1.32 1.497l-.094-.083-1.414-1.414a1 1 0 010-1.414zm12.728 0a1 1 0 01.083 1.32l-.083.094-1.414 1.414a1 1 0 01-1.497-1.32l.083-.094 1.414-1.414a1 1 0 011.414 0zM12 20a1 1 0 01.993.883L13 21v2a1 1 0 01-1.993.117L11 23v-2a1 1 0 011-1z" />
+                  <path
+                    d="M20 27.1666C23.6819 27.1666 26.6667 24.1819 26.6667 20.5C26.6667 16.8181 23.6819 13.8333 20 13.8333C16.3181 13.8333 13.3334 16.8181 13.3334 20.5C13.3334 24.1819 16.3181 27.1666 20 27.1666Z"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M33.3333 20.5H35M5 20.5H6.66667M20 33.8333V35.5M20 5.5V7.16667M29.4283 29.9283L30.6067 31.1067M9.39333 9.89333L10.5717 11.0717M10.5717 29.9283L9.39333 31.1067M30.6067 9.89333L29.4283 11.0717"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                  />
                 </svg>
               </button>
             </li>
