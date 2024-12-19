@@ -45,8 +45,8 @@ const Clock = () => {
   // Render a div element with the formatted time as the content, and assign it a CSS class for styling
   return (
     <div className="flex flex-col text-left">
-      <time className="text-base font-medium leading-tight text-gray-900 dark:text-white">{currentDate}</time>
-      <span className="text-base font-medium leading-tight text-gray-900 dark:text-white">
+      <time className="text-xs font-medium leading-tight text-gray-900 dark:text-white">{currentDate}</time>
+      <span className="text-xs font-medium leading-tight text-gray-900 dark:text-white">
         {formattedTime} / UTC{formattedOffset}
       </span>
     </div>

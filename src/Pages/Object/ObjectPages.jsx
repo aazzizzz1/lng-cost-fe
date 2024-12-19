@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import SensorManagementTable from './SensorManagementTable';
+import React, { Component } from "react";
+import ObjectManagementTable from "./ObjectManagementTable";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -19,22 +19,24 @@ class ErrorBoundary extends Component {
     if (this.state.hasError) {
       return <h1>Something went wrong.</h1>;
     }
-    return this.props.children; 
+    return this.props.children;
   }
 }
 
-const SensorPages = () => {
+const ObjectPages = () => {
   return (
     <ErrorBoundary>
-      <div className="p-4 dark:bg-darkmode">
-        <p className="text-3xl font-bold text-gray-900 dark:text-white">Management and Configuration Sensor</p>
-        <p className="text-xl text-gray-600 dark:text-white mb-8">
-          Management and Configuration Sensor Detail
+      <div className="p-8 dark:bg-darkmode">
+        <p className="text-3xl font-bold text-gray-900 dark:text-white">
+          Management and Configuration Object
         </p>
-        <SensorManagementTable/>
+        <p className="text-xl text-gray-600 dark:text-white mb-8">
+          Management and Configuration Object Detail
+        </p>
+        <ObjectManagementTable />
       </div>
     </ErrorBoundary>
-  )
-}
+  );
+};
 
-export default SensorPages;
+export default ObjectPages;

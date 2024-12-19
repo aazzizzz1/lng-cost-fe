@@ -7,10 +7,11 @@ import SignUp from "../Pages/Auth/SignUp";
 import Dashboard from "../Pages/Home/Dashboard";
 import HomeLayout from "../Layout/HomeLayout";
 import Simulator from "../Pages/Simulator/Simulator";
-import SensorPages from "../Pages/Sensor/SensorPages";
+import ObjectPages from "../Pages/Object/ObjectPages";
 import AccountSetting from "../Pages/Account/AccountSetting";
 import SelfTestPages from "../Pages/SelfTest/SelfTestPages";
 import SelfTestDisplay from "../Pages/SelfTest/SelfTestDisplay";
+import MatrixPages from "../Pages/Matrix/MatrixPages";
 
 const RouteComponents = () => {
   return (
@@ -34,10 +35,18 @@ const RouteComponents = () => {
             }
           />
           <Route
-            path="/sensor"
+            path="/object"
             element={
               <HomeLayout>
-                <SensorPages />
+                <ObjectPages />
+              </HomeLayout>
+            }
+          />
+          <Route
+            path="/matrix"
+            element={
+              <HomeLayout>
+                <MatrixPages />
               </HomeLayout>
             }
           />

@@ -100,7 +100,7 @@ const FormSimulator = () => {
       <section className="bg-gray-50 dark:bg-gray-900">
         <div className="w-full bg-white rounded-lg shadow dark:border md:max-w-full xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           {/* Modal body */}
-          <div className="p-6 space-y-4 md:space-y-6">
+          <div className="p-6 space-y-2 md:space-y-6">
             {/* {successMessage && (
                       <SuccessToast
                         showToast={showToastUser}
@@ -116,14 +116,14 @@ const FormSimulator = () => {
               Simulator Form
             </h1>
             <form onSubmit={handleSubmit}>
-              <div className="grid gap-4 mb-4 grid-cols-5">
+              <div className="grid sm:gap-3 md:gap-4 mb-4 grid-cols-5">
                 <div className="text-lg font-semibold col-span-5 text-gray-900 dark:text-white">
                   Wheater
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label
                     htmlFor="temperaturemin"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Temperature
                   </label>
@@ -159,10 +159,10 @@ const FormSimulator = () => {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label
                     htmlFor="category"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Air Humidity
                   </label>
@@ -198,12 +198,12 @@ const FormSimulator = () => {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="sm:col-span-1">
                   <label
                     htmlFor="brand"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Wind Direct
+                    Wind
                   </label>
                   <input
                     type="text"
@@ -216,10 +216,10 @@ const FormSimulator = () => {
                     required=""
                   />
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label
                     htmlFor="price"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Wind Velocity
                   </label>
@@ -254,10 +254,10 @@ const FormSimulator = () => {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label
                     htmlFor="price"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Air Pressure
                   </label>
@@ -299,7 +299,7 @@ const FormSimulator = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Heading
                   </label>
@@ -336,10 +336,10 @@ const FormSimulator = () => {
                     </div>
                   </div>
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Heading Rate
                   </label>
@@ -379,7 +379,7 @@ const FormSimulator = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     roll
                   </label>
@@ -419,7 +419,7 @@ const FormSimulator = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     pitch
                   </label>
@@ -455,7 +455,7 @@ const FormSimulator = () => {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Angularvelocity
                   </label>
@@ -494,9 +494,9 @@ const FormSimulator = () => {
                 <div className="col-span-2">
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Speed of Ship Motion on Water
+                    Speed top of Water
                   </label>
                   <div className="flex flex-row gap-2">
                     <input
@@ -533,9 +533,9 @@ const FormSimulator = () => {
                 <div className="col-span-3">
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Water Current Speed
+                    Water Speed
                   </label>
                   <div className="flex flex-row gap-2">
                     <input
@@ -576,7 +576,7 @@ const FormSimulator = () => {
                 <div className="col-span-5">
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Ocean Water Depth
                   </label>
@@ -616,7 +616,7 @@ const FormSimulator = () => {
                 <div className="col-span-2">
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Heading Magnetic
                   </label>
@@ -656,7 +656,7 @@ const FormSimulator = () => {
                 <div className="col-span-2">
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Heading-Deviation
                   </label>
@@ -693,10 +693,10 @@ const FormSimulator = () => {
                     />
                   </div>
                 </div>
-                <div className="col-span-1">
+                <div className="col-span-1 sm:col-span-2">
                   <label
                     htmlFor="name"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Variation
                   </label>
@@ -765,10 +765,10 @@ const FormSimulator = () => {
                 {/* Waypoint Latitude*/}
                 <div className="grid gap-4 col-span-5 md:gap-6 grid-cols-5">
                   {waypoints.map((waypoint, index) => (
-                    <div key={index}>
+                    <div key={index} className="sm:col-span-2">
                       <label
                         htmlFor="weight"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                       >
                         Waypoint {index + 1}
                       </label>
@@ -800,10 +800,10 @@ const FormSimulator = () => {
                 {/* Waypoint Longitude*/}
                 <div className="grid gap-4 col-span-5 md:gap-6 grid-cols-5">
                   {waypoints.map((waypoint, index) => (
-                    <div key={index}>
+                    <div key={index} className="sm:col-span-2">
                       <label
                         htmlFor="weight"
-                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        className="block mb-2 sm:text-xs text-sm font-medium text-gray-900 dark:text-white"
                       >
                         Waypoint {index + 1}
                       </label>

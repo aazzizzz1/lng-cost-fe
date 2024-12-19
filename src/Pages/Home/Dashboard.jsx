@@ -192,7 +192,7 @@ const Dashboard = () => {
                 30.55 m
               </div>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col sm:col-span-2">
               <p className="dark:text-white">Magnetic Heading</p>
               <div className="border-2 border-gray-300 bg-gray-300 dark:border-secondcontent dark:bg-secondcontent dark:text-white p-1 shadow-md rounded font-medium">
                 46°

@@ -48,11 +48,11 @@ const CurrentPosition = () => {
   }
 
   return (
-    <div className="flex flex-col text-left text-base font-medium leading-tight">
-      <p className='dark:text-white'>
+    <div className="flex flex-col text-left text-xs font-medium leading-tight">
+      <p className='text-xs font-medium leading-tight dark:text-white'>
         Latitude: {latitude.toFixed(5)}°
       </p>
-      <p className='dark:text-white'>
+      <p className='text-xs font-medium leading-tight dark:text-white'>
         Longitude: {longitude.toFixed(5)}°
       </p>
       {/* <p className='dark:text-white'>

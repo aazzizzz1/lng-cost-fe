@@ -11,7 +11,7 @@ const SelfTest = () => {
 
   // State to track the current ID for Interface Module and PSU
   const [currentINTERFACEID, setCurrentINTERFACEID] = useState(1);
-  const [currentPSUID, setCurrentPSUID] = useState(1);
+  // const [currentPSUID, setCurrentPSUID] = useState(1);
 
   const {
     cpu,
@@ -49,13 +49,13 @@ const SelfTest = () => {
   };
 
   // Function to change ID for PSU
-  const handleNextPSUID = () => {
-    setCurrentPSUID((prevID) => (prevID < psuData.length ? prevID + 1 : 1));
-  };
+  // const handleNextPSUID = () => {
+  //   setCurrentPSUID((prevID) => (prevID < psuData.length ? prevID + 1 : 1));
+  // };
 
-  const handlePrevPSUID = () => {
-    setCurrentPSUID((prevID) => (prevID > 1 ? prevID - 1 : psuData.length));
-  };
+  // const handlePrevPSUID = () => {
+  //   setCurrentPSUID((prevID) => (prevID > 1 ? prevID - 1 : psuData.length));
+  // };
 
   // Ekstraksi logika ternary ke variabel baru
   let serialInterfaceClass = "";
@@ -63,22 +63,27 @@ const SelfTest = () => {
   if (
     interfaceModuleData[currentINTERFACEID - 1].serialInterface === "connected"
   ) {
-    serialInterfaceClass = "border-green-600 text-green-600 dark:border-green-600 dark:text-green-600";
+    serialInterfaceClass =
+      "border-green-600 text-green-600 dark:border-green-600 dark:text-green-600";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].serialInterface ===
     "disconnected"
   ) {
-    serialInterfaceClass = "border-red-500 text-red-500 dark:border-red-500 dark:text-red-500";
+    serialInterfaceClass =
+      "border-red-500 text-red-500 dark:border-red-500 dark:text-red-500";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].serialInterface === "testok"
   ) {
-    serialInterfaceClass = "border-yellow-500 text-yellow-500 dark:border-yellow-500 dark:text-yellow-500";
+    serialInterfaceClass =
+      "border-yellow-500 text-yellow-500 dark:border-yellow-500 dark:text-yellow-500";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].serialInterface === "testnotok"
   ) {
-    serialInterfaceClass = "border-orange-500 text-orange-500 dark:border-orange-500 dark:text-orange-500";
+    serialInterfaceClass =
+      "border-orange-500 text-orange-500 dark:border-orange-500 dark:text-orange-500";
   } else {
-    serialInterfaceClass = "border-gray-300 text-gray-900 dark:border-gray-300 dark:text-gray-900";
+    serialInterfaceClass =
+      "border-gray-300 text-gray-900 dark:border-gray-300 dark:text-gray-900";
   }
 
   // Ekstraksi logika ternary ke variabel baru
@@ -87,43 +92,53 @@ const SelfTest = () => {
   if (
     interfaceModuleData[currentINTERFACEID - 1].analogInterface === "connected"
   ) {
-    analogInterfaceClass = "border-green-600 text-green-600 dark:border-green-600 dark:text-green-600";
+    analogInterfaceClass =
+      "border-green-600 text-green-600 dark:border-green-600 dark:text-green-600";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].analogInterface ===
     "disconnected"
   ) {
-    analogInterfaceClass = "border-red-500 text-red-500 dark:border-red-500 dark:text-red-500";
+    analogInterfaceClass =
+      "border-red-500 text-red-500 dark:border-red-500 dark:text-red-500";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].analogInterface === "testok"
   ) {
-    analogInterfaceClass = "border-yellow-500 text-yellow-500 dark:border-yellow-500 dark:text-yellow-500";
+    analogInterfaceClass =
+      "border-yellow-500 text-yellow-500 dark:border-yellow-500 dark:text-yellow-500";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].analogInterface === "testnotok"
   ) {
-    analogInterfaceClass = "border-orange-500 text-orange-500 dark:border-orange-500 dark:text-orange-500";
+    analogInterfaceClass =
+      "border-orange-500 text-orange-500 dark:border-orange-500 dark:text-orange-500";
   } else {
-    analogInterfaceClass = "border-gray-300 text-gray-900 dark:border-gray-300 dark:text-gray-900";
+    analogInterfaceClass =
+      "border-gray-300 text-gray-900 dark:border-gray-300 dark:text-gray-900";
   }
 
   // Ekstraksi logika ternary ke variabel baru
   let gpioInterfaceClass = "";
 
   if (interfaceModuleData[currentINTERFACEID - 1].digitalGpio === "connected") {
-    gpioInterfaceClass = "border-green-600 text-green-600 dark:border-green-600 dark:text-green-600";
+    gpioInterfaceClass =
+      "border-green-600 text-green-600 dark:border-green-600 dark:text-green-600";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].digitalGpio === "disconnected"
   ) {
-    gpioInterfaceClass = "border-red-500 text-red-500 dark:border-red-500 dark:text-red-500";
+    gpioInterfaceClass =
+      "border-red-500 text-red-500 dark:border-red-500 dark:text-red-500";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].digitalGpio === "testok"
   ) {
-    gpioInterfaceClass = "border-yellow-500 text-yellow-500 dark:border-yellow-500 dark:text-yellow-500";
+    gpioInterfaceClass =
+      "border-yellow-500 text-yellow-500 dark:border-yellow-500 dark:text-yellow-500";
   } else if (
     interfaceModuleData[currentINTERFACEID - 1].digitalGpio === "testnotok"
   ) {
-    gpioInterfaceClass = "border-orange-500 text-orange-500 dark:border-orange-500 dark:text-orange-500";
+    gpioInterfaceClass =
+      "border-orange-500 text-orange-500 dark:border-orange-500 dark:text-orange-500";
   } else {
-    gpioInterfaceClass = "border-gray-300 text-gray-900 dark:border-gray-300 dark:text-gray-900";
+    gpioInterfaceClass =
+      "border-gray-300 text-gray-900 dark:border-gray-300 dark:text-gray-900";
   }
 
   return (
@@ -457,7 +472,60 @@ const SelfTest = () => {
             Check PSU
           </button>
           {/* PSU Section */}
-          <p className="font-bold mb-2 text-gray-900 dark:text-white">
+          {psuData.map((item) => (
+            <div key={item.id} className="grid grid-cols-2 gap-2 mb-2">
+              <div>
+                <label
+                  htmlFor="cpu"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  VOLTAGE
+                </label>
+                <div className="flex flex-row gap-2">
+                  <input
+                    type="number"
+                    name="cpu"
+                    value={item.voltage1}
+                    onChange={item.voltage1}
+                    id="cpu"
+                    className={`bg-gray-50 border ${
+                      item.voltage1 < 0
+                        ? "border-red-500 dark:border-red-500"
+                        : "border-gray-300"
+                    } cursor-not-allowed text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
+                    placeholder="Min Temperature"
+                    required=""
+                    disabled
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="cpu"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  CURRENT
+                </label>
+                <div className="flex flex-row gap-2 ">
+                  <input
+                    type="number"
+                    name="cpuMax"
+                    id="cpuMax"
+                    value={item.current1}
+                    onChange={item.current1}
+                    className={`bg-gray-50 border ${
+                      parseFloat(item.current1) > 70
+                        ? "border-red-500 dark:border-red-500"
+                        : "border-gray-300"
+                    } text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500`}
+                    placeholder="Type product name"
+                    required=""
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+          {/* <p className="font-bold mb-2 text-gray-900 dark:text-white">
             PSU ID: {currentPSUID}
           </p>
           <div className="grid grid-cols-2 gap-2 mb-2">
@@ -518,7 +586,7 @@ const SelfTest = () => {
             <button onClick={handleNextPSUID}>
               <RightArrowIcon />
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
       {/* Button Submit */}
@@ -530,8 +598,8 @@ const SelfTest = () => {
           Start Selftest
         </button>
         <div className="text-xs font-light mb-3 col-span-5 text-gray-900 dark:text-white">
-            Last Update At {new Date().toLocaleString()}
-          </div>
+          Last Update At {new Date().toLocaleString()}
+        </div>
         {/* <button
           data-modal-toggle="createProductModal2"
           type="button"

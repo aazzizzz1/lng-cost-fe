@@ -18,11 +18,6 @@ const initialState = {
   digital_gpio: "testok",
   psuData: [
     { id: 1, voltage1: 30, current1: 10},
-    { id: 2, voltage1: 50, current1: 100},
-    { id: 3, voltage1: 51, current1: 700},
-    { id: 4, voltage1: 52, current1: 800},
-    { id: 5, voltage1: 53, current1: 900},
-    { id: 6, voltage1: 54, current1: 1000},
     // Add more data as needed
   ],
   // Example data for the Interface Module and PSU (you can replace this with real data)

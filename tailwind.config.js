@@ -3,14 +3,14 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
     "./node_modules/flowbite/**/*.js, jsx, ts, tsx}",
-    "./node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}"
+    "./node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
       screens: {
         // 'xm': {'min': '0px', 'max': '639px'},
         // => @media (min-width: 0px and max-width: 639px) { ... }
-        'sm': {'min': '0px', 'max': '767px'},
+        sm: { min: "0px", max: "767px" },
         // => @media (min-width: 0px and max-width: 767px) { ... }
       },
       colors: {
@@ -71,6 +71,16 @@ module.exports = {
           "Noto Color Emoji",
         ],
       },
+      fontSize: {
+        ss: [
+          "0.7rem",
+          {
+            lineHeight: "1rem",
+            // letterSpacing: '-0.01em',
+            // fontWeight: '500',
+          },
+        ],
+      },
       gap: {
         1: "1px",
       },
@@ -84,9 +94,8 @@ module.exports = {
     },
   },
   plugins: [
-    require('flowbite/plugin')({
+    require("flowbite/plugin")({
       charts: true,
-  }),
+    }),
   ],
-}
-
+};
