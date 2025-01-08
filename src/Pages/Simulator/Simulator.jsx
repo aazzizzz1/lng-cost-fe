@@ -17,7 +17,7 @@ const Simulator = () => {
     errorMessage,
   } = useSelector((state) => state.simulator);
   return (
-    <div className="">
+    <div className="p-4">
       <div className="mt-3">
         {errorMessage && (
           <ErrorAlert message={errorMessage} onClose={handleCloseError} />

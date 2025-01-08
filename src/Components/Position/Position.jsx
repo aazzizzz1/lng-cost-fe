@@ -40,7 +40,7 @@ const CurrentPosition = () => {
   }, [dispatch]);
 
   if (error) {
-    return <div className='dark:text-white'>{error}</div>;
+    return <div className='dark:text-white text-xs font-medium leading-tight'>{error}</div>;
   }
 
   if (latitude === null || longitude === null) {

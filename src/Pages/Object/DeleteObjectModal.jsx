@@ -9,7 +9,7 @@ const DeleteObjectModal = ({ isOpen, onClose, onDelete, sensor }) => {
   };
 
   return isOpen ? (
-    <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
       <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg">
         <div className="p-6 text-center">
           <svg

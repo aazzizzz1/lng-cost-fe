@@ -5,7 +5,7 @@ import ConsumerIcon from "../../Assets/Svg/Object/ConsumerIcon";
 
 const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
   return isOpen ? (
-    <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-900 w-1/3">
         <div className="flex justify-between mb-4 rounded-t sm:mb-5">
           <div className="text-lg text-gray-900 md:text-xl dark:text-white">
@@ -54,92 +54,72 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
             Details
           </dt>
           <dd className="mb-4 font-light text-gray-500 sm:mb-5 dark:text-gray-400">
-            {/* {sensor.parameters.map((param, index) => (
-            <li key={index}>{param}</li>
-          ))} */}
-            <span>
-              Port: {sensor.port}
-              <br />
-              Communication:{" "}
-              {(() => {
-                switch (sensor.communication) {
-                  case 1:
-                    return "RS-422";
-                  case 2:
-                    return "RS-232";
-                  case 3:
-                    return "Analog";
-                  case 4:
-                    return "Ethernet";
-                  case 5:
-                    return "TCP/IP";
-                  case 6:
-                    return "Serial";
-                  default:
-                    return sensor.communication;
-                }
-              })()}
-              <br />
-              Baud rate: {""}
-              {(() => {
-                switch (sensor.baudRate) {
-                  case 1:
-                    return "110";
-                  case 2:
-                    return "300";
-                  case 3:
-                    return "600";
-                  case 4:
-                    return "1200";
-                  case 5:
-                    return "2400";
-                  case 6:
-                    return "4800";
-                  case 7:
-                    return "9600";
-                  case 8:
-                    return "14400";
-                  case 9:
-                    return "19200";
-                  case 10:
-                    return "38400";
-                  case 11:
-                    return "57600";
-                  case 12:
-                    return "115200";
-                  case 13:
-                    return "128000";
-                  case 14:
-                    return "256000";
-                  default:
-                    return sensor.baudRate;
-                }
-              })()}
-              <br />
-              Update rate: {""}
-              {(() => {
-                switch (sensor.updateRate) {
-                  case 1:
-                    return "1";
-                  case 2:
-                    return "5";
-                  case 3:
-                    return "10";
-                  case 4:
-                    return "50";
-                  case 5:
-                    return "100";
-                  case 6:
-                    return "200";
-                  case 7:
-                    return "500";
-                  case 8:
-                    return "1000";
-                  default:
-                    return sensor.updateRate;
-                }
-              })()}
-            </span>
+            {sensor.interfaceType && (
+              <>
+                <span>Interface Type: {sensor.interfaceType}</span>
+                <br />
+                {sensor.interfaceType === "Serial" && (
+                  <>
+                    {sensor.serialType && (
+                      <>
+                        <span>Serial Type: {sensor.serialType}</span>
+                        <br />
+                      </>
+                    )}
+                    {sensor.baudRate && (
+                      <>
+                        <span>Baud Rate: {sensor.baudRate}</span>
+                        <br />
+                      </>
+                    )}
+                    {sensor.cardId && (
+                      <>
+                        <span>Card ID: {sensor.cardId}</span>
+                        <br />
+                      </>
+                    )}
+                  </>
+                )}
+                {sensor.interfaceType === "Ethernet" && (
+                  <>
+                    {sensor.protocol && (
+                      <>
+                        <span>Protocol: {sensor.protocol}</span>
+                        <br />
+                      </>
+                    )}
+                    {sensor.ipClient && (
+                      <>
+                        <span>IP Client: {sensor.ipClient}</span>
+                        <br />
+                      </>
+                    )}
+                    {sensor.netmask && (
+                      <>
+                        <span>Netmask: {sensor.netmask}</span>
+                        <br />
+                      </>
+                    )}
+                    {sensor.port && (
+                      <>
+                        <span>Port: {sensor.port}</span>
+                        <br />
+                      </>
+                    )}
+                  </>
+                )}
+                {sensor.interfaceType === "Digital" && (
+                  <>
+                    {sensor.digitalOption && (
+                      <>
+                        <span>Digital Option: {sensor.digitalOption}</span>
+                        <br />
+                      </>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </dd>
         </dl>
       </div>

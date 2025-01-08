@@ -20,76 +20,56 @@ const sensorData = [
   {
     id: 1,
     name: "CMS",
-    consumers: ["Consumer 1", "Consumer 2"],
-    parameters: [
-      "IP: 3120600087",
-      "Measurement range: 700m",
-      "Accuracy: 70%",
-      "Baud rate: 50",
-      "Format data: JSON",
-    ],
     objectId: 2,
     port: 8000,
     communication: 1,
     baudRate: 2,
     updateRate: 4,
+    cardId: 1,
+    protocol: "TCP/IP",
+    ipClient: "192.168.1.1",
+    netmask: "255.255.255.0",
+    digitalOption: "Positive Pulse",
+    interfaceType: "Ethernet",
+    serialType: "RS-232",
   },
   {
     id: 2,
-    name: "Weather System navigation sensor",
-    consumers: ["Consumer 1", "Consumer 2"],
-    parameters: [
-      "IP: 3120600087",
-      "Measurement range: 700m",
-      "Accuracy: 70%",
-      "Baud rate: 50",
-      "Format data: JSON",
-    ],
+    name: "Temperature Sensor",
     objectId: 1,
-    port: 8000,
-    communication: 3,
-    baudRate: 4,
+    port: 8080,
+    communication: 2,
+    baudRate: 9600,
     updateRate: 5,
+    cardId: 2,
+    protocol: "HTTP",
+    ipClient: "192.168.1.2",
+    netmask: "255.255.255.0",
+    digitalOption: "Negative Pulse",
+    interfaceType: "Serial",
+    serialType: "RS-422",
   },
   {
     id: 3,
-    name: "2x DGPS sensor",
-    consumers: ["Consumer 1", "Consumer 3"],
-    parameters: [
-      "IP: 3120600087",
-      "Accuracy: 70%",
-      "Baud rate: 50",
-      "Format data: JSON",
-    ],
+    name: "Pressure Sensor",
     objectId: 1,
-    port: 8000,
-    communication: 2,
-    baudRate: 7,
-    updateRate: 3,
-  },
-  {
-    id: 4,
-    name: "KRI Bung Tomo",
-    consumers: ["Consumer 1", "Consumer 4"],
-    parameters: [
-      "IP: 3120600088",
-      "Measurement range: 800m",
-      "Accuracy: 80%",
-      "Baud rate: 60",
-      "Format data: XML",
-    ],
-    objectId: 2,
-    port: 8000,
-    communication: 5,
-    baudRate: 9,
-    updateRate: 4,
+    port: 9000,
+    communication: 3,
+    baudRate: 115200,
+    updateRate: 6,
+    cardId: 3,
+    protocol: "Modbus",
+    ipClient: "192.168.1.3",
+    netmask: "255.255.255.0",
+    digitalOption: "Positive Pulse",
+    interfaceType: "Digital",
+    serialType: "RS-485",
   },
 ];
-
 // Sensor Management Table Component
 const ObjectManagementTable = ({ sensors }) => {
   // const handleConfigureSensor = (sensorId) => {
-  //   console.log(`Configuring sensor with ID: ${sensorId}`);
+  //   console.log(Configuring sensor with ID: ${sensorId});
   //   // Add configuration logic here
   // };
 
@@ -160,6 +140,23 @@ const ObjectManagementTable = ({ sensors }) => {
     setSelectedSensors([]);
   };
 
+  const [toggleStates, setToggleStates] = useState({});
+
+  const handleToggleChange = (sensorId) => {
+    setToggleStates((prevStates) => ({
+      ...prevStates,
+      [sensorId]: !prevStates[sensorId],
+    }));
+  };
+
+  useEffect(() => {
+    const initialToggleStates = sensors.reduce((acc, sensor) => {
+      acc[sensor.id] = false;
+      return acc;
+    }, {});
+    setToggleStates(initialToggleStates);
+  }, [sensors]);
+
   useEffect(() => {
     if (selectedSensors.length === sensorList.length) {
       setIsAllSelected(true); // Semua dipilih
@@ -169,8 +166,8 @@ const ObjectManagementTable = ({ sensors }) => {
   }, [selectedSensors, sensorList.length]);
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 p-3">
-      <div className="mx-auto max-w-screen-xl px-4 lg:px-4">
+    <section className="bg-gray-50 dark:bg-gray-900">
+      <div className="mx-auto">
         <div className="bg-white dark:bg-gray-800 relative shadow-md rounded-lg overflow-hidden">
           <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
             <div className="w-full md:w-1/2 flex flex-row gap-2">
@@ -184,17 +181,31 @@ const ObjectManagementTable = ({ sensors }) => {
                 <CreateIcon />
                 Add Object
               </button>
+              {selectedSensors.length > 0 && (
+                <button
+                  type="button"
+                  data-modal-target="delete-modal"
+                  data-modal-toggle="delete-modal"
+                  className="flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
+                  onClick={() => setDeleteConfirmationOpen(true)} // Open the confirmation modal
+                >
+                  <DeleteIcon />
+                  Delete Selected
+                </button>
+              )}
+            </div>
+            {/* <div className="w-full md:w-1/2 flex flex-row gap-2 justify-end">
               <button
                 type="button"
-                data-modal-target="delete-modal"
-                data-modal-toggle="delete-modal"
-                className="flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-                onClick={() => setDeleteConfirmationOpen(true)} // Open the confirmation modal
+                id="createProductButton"
+                data-modal-toggle="createProductModal"
+                className="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+                onClick={() => setCreateModalOpen(true)}
               >
-                <DeleteIcon />
-                Delete All
+                <CreateIcon />
+                Add NDDU
               </button>
-            </div>
+            </div> */}
           </div>
           {/* Table */}
           <div className="overflow-x-auto">
@@ -284,92 +295,49 @@ const ObjectManagementTable = ({ sensors }) => {
                     </td> */}
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       <div className="flex flex-wrap gap-1">
-                        <span>
-                          Port: {sensor.port}
-                          <br />
-                          Communication:{" "}
-                          {getCommunicationType(sensor.communication)}
-                          <br />
-                          Baud rate: {""}
-                          {(() => {
-                            switch (sensor.baudRate) {
-                              case 1:
-                                return "110";
-                              case 2:
-                                return "300";
-                              case 3:
-                                return "600";
-                              case 4:
-                                return "1200";
-                              case 5:
-                                return "2400";
-                              case 6:
-                                return "4800";
-                              case 7:
-                                return "9600";
-                              case 8:
-                                return "14400";
-                              case 9:
-                                return "19200";
-                              case 10:
-                                return "38400";
-                              case 11:
-                                return "57600";
-                              case 12:
-                                return "115200";
-                              case 13:
-                                return "128000";
-                              case 14:
-                                return "256000";
-                              default:
-                                return sensor.baudRate;
-                            }
-                          })()}
-                          <br />
-                          Update rate: {""}
-                          {(() => {
-                            let updateRate;
-                            switch (sensor.updateRate) {
-                              case 1:
-                                updateRate = "1";
-                                break;
-                              case 2:
-                                updateRate = "5";
-                                break;
-                              case 3:
-                                updateRate = "10";
-                                break;
-                              case 4:
-                                updateRate = "50";
-                                break;
-                              case 5:
-                                updateRate = "100";
-                                break;
-                              case 6:
-                                updateRate = "200";
-                                break;
-                              case 7:
-                                updateRate = "500";
-                                break;
-                              case 8:
-                                updateRate = "1000";
-                                break;
-                              default:
-                                updateRate = sensor.updateRate;
-                            }
-                            return updateRate;
-                          })()}
-                        </span>
-                        {/* {sensor.parameters.map((parameter, paramIndex) => (
-                          <span
-                            key={paramIndex}
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getParameterClass(
-                              parameter
-                            )}`}
-                          >
-                            {parameter}
-                          </span>
-                        ))} */}
+                        {sensor.interfaceType && (
+                          <>
+                            <span>Interface Type: {sensor.interfaceType}</span>
+                            {sensor.interfaceType === "Serial" && (
+                              <>
+                                {sensor.serialType && (
+                                  <span>Serial Type: {sensor.serialType}</span>
+                                )}
+                                {sensor.baudRate && (
+                                  <span>Baud Rate: {sensor.baudRate}</span>
+                                )}
+                                {sensor.cardId && (
+                                  <span>Card ID: {sensor.cardId}</span>
+                                )}
+                              </>
+                            )}
+                            {sensor.interfaceType === "Ethernet" && (
+                              <>
+                                {sensor.protocol && (
+                                  <span>Protocol: {sensor.protocol}</span>
+                                )}
+                                {sensor.ipClient && (
+                                  <span>IP Client: {sensor.ipClient}</span>
+                                )}
+                                {sensor.netmask && (
+                                  <span>Netmask: {sensor.netmask}</span>
+                                )}
+                                {sensor.port && (
+                                  <span>Port: {sensor.port}</span>
+                                )}
+                              </>
+                            )}
+                            {sensor.interfaceType === "Digital" && (
+                              <>
+                                {sensor.digitalOption && (
+                                  <span>
+                                    Digital Option: {sensor.digitalOption}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -415,6 +383,18 @@ const ObjectManagementTable = ({ sensors }) => {
                           <DeleteIcon />
                           Delete
                         </button>
+                        <label className="inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={toggleStates[sensor.id] || false}
+                            onChange={() => handleToggleChange(sensor.id)}
+                          />
+                          <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600" />
+                          <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                            {toggleStates[sensor.id] ? "Enabled" : "Disabled"}
+                          </span>
+                        </label>
                       </div>
                     </td>
                   </tr>
@@ -464,7 +444,7 @@ const ObjectManagementTable = ({ sensors }) => {
 //     case "Consumer 1":
 // Helper function to get sensor object type
 const sensorObjectType = (objectId) => {
-  if (objectId === 1) return "sensor";
+  if (objectId === 1) return "source";
   if (objectId === 2) return "consumer";
   return objectId;
 };
@@ -479,24 +459,24 @@ const sensorObjectType = (objectId) => {
 //     default:
 // Helper functions for dynamic class assignment
 
-const getCommunicationType = (communication) => {
-  switch (communication) {
-    case 1:
-      return "RS-422";
-    case 2:
-      return "RS-232";
-    case 3:
-      return "Analog";
-    case 4:
-      return "Ethernet";
-    case 5:
-      return "TCP/IP";
-    case 6:
-      return "Serial";
-    default:
-      return communication;
-  }
-};
+// const getCommunicationType = (communication) => {
+//   switch (communication) {
+//     case 1:
+//       return "RS-422";
+//     case 2:
+//       return "RS-232";
+//     case 3:
+//       return "Analog";
+//     case 4:
+//       return "Ethernet";
+//     case 5:
+//       return "TCP/IP";
+//     case 6:
+//       return "Serial";
+//     default:
+//       return communication;
+//   }
+// };
 
 //   }
 // };
