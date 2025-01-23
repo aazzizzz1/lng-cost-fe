@@ -97,7 +97,7 @@ const Dashboard = () => {
   }, [angleTrue, angleRelative, courseHeadingAngle, rollAngle, pitchAngle]);
 
   return (
-    <div className="p-4 dark:bg-darkmode">
+    <div className="p-4 dark:bg-darkmode md:h-screen">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
         <div className="flex flex-col gap-2 col-span-2 md:col-span-1">
           <div className="border-2 shadow-md p-2 h-96 md:h-60 flex flex-col">

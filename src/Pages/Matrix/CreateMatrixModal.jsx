@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
+import { updateConsumer } from "../../Provider/matrixSlice";
 
-const CreateMatrixModal = ({ isOpen, onClose, onCreate, sensors, consumer }) => {
+const CreateMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
+  const dispatch = useDispatch();
   const [selectedSensors, setSelectedSensors] = useState(consumer ? consumer.sensors : []);
   const [selectedSensor, setSelectedSensor] = useState(null);
   const [selectedSentences, setSelectedSentences] = useState([]);
@@ -32,7 +35,7 @@ const CreateMatrixModal = ({ isOpen, onClose, onCreate, sensors, consumer }) => 
       ...consumer,
       sensors: selectedSensors,
     };
-    onCreate(updatedConsumer);
+    dispatch(updateConsumer(updatedConsumer));
     onClose();
   };
 
@@ -142,7 +145,6 @@ const CreateMatrixModal = ({ isOpen, onClose, onCreate, sensors, consumer }) => 
 CreateMatrixModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onCreate: PropTypes.func.isRequired,
   sensors: PropTypes.array.isRequired,
   consumer: PropTypes.object,
 };

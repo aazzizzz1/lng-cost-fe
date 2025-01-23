@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { updateConsumer, clearAllSensors } from "../../Provider/matrixSlice";
 import DeepthSensorIcon from "../../Assets/Svg/Layout/DeepthSensorIcon";
 import GyroscopeSensorIcon from "../../Assets/Svg/Layout/GyroscopeSensorIcon";
 import BarometerSensorIcon from "../../Assets/Svg/Layout/BarometerSensorIcon";
@@ -15,194 +17,14 @@ import EditMatrixModal from "./EditMatrixModal";
 import DeleteMatrixModal from "./DeleteMatrixModal";
 
 const MatrixManagement = () => {
-  const [consumers, setConsumers] = useState([
-    {
-      id: 1,
-      name: "Navigation Radar 1",
-      sensors: [
-        {
-          id: 1,
-          name: "Depth Sensor",
-          value: "5790 ms",
-          status: "pending",
-        },
-        {
-          id: 2,
-          name: "Gyroscope",
-          value: "5790 rad/s",
-          status: "success",
-        },
-        {
-          id: 3,
-          name: "Barometer",
-          value: "5790 atm",
-          status: "failed",
-        },
-        {
-          id: 4,
-          name: "Speed Sensor",
-          value: "5790 mil/h",
-          status: "pending",
-        },
-        {
-          id: 5,
-          name: "Temperature",
-          value: "25°C",
-          status: "success",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "CMS 2",
-      sensors: [
-        {
-          id: 1,
-          name: "Depth Sensor",
-          value: "1234 ms",
-          status: "success",
-        },
-        {
-          id: 2,
-          name: "Gyroscope",
-          value: "5678 rad/s",
-          status: "pending",
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "ECDIS 3",
-      sensors: [
-        {
-          id: 1,
-          name: "Barometer",
-          value: "910 atm",
-          status: "failed",
-        },
-        {
-          id: 2,
-          name: "Speed Sensor",
-          value: "112 mil/h",
-          status: "success",
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: "Navigation Radar 4",
-      sensors: [
-        {
-          id: 1,
-          name: "Depth Sensor",
-          value: "5790 ms",
-          status: "pending",
-        },
-        {
-          id: 2,
-          name: "Gyroscope",
-          value: "5790 rad/s",
-          status: "success",
-        },
-        {
-          id: 3,
-          name: "Barometer",
-          value: "5790 atm",
-          status: "failed",
-        },
-        {
-          id: 5,
-          name: "Temperature",
-          value: "25°C",
-          status: "success",
-        },
-      ],
-    },
-    {
-      id: 5,
-      name: "CMS 5",
-      sensors: [
-        {
-          id: 1,
-          name: "Depth Sensor",
-          value: "5790 ms",
-          status: "pending",
-        },
-        {
-          id: 2,
-          name: "Gyroscope",
-          value: "5790 rad/s",
-          status: "success",
-        },
-        {
-          id: 3,
-          name: "Barometer",
-          value: "5790 atm",
-          status: "failed",
-        },
-        {
-          id: 4,
-          name: "Speed Sensor",
-          value: "5790 mil/h",
-          status: "pending",
-        },
-        {
-          id: 5,
-          name: "Temperature",
-          value: "25°C",
-          status: "success",
-        },
-      ],
-    },
-    {
-      id: 6,
-      name: "ECDIS 6",
-      sensors: [
-        {
-          id: 3,
-          name: "Barometer",
-          value: "5790 atm",
-          status: "failed",
-        },
-        {
-          id: 4,
-          name: "Speed Sensor",
-          value: "5790 mil/h",
-          status: "pending",
-        },
-        {
-          id: 5,
-          name: "Temperature",
-          value: "25°C",
-          status: "success",
-        },
-      ],
-    },
-    {
-      id: 7,
-      name: "Navigation Radar 7",
-      sensors: [
-        {
-          id: 1,
-          name: "Depth Sensor",
-          value: "5790 ms",
-          status: "pending",
-        },
-        {
-          id: 2,
-          name: "Gyroscope",
-          value: "5790 rad/s",
-          status: "success",
-        },
-        {
-          id: 3,
-          name: "Barometer",
-          value: "5790 atm",
-          status: "failed",
-        },
-      ],
-    },
-  ]);
+  const dispatch = useDispatch();
+  const consumers = useSelector((state) => state.matrix.consumers);
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedConsumer, setSelectedConsumer] = useState(null);
+  const [sensors, setSensors] = useState([]);
+  const [expandedConsumerIds, setExpandedConsumerIds] = useState([]);
 
   const iconMapping = {
     "depth sensor": DeepthSensorIcon,
@@ -250,13 +72,6 @@ const MatrixManagement = () => {
         return "border-gray-700 bg-gray-100 dark:bg-gray-500";
     }
   };
-
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedConsumer, setSelectedConsumer] = useState(null);
-  const [sensors, setSensors] = useState([]);
-  const [expandedConsumerIds, setExpandedConsumerIds] = useState([]);
 
   const toggleConsumerExpansion = (consumerId) => {
     setExpandedConsumerIds((prevExpandedIds) =>
@@ -432,27 +247,15 @@ const MatrixManagement = () => {
   }, []);
 
   const handleCreateConsumer = (newConsumer) => {
-    setConsumers(
-      consumers.map((consumer) =>
-        consumer.id === newConsumer.id ? newConsumer : consumer
-      )
-    );
+    dispatch(updateConsumer(newConsumer));
   };
 
   const handleEditConsumer = (updatedConsumer) => {
-    setConsumers(
-      consumers.map((consumer) =>
-        consumer.id === updatedConsumer.id ? updatedConsumer : consumer
-      )
-    );
+    dispatch(updateConsumer(updatedConsumer));
   };
 
   const handleClearAllSensors = (updatedConsumer) => {
-    setConsumers(
-      consumers.map((consumer) =>
-        consumer.id === updatedConsumer.id ? updatedConsumer : consumer
-      )
-    );
+    dispatch(clearAllSensors(updatedConsumer.id));
   };
 
   const calculateStatusCounts = (sensors) => {

@@ -26,7 +26,7 @@ class ErrorBoundary extends Component {
 const ObjectPages = () => {
   return (
     <ErrorBoundary>
-      <div className="p-4 dark:bg-darkmode">
+      <div className="p-4 dark:bg-darkmode md:h-screen">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
           Management and Configuration Object
         </p>

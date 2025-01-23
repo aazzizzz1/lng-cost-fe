@@ -32,6 +32,7 @@ const sensorData = [
     digitalOption: "Positive Pulse",
     interfaceType: "Ethernet",
     serialType: "RS-232",
+    signalType: "digital",
   },
   {
     id: 2,
@@ -48,6 +49,7 @@ const sensorData = [
     digitalOption: "Negative Pulse",
     interfaceType: "Serial",
     serialType: "RS-422",
+    signalType: "pulse",
   },
   {
     id: 3,
@@ -64,6 +66,7 @@ const sensorData = [
     digitalOption: "Positive Pulse",
     interfaceType: "Digital",
     serialType: "RS-485",
+    signalType: "digital",
   },
 ];
 // Sensor Management Table Component
@@ -236,9 +239,9 @@ const ObjectManagementTable = ({ sensors }) => {
                   {/* <th scope="col" className="px-4 py-3">
                     Consumer sensor
                   </th> */}
-                  <th scope="col" className="px-4 py-3">
+                  {/* <th scope="col" className="px-4 py-3">
                     Parameter
-                  </th>
+                  </th> */}
                   <th scope="col" className="px-4 py-3">
                     Setting
                   </th>
@@ -293,7 +296,7 @@ const ObjectManagementTable = ({ sensors }) => {
                         </span>
                       ))}
                     </td> */}
-                    <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    {/* <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       <div className="flex flex-wrap gap-1">
                         {sensor.interfaceType && (
                           <>
@@ -339,7 +342,7 @@ const ObjectManagementTable = ({ sensors }) => {
                           </>
                         )}
                       </div>
-                    </td>
+                    </td> */}
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       <div className="flex items-center space-x-4">
                         <button
@@ -506,6 +509,7 @@ ObjectManagementTable.propTypes = {
       port: PropTypes.number.isRequired,
       communication: PropTypes.number.isRequired,
       baudRate: PropTypes.number.isRequired,
+      signalType: PropTypes.string.isRequired,
     })
   ).isRequired,
 };
