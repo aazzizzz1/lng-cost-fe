@@ -80,7 +80,7 @@ const EditMatrixModal = ({ isOpen, onClose, onUpdate, sensors, consumer }) => {
                     className={`px-2 py-1 text-sm font-medium rounded-lg ${
                       sensor.status === "enabled"
                         ? "border-green-500 bg-green-100 text-green-700"
-                        : "border-gray-300 text-gray-700"
+                        : "border-gray-300 text-gray-700 dark:text-white"
                     }`}
                   >
                     Enable
@@ -91,7 +91,7 @@ const EditMatrixModal = ({ isOpen, onClose, onUpdate, sensors, consumer }) => {
                     className={`px-2 py-1 text-sm font-medium rounded-lg ${
                       sensor.status === "disabled"
                         ? "border-red-500 bg-red-100 text-red-700"
-                        : "border-gray-300 text-gray-700"
+                        : "border-gray-300 text-gray-700 dark:text-white"
                     }`}
                   >
                     Disable

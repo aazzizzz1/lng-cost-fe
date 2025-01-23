@@ -178,36 +178,45 @@ const EditObjectModal = ({ isOpen, onClose, onUpdate, sensor }) => {
                       onChange={(e) => setProtocol(e.target.value)}
                     >
                       <option value="TCP/IP">TCP/IP</option>
-                      <option value="UDP">UDP</option>
+                      <option value="UDPU">UDP (unicase)</option>
+                      <option value="UDPM">UDP (multicase)</option>
+                      <option value="UDPB">UDP (broadcast)</option>
                       <option value="MQTT">MQTT</option>
                     </select>
                   </div>
-                  <div>
-                    <label htmlFor="ip-client" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                      IP Client
-                    </label>
-                    <input
-                      type="text"
-                      id="ip-client"
-                      value={ipClient}
-                      onChange={(e) => setIpClient(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Add IP Client"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="netmask" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                      Netmask
-                    </label>
-                    <input
-                      type="text"
-                      id="netmask"
-                      value={netmask}
-                      onChange={(e) => setNetmask(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Netmask"
-                    />
-                  </div>
+
+                  {protocol !== "MQTT" && protocol !== "UDPB" && (
+                    <div>
+                      <label htmlFor="ip-client" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        IP Client
+                      </label>
+                      <input
+                        type="text"
+                        id="ip-client"
+                        value={ipClient}
+                        onChange={(e) => setIpClient(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder={protocol === "UDPM" ? "Add IP Multicast" : "Add IP Client"}
+                      />
+                    </div>
+                  )}
+
+                  {protocol !== "MQTT" && (
+                    <div>
+                      <label htmlFor="netmask" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Netmask
+                      </label>
+                      <input
+                        type="text"
+                        id="netmask"
+                        value={netmask}
+                        onChange={(e) => setNetmask(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Netmask"
+                      />
+                    </div>
+                  )}
+
                   <div>
                     <label htmlFor="port" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                       Port

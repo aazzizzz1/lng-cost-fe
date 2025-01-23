@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import MatrixManagement from "./MatrixManagement";
-import DeleteIcon from "../../Assets/Svg/Object/DeleteIcon";
+// import DeleteIcon from "../../Assets/Svg/Object/DeleteIcon";
 // import MatrixConfiguration from './MatrixConfiguration';
 // import SensorFlow from './SensorFlow';
 
@@ -44,7 +44,7 @@ const MatrixPages = () => {
             className="px-3 py-2 flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
             onClick={() => {}}
           >
-            <DeleteIcon />
+            {/* <DeleteIcon /> */}
             RESET MATRIX
           </button>
         </div>

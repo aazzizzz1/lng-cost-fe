@@ -56,7 +56,7 @@ const CreateMatrixModal = ({ isOpen, onClose, onCreate, sensors, consumer }) => 
                   {sensors.map(sensor => (
                     <div
                       key={sensor.id}
-                      className={`flex items-center border p-2 rounded ${selectedSensors.some(s => s.id === sensor.id) ? 'border-green-500 bg-green-100' : 'border-gray-300'}`}
+                      className={`flex items-center border p-2 rounded ${selectedSensors.some(s => s.id === sensor.id) ? 'border-green-500 bg-green-100 dark:bg-green-600 dark:border-green-700' : 'border-gray-300'}`}
                     >
                       <input
                         type="checkbox"
@@ -100,7 +100,7 @@ const CreateMatrixModal = ({ isOpen, onClose, onCreate, sensors, consumer }) => 
                 {selectedSensor.sentences.map(sentence => (
                   <div
                     key={sentence.id}
-                    className={`flex items-center border p-2 rounded ${selectedSentences.includes(sentence) ? 'border-green-500 bg-green-100' : 'border-gray-300'}`}
+                    className={`flex items-center border p-2 rounded ${selectedSentences.includes(sentence) ? 'border-green-500 bg-green-100 dark:bg-green-600 dark:border-green-600' : 'border-gray-300'}`}
                   >
                     <input
                       type="checkbox"
