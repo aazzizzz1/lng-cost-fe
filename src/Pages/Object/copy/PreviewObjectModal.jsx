@@ -13,12 +13,16 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
             <div className="flex flex-row gap-2">
               <div>
                 {(() => {
-                  if (sensor.objectType === 'sensor') return <SensorIcon />;
-                  if (sensor.objectType === 'consumer') return <ConsumerIcon />;
-                  return sensor.objectType;
+                  if (sensor.objectId === 1) return <SensorIcon />;
+                  if (sensor.objectId === 2) return <ConsumerIcon />;
+                  return sensor.objectId;
                 })()}
               </div>
-              {sensor.objectType}
+              {(() => {
+                if (sensor.objectId === 1) return "sensor";
+                if (sensor.objectId === 2) return "consumer";
+                return sensor.objectId;
+              })()}
             </div>
           </div>
           <div>
@@ -54,7 +58,7 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
               <>
                 <span>Interface Type: {sensor.interfaceType}</span>
                 <br />
-                {sensor.interfaceType === "serial" && (
+                {sensor.interfaceType === "Serial" && (
                   <>
                     {sensor.serialType && (
                       <>
@@ -76,7 +80,7 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
                     )}
                   </>
                 )}
-                {sensor.interfaceType === "network" && (
+                {sensor.interfaceType === "Ethernet" && (
                   <>
                     {sensor.protocol && (
                       <>
@@ -84,9 +88,9 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
                         <br />
                       </>
                     )}
-                    {sensor.clientIp && (
+                    {sensor.ipClient && (
                       <>
-                        <span>Client IP: {sensor.clientIp}</span>
+                        <span>IP Client: {sensor.ipClient}</span>
                         <br />
                       </>
                     )}
@@ -104,43 +108,11 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
                     )}
                   </>
                 )}
-                {sensor.interfaceType === "digital" && (
+                {sensor.interfaceType === "Digital" && (
                   <>
-                    {sensor.digitalType && (
+                    {sensor.digitalOption && (
                       <>
-                        <span>Digital Type: {sensor.digitalType}</span>
-                        <br />
-                      </>
-                    )}
-                    {sensor.cardId && (
-                      <>
-                        <span>Card ID: {sensor.cardId}</span>
-                        <br />
-                      </>
-                    )}
-                  </>
-                )}
-                {sensor.interfaceType === "analog" && (
-                  <>
-                    {sensor.cardId && (
-                      <>
-                        <span>Card ID: {sensor.cardId}</span>
-                        <br />
-                      </>
-                    )}
-                  </>
-                )}
-                {sensor.interfaceType === "pulse" && (
-                  <>
-                    {sensor.pulseType && (
-                      <>
-                        <span>Pulse Type: {sensor.pulseType}</span>
-                        <br />
-                      </>
-                    )}
-                    {sensor.cardId && (
-                      <>
-                        <span>Card ID: {sensor.cardId}</span>
+                        <span>Digital Option: {sensor.digitalOption}</span>
                         <br />
                       </>
                     )}

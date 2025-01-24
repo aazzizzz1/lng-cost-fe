@@ -12,21 +12,12 @@ import CreateIcon from "../../Assets/Svg/Object/CreateIcon";
 import DeleteIcon from "../../Assets/Svg/Object/DeleteIcon";
 import PreviewIcon from "../../Assets/Svg/Object/PreviewIcon";
 import EditIcon from "../../Assets/Svg/Object/EditIcon";
-import { createSensor, editSensor, deleteObject, deleteMultipleObjects, fetchObjects } from "../../Provider/objectSlice";
+import { createSensor, editSensor, deleteSensor } from "../../Provider/objectSlice";
 
 // Sensor Management Table Component
 const ObjectManagementTable = () => {
   const dispatch = useDispatch();
   const sensors = useSelector((state) => state.objects.sensors);
-
-  useEffect(() => {
-    dispatch(fetchObjects());
-  }, [dispatch]);
-
-  // Add useEffect to listen for changes in sensors state
-  useEffect(() => {
-    dispatch(fetchObjects());
-  }, [sensors, dispatch]);
 
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -44,13 +35,7 @@ const ObjectManagementTable = () => {
   };
 
   const handleDeleteSensor = (sensorId) => {
-    dispatch(deleteObject(sensorId));
-  };
-
-  const handleDeleteMultipleSensors = () => {
-    dispatch(deleteMultipleObjects(selectedSensors));
-    setDeleteConfirmationOpen(false);
-    setSelectedSensors([]);
+    dispatch(deleteSensor(sensorId));
   };
 
   const [isAllSelected, setIsAllSelected] = useState(false);
@@ -73,6 +58,18 @@ const ObjectManagementTable = () => {
       setSelectedSensors(sensors.map((sensor) => sensor.id));
     }
     setIsAllSelected(!isAllSelected);
+  };
+
+  const handleDeleteConfirmation = () => {
+    if (selectedSensors.length === 0) {
+      alert("Please select at least one sensor to delete.");
+      return;
+    }
+    selectedSensors.forEach((sensorId) => {
+      dispatch(deleteSensor(sensorId));
+    });
+    setDeleteConfirmationOpen(false);
+    setSelectedSensors([]);
   };
 
   const [toggleStates, setToggleStates] = useState({});
@@ -187,12 +184,12 @@ const ObjectManagementTable = () => {
                       <div className="flex flex-row gap-2">
                         <div>
                           {(() => {
-                            if (sensor.objectType === "sensor") return <SensorIcon />;
-                            if (sensor.objectType === "consumer") return <ConsumerIcon />;
-                            return sensor.objectType;
+                            if (sensor.objectId === 1) return <SensorIcon />;
+                            if (sensor.objectId === 2) return <ConsumerIcon />;
+                            return sensor.objectId;
                           })()}
                         </div>
-                        {sensorObjectType(sensor.objectType)}
+                        {sensorObjectType(sensor.objectId)}
                       </div>
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -283,7 +280,7 @@ const ObjectManagementTable = () => {
         <DeleteConfirmationModal
           isOpen={isDeleteConfirmationOpen}
           onClose={() => setDeleteConfirmationOpen(false)}
-          onConfirm={handleDeleteMultipleSensors}
+          onConfirm={handleDeleteConfirmation}
           selectedCount={selectedSensors.length}
         />
       </div>
@@ -291,10 +288,10 @@ const ObjectManagementTable = () => {
   );
 };
 
-const sensorObjectType = (objectType) => {
-  if (objectType === "sensor") return "source";
-  if (objectType === "consumer") return "consumer";
-  return objectType;
+const sensorObjectType = (objectId) => {
+  if (objectId === 1) return "source";
+  if (objectId === 2) return "consumer";
+  return objectId;
 };
 
 ObjectManagementTable.propTypes = {
@@ -303,7 +300,7 @@ ObjectManagementTable.propTypes = {
       name: PropTypes.string.isRequired,
       consumers: PropTypes.arrayOf(PropTypes.string).isRequired,
       parameters: PropTypes.arrayOf(PropTypes.string).isRequired,
-      objectType: PropTypes.string.isRequired,
+      objectId: PropTypes.string.isRequired,
       port: PropTypes.number.isRequired,
       communication: PropTypes.number.isRequired,
       baudRate: PropTypes.number.isRequired,

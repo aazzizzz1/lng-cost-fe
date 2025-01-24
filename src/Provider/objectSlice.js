@@ -1,60 +1,42 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+const api = process.env.REACT_APP_API;
 
 const initialState = {
-  sensors: [
-    {
-      id: 1,
-      name: "CMS",
-      objectId: 2,
-      port: 8000,
-      communication: 1,
-      baudRate: 2,
-      updateRate: 4,
-      cardId: 1,
-      protocol: "TCP/IP",
-      ipClient: "192.168.1.1",
-      netmask: "255.255.255.0",
-      digitalOption: "Positive Pulse",
-      interfaceType: "Ethernet",
-      serialType: "RS-232",
-      signalType: "digital",
-    },
-    {
-      id: 2,
-      name: "Temperature Sensor",
-      objectId: 1,
-      port: 8080,
-      communication: 2,
-      baudRate: 9600,
-      updateRate: 5,
-      cardId: 2,
-      protocol: "HTTP",
-      ipClient: "192.168.1.2",
-      netmask: "255.255.255.0",
-      digitalOption: "Negative Pulse",
-      interfaceType: "Serial",
-      serialType: "RS-422",
-      signalType: "pulse",
-    },
-    {
-      id: 3,
-      name: "Pressure Sensor",
-      objectId: 1,
-      port: 9000,
-      communication: 3,
-      baudRate: 115200,
-      updateRate: 6,
-      cardId: 3,
-      protocol: "Modbus",
-      ipClient: "192.168.1.3",
-      netmask: "255.255.255.0",
-      digitalOption: "Positive Pulse",
-      interfaceType: "Digital",
-      serialType: "RS-485",
-      signalType: "digital",
-    },
-  ],
+  sensors: [],
+  selectedSensor: null,
 };
+
+export const fetchObjects = createAsyncThunk('objects/fetchObjects', async () => {
+  const response = await axios.get(`${api}/objects`);
+  return response.data.data;
+});
+
+export const createObject = createAsyncThunk('objects/createObject', async (newObject) => {
+  const response = await axios.post(`${api}/objects`, newObject);
+  console.log(response.data);
+  return response.data;
+});
+
+export const updateObject = createAsyncThunk('objects/updateObject', async ({ id, updatedObject }) => {
+  const response = await axios.put(`${api}/objects/${id}`, updatedObject);
+  return response.data;
+});
+
+export const deleteObject = createAsyncThunk('objects/deleteObject', async (id) => {
+  await axios.delete(`${api}/objects/${id}`);
+  return id;
+});
+
+export const deleteMultipleObjects = createAsyncThunk('objects/deleteMultipleObjects', async (ids) => {
+  await Promise.all(ids.map(id => axios.delete(`${api}/objects/${id}`)));
+  return ids;
+});
+
+export const fetchObjectById = createAsyncThunk('objects/fetchObjectById', async (id) => {
+  const response = await axios.get(`${api}/objects/${id}`);
+  return response.data;
+});
 
 const objectSlice = createSlice({
   name: 'objects',
@@ -72,8 +54,83 @@ const objectSlice = createSlice({
     deleteSensor: (state, action) => {
       state.sensors = state.sensors.filter(sensor => sensor.id !== action.payload);
     },
+    setSelectedSensor: (state, action) => {
+      state.selectedSensor = action.payload;
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchObjects.fulfilled, (state, action) => {
+      state.sensors = action.payload.map((obj) => {
+        const interfaceData = obj.sensor ? obj.sensor.interface : obj.consumer.interface;
+        const interfaceType = interfaceData.interface_type;
+        let specificInterfaceData = {};
+
+        switch (interfaceType) {
+          case 'serial':
+            specificInterfaceData = {
+              serialType: interfaceData.serialInterface.type,
+              baudRate: interfaceData.serialInterface.baud_rate,
+              cardId: interfaceData.serialInterface.card_id,
+            };
+            break;
+          case 'digital':
+            specificInterfaceData = {
+              digitalType: interfaceData.digitalInterface.type,
+              cardId: interfaceData.digitalInterface.card_id,
+            };
+            break;
+          case 'analog':
+            specificInterfaceData = {
+              cardId: interfaceData.analogInterface.card_id,
+            };
+            break;
+          case 'pulse':
+            specificInterfaceData = {
+              pulseType: interfaceData.pulseInterface.type,
+              cardId: interfaceData.pulseInterface.card_id,
+            };
+            break;
+          case 'network':
+            specificInterfaceData = {
+              clientIp: interfaceData.networkInterface.client_ip,
+              netmask: interfaceData.networkInterface.netmask,
+              port: interfaceData.networkInterface.port,
+              protocol: interfaceData.networkInterface.protocol,
+            };
+            break;
+          default:
+            break;
+        }
+
+        return {
+          id: obj.id,
+          name: obj.object_name,
+          objectType: obj.object_type,
+          interfaceType,
+          ...specificInterfaceData,
+        };
+      });
+    });
+    builder.addCase(createObject.fulfilled, (state, action) => {
+      state.sensors.push(action.payload);
+    });
+    builder.addCase(updateObject.fulfilled, (state, action) => {
+      const index = state.sensors.findIndex(sensor => sensor.id === action.payload.id);
+      if (index !== -1) {
+        state.sensors[index] = action.payload;
+      }
+    });
+    builder.addCase(deleteObject.fulfilled, (state, action) => {
+      state.sensors = state.sensors.filter(sensor => sensor.id !== action.payload);
+    });
+    builder.addCase(deleteMultipleObjects.fulfilled, (state, action) => {
+      state.sensors = state.sensors.filter(sensor => !action.payload.includes(sensor.id));
+    });
+    builder.addCase(fetchObjectById.fulfilled, (state, action) => {
+      state.selectedSensor = action.payload;
+    });
   },
 });
 
-export const { createSensor, editSensor, deleteSensor } = objectSlice.actions;
+export const { createSensor, editSensor, deleteSensor, setSelectedSensor } = objectSlice.actions;
 export default objectSlice.reducer;
