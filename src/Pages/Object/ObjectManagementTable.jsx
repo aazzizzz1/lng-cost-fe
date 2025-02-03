@@ -12,21 +12,30 @@ import CreateIcon from "../../Assets/Svg/Object/CreateIcon";
 import DeleteIcon from "../../Assets/Svg/Object/DeleteIcon";
 import PreviewIcon from "../../Assets/Svg/Object/PreviewIcon";
 import EditIcon from "../../Assets/Svg/Object/EditIcon";
-import { createSensor, editSensor, deleteObject, deleteMultipleObjects, fetchObjects } from "../../Provider/objectSlice";
+import { createSensor, editSensor, deleteObject, deleteMultipleObjects, fetchObjects, clearMessages } from "../../Provider/objectSlice";
+import SuccessAlertObject from "../../Components/Alerts/ObjectAlert/SuccessAlertObject";
+import ErrorAlertObject from "../../Components/Alerts/ObjectAlert/ErrorAlertObject";
 
 // Sensor Management Table Component
 const ObjectManagementTable = () => {
   const dispatch = useDispatch();
   const sensors = useSelector((state) => state.objects.sensors);
-
-  useEffect(() => {
-    dispatch(fetchObjects());
-  }, [dispatch]);
+  const successMessage = useSelector((state) => state.objects.successMessage);
+  const errorMessage = useSelector((state) => state.objects.errorMessage);
 
   // Add useEffect to listen for changes in sensors state
   useEffect(() => {
     dispatch(fetchObjects());
   }, [sensors, dispatch]);
+
+  useEffect(() => {
+    if (successMessage || errorMessage) {
+      const timer = setTimeout(() => {
+        dispatch(clearMessages());
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, errorMessage, dispatch]);
 
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -104,6 +113,16 @@ const ObjectManagementTable = () => {
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto">
         <div className="bg-white dark:bg-gray-800 relative shadow-md rounded-lg overflow-hidden">
+          <SuccessAlertObject
+            message={successMessage}
+            onClose={() => dispatch(clearMessages())}
+            isVisible={!!successMessage}
+          />
+          <ErrorAlertObject
+            message={errorMessage}
+            onClose={() => dispatch(clearMessages())}
+            isVisible={!!errorMessage}
+          />
           <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
             <div className="w-full md:w-1/2 flex flex-row gap-2">
               <button

@@ -5,6 +5,8 @@ const api = process.env.REACT_APP_API;
 const initialState = {
   sensors: [],
   selectedSensor: null,
+  successMessage: '',
+  errorMessage: '',
 };
 
 export const fetchObjects = createAsyncThunk('objects/fetchObjects', async (_, { rejectWithValue }) => {
@@ -87,6 +89,10 @@ const objectSlice = createSlice({
     setSelectedSensor: (state, action) => {
       state.selectedSensor = action.payload;
     },
+    clearMessages: (state) => {
+      state.successMessage = '';
+      state.errorMessage = '';
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchObjects.fulfilled, (state, action) => {
@@ -135,27 +141,63 @@ const objectSlice = createSlice({
           ...specificInterfaceData,
         };
       });
+      // state.successMessage = 'Objects fetched successfully';
+      // state.errorMessage = '';
+    });
+    builder.addCase(fetchObjects.rejected, (state, action) => {
+      state.errorMessage = 'Error fetching objects';
+      state.successMessage = '';
     });
     builder.addCase(createObject.fulfilled, (state, action) => {
       state.sensors.push(action.payload);
+      state.successMessage = 'Object created successfully';
+      state.errorMessage = '';
+    });
+    builder.addCase(createObject.rejected, (state, action) => {
+      state.errorMessage = 'Error creating object';
+      state.successMessage = '';
     });
     builder.addCase(updateObject.fulfilled, (state, action) => {
       const index = state.sensors.findIndex(sensor => sensor.id === action.payload.id);
       if (index !== -1) {
         state.sensors[index] = action.payload;
       }
+      state.successMessage = 'Object updated successfully';
+      state.errorMessage = '';
+    });
+    builder.addCase(updateObject.rejected, (state, action) => {
+      state.errorMessage = 'Error updating object';
+      state.successMessage = '';
     });
     builder.addCase(deleteObject.fulfilled, (state, action) => {
       state.sensors = state.sensors.filter(sensor => sensor.id !== action.payload);
+      state.successMessage = 'Object deleted successfully';
+      state.errorMessage = '';
+    });
+    builder.addCase(deleteObject.rejected, (state, action) => {
+      state.errorMessage = 'Error deleting object';
+      state.successMessage = '';
     });
     builder.addCase(deleteMultipleObjects.fulfilled, (state, action) => {
       state.sensors = state.sensors.filter(sensor => !action.payload.includes(sensor.id));
+      state.successMessage = 'Objects deleted successfully';
+      state.errorMessage = '';
+    });
+    builder.addCase(deleteMultipleObjects.rejected, (state, action) => {
+      state.errorMessage = 'Error deleting multiple objects';
+      state.successMessage = '';
     });
     builder.addCase(fetchObjectById.fulfilled, (state, action) => {
       state.selectedSensor = action.payload;
+      state.successMessage = 'Object fetched successfully';
+      state.errorMessage = '';
+    });
+    builder.addCase(fetchObjectById.rejected, (state, action) => {
+      state.errorMessage = 'Error fetching object by ID';
+      state.successMessage = '';
     });
   },
 });
 
-export const { createSensor, editSensor, deleteSensor, setSelectedSensor } = objectSlice.actions;
+export const { createSensor, editSensor, deleteSensor, setSelectedSensor, clearMessages } = objectSlice.actions;
 export default objectSlice.reducer;
