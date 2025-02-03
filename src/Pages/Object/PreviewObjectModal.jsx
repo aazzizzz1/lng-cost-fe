@@ -76,7 +76,7 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
                     )}
                   </>
                 )}
-                {sensor.interfaceType === "network" && (
+                {sensor.interfaceType === "ethernet" && (
                   <>
                     {sensor.protocol && (
                       <>
@@ -106,6 +106,12 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
                 )}
                 {sensor.interfaceType === "digital" && (
                   <>
+                    {sensor.signalType && (
+                      <>
+                        <span>Signal Type: {sensor.signalType}</span>
+                        <br />
+                      </>
+                    )}
                     {sensor.digitalType && (
                       <>
                         <span>Digital Type: {sensor.digitalType}</span>

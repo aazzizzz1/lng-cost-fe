@@ -8,12 +8,14 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
   const dispatch = useDispatch();
   const [name, setName] = useState(sensor?.name || "");
   const [objectType, setObjectType] = useState(sensor?.objectType || "sensor");
-  const [interfaceType, setInterfaceType] = useState(sensor?.interfaceType || "");
+  const [interfaceType, setInterfaceType] = useState(
+    sensor?.interfaceType || ""
+  );
   const [serialType, setSerialType] = useState(sensor?.serialType || "RS-232");
   const [baudRate, setBaudRate] = useState(sensor?.baudRate || 9600);
   const [cardId, setCardId] = useState(sensor?.cardId || 1);
   const [protocol, setProtocol] = useState(sensor?.protocol || "TCP");
-  const [ipClient, setIpClient] = useState(sensor?.ipClient || "");
+  const [clientIp, setClientIp] = useState(sensor?.clientIp || "");
   const [netmask, setNetmask] = useState(sensor?.netmask || "");
   const [port, setPort] = useState(sensor?.port || "");
   const [digitalType, setDigitalType] = useState(sensor?.digitalType || "");
@@ -29,7 +31,7 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
       setBaudRate(sensor.baudRate);
       setCardId(sensor.cardId);
       setProtocol(sensor.protocol);
-      setIpClient(sensor.ipClient);
+      setClientIp(sensor.clientIp);
       setNetmask(sensor.netmask);
       setPort(sensor.port);
       setDigitalType(sensor.digitalType);
@@ -47,7 +49,7 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
       updateRate: 1, // Assuming updateRate is 1
       serialType,
       baudrate: baudRate,
-      ipClient,
+      ipClient: clientIp,
       netmask,
       port,
       ethernetProtocol: protocol,
@@ -118,10 +120,9 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
                 >
                   <option value="">Select Interface</option>
                   <option value="serial">Serial</option>
-                  <option value="network">Network</option>
+                  <option value="ethernet">Ethernet</option>
                   <option value="digital">Digital</option>
                   <option value="analog">Analog</option>
-                  <option value="pulse">Pulse</option>
                 </select>
               </div>
 
@@ -191,7 +192,7 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
                 </>
               )}
 
-              {interfaceType === "network" && (
+              {interfaceType === "ethernet" && (
                 <>
                   <div>
                     <label
@@ -206,45 +207,51 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
                       value={protocol}
                       onChange={(e) => setProtocol(e.target.value)}
                     >
-                      <option value="TCP">TCP</option>
-                      <option value="UDP">UDP</option>
+                      <option value="TCP/IP">TCP/IP</option>
+                      <option value="UDPU">UDP (unicase)</option>
+                      <option value="UDPM">UDP (multicase)</option>
+                      <option value="UDPB">UDP (broadcast)</option>
                       <option value="MQTT">MQTT</option>
                     </select>
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="ip-client"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      IP Client
-                    </label>
-                    <input
-                      type="text"
-                      id="ip-client"
-                      value={ipClient}
-                      onChange={(e) => setIpClient(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="IP Client"
-                    />
-                  </div>
+                  {protocol !== "MQTT" && protocol !== "UDPB" && (
+                    <div>
+                      <label
+                        htmlFor="client-ip"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Client IP
+                      </label>
+                      <input
+                        type="text"
+                        id="client-ip"
+                        value={clientIp}
+                        onChange={(e) => setClientIp(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Client IP"
+                      />
+                    </div>
+                  )}
 
-                  <div>
-                    <label
-                      htmlFor="netmask"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Netmask
-                    </label>
-                    <input
-                      type="text"
-                      id="netmask"
-                      value={netmask}
-                      onChange={(e) => setNetmask(e.target.value)}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Netmask"
-                    />
-                  </div>
+                  {protocol !== "MQTT" && (
+                    <div>
+                      <label
+                        htmlFor="netmask"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                      >
+                        Netmask
+                      </label>
+                      <input
+                        type="text"
+                        id="netmask"
+                        value={netmask}
+                        onChange={(e) => setNetmask(e.target.value)}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                        placeholder="Netmask"
+                      />
+                    </div>
+                  )}
 
                   <div>
                     <label
@@ -280,8 +287,8 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
                       value={signalType}
                       onChange={(e) => setSignalType(e.target.value)}
                     >
-                      <option value="Voltage">Voltage</option>
-                      <option value="Current">Current</option>
+                      <option value="digital">Digital</option>
+                      <option value="pulse">Pulse</option>
                     </select>
                   </div>
                   <div>
@@ -297,8 +304,24 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
                       value={digitalType}
                       onChange={(e) => setDigitalType(e.target.value)}
                     >
-                      <option value="TTL">TTL</option>
-                      <option value="CMOS">CMOS</option>
+                      {signalType === "digital" ? (
+                        <>
+                          <option value="high-z">High Z</option>
+                          <option value="enable-pull-up">Enable Pull Up</option>
+                          <option value="enable-pull-down">
+                            Enable Pull Down
+                          </option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="positive-pulse">
+                            Digital Positive Pulse
+                          </option>
+                          <option value="negative-pulse">
+                            Digital Negative Pulse
+                          </option>
+                        </>
+                      )}
                     </select>
                   </div>
                   <div>
