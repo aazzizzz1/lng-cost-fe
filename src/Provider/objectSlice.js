@@ -144,7 +144,7 @@ const objectSlice = createSlice({
           ...specificInterfaceData,
         };
       });
-      state.successMessage = 'Objects fetched successfully';
+      // state.successMessage = 'Objects fetched successfully';
       state.errorMessage = '';
       state.shouldfetchObjects = false;
     });
