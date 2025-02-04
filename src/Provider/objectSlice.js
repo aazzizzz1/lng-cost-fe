@@ -7,6 +7,7 @@ const initialState = {
   selectedObject: null,
   successMessage: '',
   errorMessage: '',
+  shouldfetchObjects: false,
 };
 
 export const fetchObjects = createAsyncThunk('objects/fetchObjects', async (_, { rejectWithValue }) => {
@@ -145,6 +146,7 @@ const objectSlice = createSlice({
       });
       state.successMessage = 'Objects fetched successfully';
       state.errorMessage = '';
+      state.shouldfetchObjects = false;
     });
     builder.addCase(fetchObjects.rejected, (state, action) => {
       state.errorMessage = 'Error fetching objects';
@@ -154,6 +156,7 @@ const objectSlice = createSlice({
       state.objects.push(action.payload);
       state.successMessage = 'Object created successfully';
       state.errorMessage = '';
+      state.shouldfetchObjects = true;
     });
     builder.addCase(createObject.rejected, (state, action) => {
       state.errorMessage = 'Error creating object';
@@ -166,6 +169,7 @@ const objectSlice = createSlice({
       }
       state.successMessage = 'Object updated successfully';
       state.errorMessage = '';
+      state.shouldfetchObjects = true;
     });
     builder.addCase(updateObject.rejected, (state, action) => {
       state.errorMessage = 'Error updating object';
@@ -175,6 +179,7 @@ const objectSlice = createSlice({
       state.objects = state.objects.filter(object => object.id !== action.payload);
       state.successMessage = 'Object deleted successfully';
       state.errorMessage = '';
+      state.shouldfetchObjects = true;
     });
     builder.addCase(deleteObject.rejected, (state, action) => {
       state.errorMessage = 'Error deleting object';
@@ -184,6 +189,7 @@ const objectSlice = createSlice({
       state.objects = state.objects.filter(object => !action.payload.includes(object.id));
       state.successMessage = 'Objects deleted successfully';
       state.errorMessage = '';
+      state.shouldfetchObjects = true;
     });
     builder.addCase(deleteMultipleObjects.rejected, (state, action) => {
       state.errorMessage = 'Error deleting multiple objects';

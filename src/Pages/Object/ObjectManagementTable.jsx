@@ -22,10 +22,17 @@ const ObjectManagementTable = () => {
   const objects = useSelector((state) => state.objects.objects);
   const successMessage = useSelector((state) => state.objects.successMessage);
   const errorMessage = useSelector((state) => state.objects.errorMessage);
+  const shouldfetchObjects = useSelector((state) => state.objects.shouldfetchObjects);
 
   useEffect(() => {
     dispatch(fetchObjects());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (shouldfetchObjects) {
+      dispatch(fetchObjects());
+    }
+  }, [shouldfetchObjects, dispatch]);
 
   useEffect(() => {
     if (successMessage || errorMessage) {
