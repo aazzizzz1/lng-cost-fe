@@ -3,8 +3,8 @@ import axios from 'axios';
 const api = process.env.REACT_APP_API;
 
 const initialState = {
-  sensors: [],
-  selectedSensor: null,
+  objects: [],
+  selectedObject: null,
   successMessage: '',
   errorMessage: '',
 };
@@ -12,6 +12,7 @@ const initialState = {
 export const fetchObjects = createAsyncThunk('objects/fetchObjects', async (_, { rejectWithValue }) => {
   try {
     const response = await axios.get(`${api}/objects`);
+    console.log(response.data.data)
     return response.data.data;
   } catch (error) {
     console.error('Error fetching objects:', error);
@@ -74,20 +75,21 @@ const objectSlice = createSlice({
   name: 'objects',
   initialState,
   reducers: {
-    createSensor: (state, action) => {
-      state.sensors.push(action.payload);
+    // Renamed to avoid duplicate naming with async thunks
+    addObject: (state, action) => {
+      state.objects.push(action.payload);
     },
-    editSensor: (state, action) => {
-      const index = state.sensors.findIndex(sensor => sensor.id === action.payload.id);
+    updateObjectSync: (state, action) => {
+      const index = state.objects.findIndex(object => object.id === action.payload.id);
       if (index !== -1) {
-        state.sensors[index] = action.payload;
+        state.objects[index] = action.payload;
       }
     },
-    deleteSensor: (state, action) => {
-      state.sensors = state.sensors.filter(sensor => sensor.id !== action.payload);
+    removeObject: (state, action) => {
+      state.objects = state.objects.filter(object => object.id !== action.payload);
     },
-    setSelectedSensor: (state, action) => {
-      state.selectedSensor = action.payload;
+    setSelectedObject: (state, action) => {
+      state.selectedObject = action.payload;
     },
     clearMessages: (state) => {
       state.successMessage = '';
@@ -96,7 +98,7 @@ const objectSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchObjects.fulfilled, (state, action) => {
-      state.sensors = action.payload.map((obj) => {
+      state.objects = action.payload.map((obj) => {
         const interfaceData = obj.sensor ? obj.sensor.interface : obj.consumer.interface;
         const interfaceType = interfaceData.interface_type;
         let specificInterfaceData = {};
@@ -141,15 +143,15 @@ const objectSlice = createSlice({
           ...specificInterfaceData,
         };
       });
-      // state.successMessage = 'Objects fetched successfully';
-      // state.errorMessage = '';
+      state.successMessage = 'Objects fetched successfully';
+      state.errorMessage = '';
     });
     builder.addCase(fetchObjects.rejected, (state, action) => {
       state.errorMessage = 'Error fetching objects';
       state.successMessage = '';
     });
     builder.addCase(createObject.fulfilled, (state, action) => {
-      state.sensors.push(action.payload);
+      state.objects.push(action.payload);
       state.successMessage = 'Object created successfully';
       state.errorMessage = '';
     });
@@ -158,9 +160,9 @@ const objectSlice = createSlice({
       state.successMessage = '';
     });
     builder.addCase(updateObject.fulfilled, (state, action) => {
-      const index = state.sensors.findIndex(sensor => sensor.id === action.payload.id);
+      const index = state.objects.findIndex(object => object.id === action.payload.id);
       if (index !== -1) {
-        state.sensors[index] = action.payload;
+        state.objects[index] = action.payload;
       }
       state.successMessage = 'Object updated successfully';
       state.errorMessage = '';
@@ -170,7 +172,7 @@ const objectSlice = createSlice({
       state.successMessage = '';
     });
     builder.addCase(deleteObject.fulfilled, (state, action) => {
-      state.sensors = state.sensors.filter(sensor => sensor.id !== action.payload);
+      state.objects = state.objects.filter(object => object.id !== action.payload);
       state.successMessage = 'Object deleted successfully';
       state.errorMessage = '';
     });
@@ -179,7 +181,7 @@ const objectSlice = createSlice({
       state.successMessage = '';
     });
     builder.addCase(deleteMultipleObjects.fulfilled, (state, action) => {
-      state.sensors = state.sensors.filter(sensor => !action.payload.includes(sensor.id));
+      state.objects = state.objects.filter(object => !action.payload.includes(object.id));
       state.successMessage = 'Objects deleted successfully';
       state.errorMessage = '';
     });
@@ -188,7 +190,7 @@ const objectSlice = createSlice({
       state.successMessage = '';
     });
     builder.addCase(fetchObjectById.fulfilled, (state, action) => {
-      state.selectedSensor = action.payload;
+      state.selectedObject = action.payload;
       state.successMessage = 'Object fetched successfully';
       state.errorMessage = '';
     });
@@ -199,5 +201,5 @@ const objectSlice = createSlice({
   },
 });
 
-export const { createSensor, editSensor, deleteSensor, setSelectedSensor, clearMessages } = objectSlice.actions;
+export const { addObject, updateObjectSync, removeObject, setSelectedObject, clearMessages } = objectSlice.actions;
 export default objectSlice.reducer;

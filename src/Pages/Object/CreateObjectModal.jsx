@@ -298,10 +298,10 @@ const CreateObjectModal = ({ isOpen, onClose }) => {
                       ) : (
                         <>
                           <option value="positive-pulse">
-                            Digital Positive Pulse
+                            Positive Pulse
                           </option>
                           <option value="negative-pulse">
-                            Digital Negative Pulse
+                            Negative Pulse
                           </option>
                         </>
                       )}

@@ -4,41 +4,41 @@ import { useDispatch } from "react-redux";
 import { updateObject } from "../../Provider/objectSlice";
 
 // Modal untuk edit sensor yang sudah ada
-const EditObjectModal = ({ isOpen, onClose, sensor }) => {
+const EditObjectModal = ({ isOpen, onClose, object }) => {
   const dispatch = useDispatch();
-  const [name, setName] = useState(sensor?.name || "");
-  const [objectType, setObjectType] = useState(sensor?.objectType || "sensor");
+  const [name, setName] = useState(object?.name || "");
+  const [objectType, setObjectType] = useState(object?.objectType || "sensor");
   const [interfaceType, setInterfaceType] = useState(
-    sensor?.interfaceType || ""
+    object?.interfaceType || ""
   );
-  const [serialType, setSerialType] = useState(sensor?.serialType || "RS-232");
-  const [baudRate, setBaudRate] = useState(sensor?.baudRate || 9600);
-  const [cardId, setCardId] = useState(sensor?.cardId || 1);
-  const [protocol, setProtocol] = useState(sensor?.protocol || "TCP");
-  const [clientIp, setClientIp] = useState(sensor?.clientIp || "");
-  const [netmask, setNetmask] = useState(sensor?.netmask || "");
-  const [port, setPort] = useState(sensor?.port || "");
-  const [digitalType, setDigitalType] = useState(sensor?.digitalType || "");
-  const [signalType, setSignalType] = useState(sensor?.signalType || "");
-  const [pulseType, setPulseType] = useState(sensor?.pulseType || "");
+  const [serialType, setSerialType] = useState(object?.serialType || "RS-232");
+  const [baudRate, setBaudRate] = useState(object?.baudRate || 9600);
+  const [cardId, setCardId] = useState(object?.cardId || 1);
+  const [protocol, setProtocol] = useState(object?.protocol || "TCP");
+  const [clientIp, setClientIp] = useState(object?.clientIp || "");
+  const [netmask, setNetmask] = useState(object?.netmask || "");
+  const [port, setPort] = useState(object?.port || "");
+  const [digitalType, setDigitalType] = useState(object?.digitalType || "");
+  const [signalType, setSignalType] = useState(object?.signalType || "");
+  const [pulseType, setPulseType] = useState(object?.pulseType || "");
 
   useEffect(() => {
-    if (sensor) {
-      setName(sensor.name);
-      setObjectType(sensor.objectType);
-      setInterfaceType(sensor.interfaceType);
-      setSerialType(sensor.serialType);
-      setBaudRate(sensor.baudRate);
-      setCardId(sensor.cardId);
-      setProtocol(sensor.protocol);
-      setClientIp(sensor.clientIp);
-      setNetmask(sensor.netmask);
-      setPort(sensor.port);
-      setDigitalType(sensor.digitalType);
-      setSignalType(sensor.signalType);
-      setPulseType(sensor.pulseType);
+    if (object) {
+      setName(object.name);
+      setObjectType(object.objectType);
+      setInterfaceType(object.interfaceType);
+      setSerialType(object.serialType);
+      setBaudRate(object.baudRate);
+      setCardId(object.cardId);
+      setProtocol(object.protocol);
+      setClientIp(object.clientIp);
+      setNetmask(object.netmask);
+      setPort(object.port);
+      setDigitalType(object.digitalType);
+      setSignalType(object.signalType);
+      setPulseType(object.pulseType);
     }
-  }, [sensor]);
+  }, [object]);
 
   const handleSubmit = () => {
     const updatedObject = {
@@ -58,7 +58,7 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
       pulseType,
     };
 
-    dispatch(updateObject({ id: sensor.id, updatedObject }));
+    dispatch(updateObject({ id: object.id, updatedObject }));
     onClose();
   };
 
@@ -315,10 +315,10 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
                       ) : (
                         <>
                           <option value="positive-pulse">
-                            Digital Positive Pulse
+                            Positive Pulse
                           </option>
                           <option value="negative-pulse">
-                            Digital Negative Pulse
+                            Negative Pulse
                           </option>
                         </>
                       )}
@@ -374,7 +374,7 @@ const EditObjectModal = ({ isOpen, onClose, sensor }) => {
 EditObjectModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  sensor: PropTypes.object.isRequired,
+  object: PropTypes.object.isRequired,
 };
 
 export default EditObjectModal;

@@ -3,22 +3,22 @@ import PropTypes from "prop-types";
 import SensorIcon from "../../Assets/Svg/Object/SensorIcon";
 import ConsumerIcon from "../../Assets/Svg/Object/ConsumerIcon";
 
-const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
+const PreviewObjectModal = ({ isOpen, onClose, object }) => {
   return isOpen ? (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg shadow-lg dark:bg-gray-900 w-1/3">
         <div className="flex justify-between mb-4 rounded-t sm:mb-5">
           <div className="text-lg text-gray-900 md:text-xl dark:text-white">
-            <h3 className="font-semibold ">{sensor.name}</h3>
+            <h3 className="font-semibold ">{object.name}</h3>
             <div className="flex flex-row gap-2">
               <div>
                 {(() => {
-                  if (sensor.objectType === 'sensor') return <SensorIcon />;
-                  if (sensor.objectType === 'consumer') return <ConsumerIcon />;
-                  return sensor.objectType;
+                  if (object.objectType === 'sensor') return <SensorIcon />;
+                  if (object.objectType === 'consumer') return <ConsumerIcon />;
+                  return object.objectType;
                 })()}
               </div>
-              {sensor.objectType}
+              {object.objectType}
             </div>
           </div>
           <div>
@@ -50,103 +50,103 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
             Details
           </dt>
           <dd className="mb-4 font-light text-gray-500 sm:mb-5 dark:text-gray-400">
-            {sensor.interfaceType && (
+            {object.interfaceType && (
               <>
-                <span>Interface Type: {sensor.interfaceType}</span>
+                <span>Interface Type: {object.interfaceType}</span>
                 <br />
-                {sensor.interfaceType === "serial" && (
+                {object.interfaceType === "serial" && (
                   <>
-                    {sensor.serialType && (
+                    {object.serialType && (
                       <>
-                        <span>Serial Type: {sensor.serialType}</span>
+                        <span>Serial Type: {object.serialType}</span>
                         <br />
                       </>
                     )}
-                    {sensor.baudRate && (
+                    {object.baudRate && (
                       <>
-                        <span>Baud Rate: {sensor.baudRate}</span>
+                        <span>Baud Rate: {object.baudRate}</span>
                         <br />
                       </>
                     )}
-                    {sensor.cardId && (
+                    {object.cardId && (
                       <>
-                        <span>Card ID: {sensor.cardId}</span>
+                        <span>Card ID: {object.cardId}</span>
                         <br />
                       </>
                     )}
                   </>
                 )}
-                {sensor.interfaceType === "ethernet" && (
+                {object.interfaceType === "ethernet" && (
                   <>
-                    {sensor.protocol && (
+                    {object.protocol && (
                       <>
-                        <span>Protocol: {sensor.protocol}</span>
+                        <span>Protocol: {object.protocol}</span>
                         <br />
                       </>
                     )}
-                    {sensor.clientIp && (
+                    {object.clientIp && (
                       <>
-                        <span>Client IP: {sensor.clientIp}</span>
+                        <span>Client IP: {object.clientIp}</span>
                         <br />
                       </>
                     )}
-                    {sensor.netmask && (
+                    {object.netmask && (
                       <>
-                        <span>Netmask: {sensor.netmask}</span>
+                        <span>Netmask: {object.netmask}</span>
                         <br />
                       </>
                     )}
-                    {sensor.port && (
+                    {object.port && (
                       <>
-                        <span>Port: {sensor.port}</span>
+                        <span>Port: {object.port}</span>
                         <br />
                       </>
                     )}
                   </>
                 )}
-                {sensor.interfaceType === "digital" && (
+                {object.interfaceType === "digital" && (
                   <>
-                    {sensor.signalType && (
+                    {object.signalType && (
                       <>
-                        <span>Signal Type: {sensor.signalType}</span>
+                        <span>Signal Type: {object.signalType}</span>
                         <br />
                       </>
                     )}
-                    {sensor.digitalType && (
+                    {object.digitalType && (
                       <>
-                        <span>Digital Type: {sensor.digitalType}</span>
+                        <span>Digital Type: {object.digitalType}</span>
                         <br />
                       </>
                     )}
-                    {sensor.cardId && (
+                    {object.cardId && (
                       <>
-                        <span>Card ID: {sensor.cardId}</span>
+                        <span>Card ID: {object.cardId}</span>
                         <br />
                       </>
                     )}
                   </>
                 )}
-                {sensor.interfaceType === "analog" && (
+                {object.interfaceType === "analog" && (
                   <>
-                    {sensor.cardId && (
+                    {object.cardId && (
                       <>
-                        <span>Card ID: {sensor.cardId}</span>
+                        <span>Card ID: {object.cardId}</span>
                         <br />
                       </>
                     )}
                   </>
                 )}
-                {sensor.interfaceType === "pulse" && (
+                {object.interfaceType === "pulse" && (
                   <>
-                    {sensor.pulseType && (
+                    {object.pulseType && (
                       <>
-                        <span>Pulse Type: {sensor.pulseType}</span>
+                        <span>Pulse Type: {object.pulseType}</span>
                         <br />
                       </>
                     )}
-                    {sensor.cardId && (
+                    {object.cardId && (
                       <>
-                        <span>Card ID: {sensor.cardId}</span>
+                        <span>Card ID: {object.cardId}</span>
                         <br />
                       </>
                     )}
@@ -164,7 +164,7 @@ const PreviewObjectModal = ({ isOpen, onClose, sensor }) => {
 PreviewObjectModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  sensor: PropTypes.object.isRequired,
+  object: PropTypes.object.isRequired,
 };
 
 export default PreviewObjectModal;

@@ -1,11 +1,6 @@
 import React from "react";
 
-const DeleteConfirmationModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  selectedCount,
-}) => {
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, selectedCount }) => {
   if (!isOpen) return null;
 
   return (
@@ -20,13 +15,13 @@ const DeleteConfirmationModal = ({
           id="modal-title"
         >
           {selectedCount > 0
-            ? "Are you sure you want to delete all selected sensors?"
-            : "Please select at least one sensor to delete."}
+            ? "Are you sure you want to delete all selected objects?"
+            : "Please select at least one object to delete."}
         </h3>
         <div className="mt-4 flex justify-end space-x-4">
           <button
             type="button"
-            className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-gray-700 rounded-lg focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-900 hover:bg-gray-800"
+            className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-gray-700 rounded-lg focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-900 hover:bg-gray-800"
             onClick={onClose}
           >
             Cancel
@@ -34,7 +29,7 @@ const DeleteConfirmationModal = ({
           {selectedCount > 0 && (
             <button
               onClick={onConfirm}
-              className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-red-700 rounded-lg focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 hover:bg-red-800"
+              className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-white bg-red-700 rounded-lg focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 hover:bg-red-800"
             >
               Confirm
             </button>
