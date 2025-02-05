@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { createObject } from "../../Provider/objectSlice";
@@ -15,10 +15,23 @@ const CreateObjectModal = ({ isOpen, onClose }) => {
   const [ipClient, setIpClient] = useState("");
   const [netmask, setNetmask] = useState("");
   const [port, setPort] = useState("");
-  const [digitalType, setDigitalType] = useState("");
-  const [signalType, setSignalType] = useState("");
+  const [signalType, setSignalType] = useState("digital");
+  const [digitalType, setDigitalType] = useState("high-z");
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    if (signalType === "digital") {
+      setDigitalType("high-z");
+    } else if (signalType === "pulse") {
+      setDigitalType("positive-pulse");
+    }
+  }, [signalType]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (interfaceType === "digital" && !digitalType) {
+      alert("Digital Type is required when Signal Type is selected.");
+      return;
+    }
     const newObject = {
       objectName: name,
       objectType,
@@ -46,7 +59,7 @@ const CreateObjectModal = ({ isOpen, onClose }) => {
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
             Add a new object
           </h2>
-          <form action="#">
+          <form onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 w-full">
               <div>
                 <label
@@ -357,7 +370,6 @@ const CreateObjectModal = ({ isOpen, onClose }) => {
             <div className="gap-2 flex flex-row">
               <button
                 type="submit"
-                onClick={handleSubmit}
                 className="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
               >
                 Add Object

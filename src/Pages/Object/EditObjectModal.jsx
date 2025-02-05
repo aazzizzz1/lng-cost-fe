@@ -20,7 +20,6 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
   const [port, setPort] = useState(object?.port || "");
   const [digitalType, setDigitalType] = useState(object?.digitalType || "");
   const [signalType, setSignalType] = useState(object?.signalType || "");
-  const [pulseType, setPulseType] = useState(object?.pulseType || "");
 
   useEffect(() => {
     if (object) {
@@ -36,11 +35,23 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
       setPort(object.port);
       setDigitalType(object.digitalType);
       setSignalType(object.signalType);
-      setPulseType(object.pulseType);
     }
   }, [object]);
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    if (signalType === "digital") {
+      setDigitalType("high-z");
+    } else if (signalType === "pulse") {
+      setDigitalType("positive-pulse");
+    }
+  }, [signalType]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (interfaceType === "digital" && !digitalType) {
+      alert("Digital Type is required when Signal Type is selected.");
+      return;
+    }
     const updatedObject = {
       objectName: name,
       objectType,
@@ -55,7 +66,6 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
       ethernetProtocol: protocol,
       signalType,
       digitalType,
-      pulseType,
     };
 
     dispatch(updateObject({ id: object.id, updatedObject }));
@@ -69,7 +79,7 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
             Edit Object {name}
           </h2>
-          <form action="#">
+          <form onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div>
                 <label
