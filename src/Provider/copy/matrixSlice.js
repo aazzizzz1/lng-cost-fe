@@ -189,8 +189,6 @@ const initialState = {
         ],
       },
   ],
-  
-  // Sensor data
   sensorData: [
     {
       id: 1,
