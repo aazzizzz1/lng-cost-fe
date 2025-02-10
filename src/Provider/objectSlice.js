@@ -54,7 +54,7 @@ export const deleteObject = createAsyncThunk('objects/deleteObject', async (id, 
 
 export const deleteMultipleObjects = createAsyncThunk('objects/deleteMultipleObjects', async (ids, { rejectWithValue }) => {
   try {
-    await Promise.all(ids.map(id => axios.delete(`${api}/objects/${id}`)));
+    await axios.delete(`${api}/objects`, { data: { ids } });
     return ids;
   } catch (error) {
     console.error('Error deleting multiple objects:', error);
