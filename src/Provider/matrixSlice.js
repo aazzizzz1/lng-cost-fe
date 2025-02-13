@@ -43,6 +43,16 @@ export const postMatrix = createAsyncThunk('matrix/postMatrix', async ({ consume
   }
 });
 
+export const resetMatrix = createAsyncThunk('matrix/resetMatrix', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.delete(`${api}/matrix`);
+    return response.data;
+  } catch (error) {
+    console.error('Error resetting matrix:', error);
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const matrixSlice = createSlice({
   name: 'matrix',
   initialState,
@@ -87,6 +97,12 @@ const matrixSlice = createSlice({
     });
     builder.addCase(fetchSensors.rejected, (state, action) => {
       console.error('Error fetching sensors:', action.payload);
+    });
+    builder.addCase(resetMatrix.fulfilled, (state) => {
+      state.consumers = [];
+    });
+    builder.addCase(resetMatrix.rejected, (state, action) => {
+      console.error('Error resetting matrix:', action.payload);
     });
   },
 });

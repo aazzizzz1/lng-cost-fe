@@ -1,8 +1,7 @@
 import React, { Component } from "react";
+import { useDispatch } from "react-redux";
+import { resetMatrix } from "../../Provider/matrixSlice";
 import MatrixManagement from "./MatrixManagement";
-// import DeleteIcon from "../../Assets/Svg/Object/DeleteIcon";
-// import MatrixConfiguration from './MatrixConfiguration';
-// import SensorFlow from './SensorFlow';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -27,6 +26,12 @@ class ErrorBoundary extends Component {
 }
 
 const MatrixPages = () => {
+  const dispatch = useDispatch();
+
+  const handleResetMatrix = () => {
+    dispatch(resetMatrix());
+  };
+
   return (
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode md:h-screen">
@@ -42,14 +47,11 @@ const MatrixPages = () => {
             data-modal-target="delete-modal"
             data-modal-toggle="delete-modal"
             className="px-3 py-2 flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
-            onClick={() => {}}
+            onClick={handleResetMatrix}
           >
-            {/* <DeleteIcon /> */}
             RESET MATRIX
           </button>
         </div>
-        {/* <SensorFlow/> */}
-        {/* <MatrixConfiguration/> */}
         <MatrixManagement />
       </div>
     </ErrorBoundary>
