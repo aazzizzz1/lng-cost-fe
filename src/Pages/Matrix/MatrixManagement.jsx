@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // Re-added useEffect
 import { useSelector, useDispatch } from "react-redux";
-import { updateConsumer, clearAllSensors } from "../../Provider/matrixSlice";
+import { updateConsumer, clearAllSensors, fetchMatrix } from "../../Provider/matrixSlice"; // Re-added fetchMatrix
 import DeepthSensorIcon from "../../Assets/Svg/Layout/DeepthSensorIcon";
 import GyroscopeSensorIcon from "../../Assets/Svg/Layout/GyroscopeSensorIcon";
 import BarometerSensorIcon from "../../Assets/Svg/Layout/BarometerSensorIcon";
@@ -25,6 +25,10 @@ const MatrixManagement = () => {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedConsumer, setSelectedConsumer] = useState(null);
   const [expandedConsumerIds, setExpandedConsumerIds] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchMatrix());
+  }, [dispatch]);
 
   const iconMapping = {
     "depth sensor": DeepthSensorIcon,
