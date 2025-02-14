@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { updateConsumer, fetchSensors, postMatrix } from "../../Provider/matrixSlice";
+import { updateConsumer, fetchSensors, postMatrix, defaultSentences } from "../../Provider/matrixSlice";
 
 const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
   const dispatch = useDispatch();
@@ -14,8 +14,6 @@ const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
   useEffect(() => {
     dispatch(fetchSensors());
   }, [dispatch]);
-
-  const defaultSentences = ["GGA", "GGL", "RMC", "VTG"]; // Default sentences
 
   const handleAddSensor = (sensor) => {
     setSelectedSensor({ ...sensor, sentences: defaultSentences });

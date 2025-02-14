@@ -53,6 +53,8 @@ export const resetMatrix = createAsyncThunk('matrix/resetMatrix', async (_, { re
   }
 });
 
+const defaultSentences = ["GGA", "GGL", "RMC", "VTG"]; // Default sentences
+
 const matrixSlice = createSlice({
   name: 'matrix',
   initialState,
@@ -108,4 +110,5 @@ const matrixSlice = createSlice({
 });
 
 export const { setConsumers, updateConsumer, clearAllSensors } = matrixSlice.actions;
+export { defaultSentences }; // Correctly export default sentences
 export default matrixSlice.reducer;
