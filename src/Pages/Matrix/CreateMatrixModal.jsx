@@ -28,6 +28,8 @@ const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
     const updatedSensor = {
       ...selectedSensor,
       sentences: selectedSentences,
+      sentence_enable: selectedSentences,
+      sentence_disable: defaultSentences.filter(sentence => !selectedSentences.includes(sentence)),
     };
     setSelectedSensors([...selectedSensors, updatedSensor]);
     setIsNestedModalOpen(false);

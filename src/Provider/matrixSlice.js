@@ -33,7 +33,8 @@ export const postMatrix = createAsyncThunk('matrix/postMatrix', async ({ consume
       consumer_id: consumerId,
       sensor: sensors.map(sensor => ({
         sensor_id: sensor.id,
-        sentences: sensor.sentences,
+        sentence_enable: sensor.sentence_enable,
+        sentence_disable: sensor.sentence_disable,
       })),
     });
     return response.data;
@@ -84,6 +85,8 @@ const matrixSlice = createSlice({
           id: sensor.id,
           name: sensor.name,
           status: sensor.statusSensor,
+          sentence_enable: sensor.sentence_enable,
+          sentence_disable: sensor.sentence_disable,
         })),
         totalSensor: matrix.totalSensor,
         totalsSensorPending: matrix.totalsSensorPending,
