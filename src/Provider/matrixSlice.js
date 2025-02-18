@@ -54,6 +54,16 @@ export const resetMatrix = createAsyncThunk('matrix/resetMatrix', async (_, { re
   }
 });
 
+export const deleteConsumer = createAsyncThunk('matrix/deleteConsumer', async (consumerId, { rejectWithValue }) => {
+  try {
+    const response = await axios.delete(`${api}/matrix/consumer/${consumerId}`);
+    return consumerId;
+  } catch (error) {
+    console.error('Error deleting consumer:', error);
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const defaultSentences = ["GGA", "GGL", "RMC", "VTG"]; // Default sentences
 
 const matrixSlice = createSlice({
@@ -108,6 +118,12 @@ const matrixSlice = createSlice({
     });
     builder.addCase(resetMatrix.rejected, (state, action) => {
       console.error('Error resetting matrix:', action.payload);
+    });
+    builder.addCase(deleteConsumer.fulfilled, (state, action) => {
+      state.consumers = state.consumers.filter(consumer => consumer.id !== action.payload);
+    });
+    builder.addCase(deleteConsumer.rejected, (state, action) => {
+      console.error('Error deleting consumer:', action.payload);
     });
   },
 });

@@ -3,11 +3,7 @@ import PropTypes from "prop-types";
 
 const DeleteMatrixModal = ({ isOpen, onClose, onDelete, consumer }) => {
   const handleDeleteAll = () => {
-    const updatedConsumer = {
-      ...consumer,
-      sensors: [],
-    };
-    onDelete(updatedConsumer);
+    onDelete(consumer.id);
     onClose();
   };
 

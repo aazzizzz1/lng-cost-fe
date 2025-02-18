@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"; // Re-added useEffect
 import { useSelector, useDispatch } from "react-redux";
-import { updateConsumer, clearAllSensors, fetchMatrix } from "../../Provider/matrixSlice"; // Re-added fetchMatrix
+import { updateConsumer, clearAllSensors, fetchMatrix, deleteConsumer } from "../../Provider/matrixSlice"; // Re-added fetchMatrix
 import DeepthSensorIcon from "../../Assets/Svg/Layout/DeepthSensorIcon";
 import GyroscopeSensorIcon from "../../Assets/Svg/Layout/GyroscopeSensorIcon";
 import BarometerSensorIcon from "../../Assets/Svg/Layout/BarometerSensorIcon";
@@ -93,8 +93,8 @@ const MatrixManagement = () => {
     dispatch(updateConsumer(updatedConsumer));
   };
 
-  const handleClearAllSensors = (updatedConsumer) => {
-    dispatch(clearAllSensors(updatedConsumer.id));
+  const handleClearAllSensors = (consumerId) => {
+    dispatch(deleteConsumer(consumerId));
   };
 
   const calculateStatusCounts = (sensors) => {
