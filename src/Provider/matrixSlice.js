@@ -57,6 +57,7 @@ export const resetMatrix = createAsyncThunk('matrix/resetMatrix', async (_, { re
 export const deleteConsumer = createAsyncThunk('matrix/deleteConsumer', async (consumerId, { rejectWithValue }) => {
   try {
     const response = await axios.delete(`${api}/matrix/consumer/${consumerId}`);
+    console.log('Consumer deleted:', response.data);
     return consumerId;
   } catch (error) {
     console.error('Error deleting consumer:', error);
