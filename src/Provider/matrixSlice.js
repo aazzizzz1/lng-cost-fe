@@ -65,6 +65,19 @@ export const deleteConsumer = createAsyncThunk('matrix/deleteConsumer', async (c
   }
 });
 
+export const deleteSensorsFromMatrix = createAsyncThunk('matrix/deleteSensorsFromMatrix', async ({ consumerId, sensorIds }, { rejectWithValue }) => {
+  try {
+    const response = await axios.delete(`${api}/matrix/deletesensor/${consumerId}`, {
+      data: { sensor_id: sensorIds }
+    });
+    console.log('Sensors deleted:', response.data);
+    return { consumerId, sensorIds };
+  } catch (error) {
+    console.error('Error deleting sensors from matrix:', error);
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const defaultSentences = ["GGA", "GGL", "RMC", "VTG"]; // Default sentences
 
 const matrixSlice = createSlice({
@@ -125,6 +138,17 @@ const matrixSlice = createSlice({
     });
     builder.addCase(deleteConsumer.rejected, (state, action) => {
       console.error('Error deleting consumer:', action.payload);
+    });
+    builder.addCase(deleteSensorsFromMatrix.fulfilled, (state, action) => {
+      const { consumerId, sensorIds } = action.payload;
+      state.consumers = state.consumers.map(consumer =>
+        consumer.id === consumerId
+          ? { ...consumer, sensors: consumer.sensors.filter(sensor => !sensorIds.includes(sensor.id)) }
+          : consumer
+      );
+    });
+    builder.addCase(deleteSensorsFromMatrix.rejected, (state, action) => {
+      console.error('Error deleting sensors from matrix:', action.payload);
     });
   },
 });

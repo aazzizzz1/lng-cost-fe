@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import EditIcon from "../../Assets/Svg/Object/EditIcon";
+import { useDispatch } from "react-redux";
+import { deleteSensorsFromMatrix } from "../../Provider/matrixSlice";
 
 const EditMatrixModal = ({ isOpen, onClose, onUpdate, sensors, consumer }) => {
+  const dispatch = useDispatch();
   const [selectedSensors, setSelectedSensors] = useState(consumer ? consumer.sensors : []);
   const [selectedSensor, setSelectedSensor] = useState(null);
   const [selectedSentences, setSelectedSentences] = useState([]);
@@ -34,6 +37,7 @@ const EditMatrixModal = ({ isOpen, onClose, onUpdate, sensors, consumer }) => {
   };
 
   const handleRemoveSensor = (sensorId) => {
+    dispatch(deleteSensorsFromMatrix({ consumerId: consumer.id, sensorIds: [sensorId] }));
     setSelectedSensors((prevSensors) => prevSensors.filter((sensor) => sensor.id !== sensorId));
   };
 
