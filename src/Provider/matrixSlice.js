@@ -80,6 +80,27 @@ export const deleteSensorsFromMatrix = createAsyncThunk('matrix/deleteSensorsFro
 
 const defaultSentences = ["GGA", "GGL", "RMC", "VTG"]; // Default sentences
 
+export const updateMatrix = createAsyncThunk('matrix/updateMatrix', async ({ consumerId, sensors }, { rejectWithValue }) => {
+  try {
+    const payload = {
+      sensor: sensors.map(sensor => {
+        const enable = sensor.sentence_enable || [];
+        return {
+          sensor_id: sensor.id,
+          sentence_enable: enable,
+          sentence_disable: defaultSentences.filter(item => !enable.includes(item)),
+        };
+      }),
+    };
+    console.log("Sending updateMatrix payload:", payload);
+    const response = await axios.put(`${api}/matrix/${consumerId}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating matrix:', error);
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const matrixSlice = createSlice({
   name: 'matrix',
   initialState,
@@ -149,6 +170,15 @@ const matrixSlice = createSlice({
     });
     builder.addCase(deleteSensorsFromMatrix.rejected, (state, action) => {
       console.error('Error deleting sensors from matrix:', action.payload);
+    });
+    builder.addCase(updateMatrix.fulfilled, (state, action) => {
+      const updatedConsumer = action.payload;
+      state.consumers = state.consumers.map(consumer =>
+        consumer.id === updatedConsumer.id ? updatedConsumer : consumer
+      );
+    });
+    builder.addCase(updateMatrix.rejected, (state, action) => {
+      console.error('Error updating matrix:', action.payload);
     });
   },
 });
