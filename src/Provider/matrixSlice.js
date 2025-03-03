@@ -5,6 +5,9 @@ const api = process.env.REACT_APP_API;
 const initialState = {
   consumers: [],
   sensors: [], // Ensure sensors is initialized as an empty array
+  successMessage: '',
+  errorMessage: '',
+  shouldfetchMatrix: false,
 };
 
 export const fetchMatrix = createAsyncThunk('matrix/fetchMatrix', async (_, { rejectWithValue }) => {
@@ -119,6 +122,12 @@ const matrixSlice = createSlice({
       state.consumers = state.consumers.map(consumer =>
         consumer.id === consumerId ? { ...consumer, sensors: [] } : consumer
       );
+      // Set flag to fetch matrix after clear operation
+      state.shouldfetchMatrix = true;
+    },
+    clearMessages(state) {
+      state.successMessage = '';
+      state.errorMessage = '';
     },
   },
   extraReducers: (builder) => {
@@ -138,9 +147,12 @@ const matrixSlice = createSlice({
         totalsSensorSuccess: matrix.totalsSensorSuccess,
         totalsSensorFailed: matrix.totalsSensorFailed,
       }));
+      // state.successMessage = 'Matrix fetched successfully';
+      // state.errorMessage = '';
     });
     builder.addCase(fetchMatrix.rejected, (state, action) => {
-      console.error('Error fetching matrix:', action.payload);
+      state.errorMessage = 'Error fetching matrix';
+      state.successMessage = '';
     });
     builder.addCase(fetchSensors.fulfilled, (state, action) => {
       state.sensors = action.payload; // Ensure sensors are set correctly
@@ -148,17 +160,35 @@ const matrixSlice = createSlice({
     builder.addCase(fetchSensors.rejected, (state, action) => {
       console.error('Error fetching sensors:', action.payload);
     });
+    builder.addCase(postMatrix.fulfilled, (state, action) => {
+      state.successMessage = 'Matrix created successfully';
+      state.errorMessage = '';
+      state.shouldfetchMatrix = true;
+    });
+    builder.addCase(postMatrix.rejected, (state, action) => {
+      state.errorMessage = 'Error creating matrix';
+      state.successMessage = '';
+    });
     builder.addCase(resetMatrix.fulfilled, (state) => {
       state.consumers = [];
+      state.successMessage = 'Matrix reset successfully';
+      state.errorMessage = '';
+      state.shouldfetchMatrix = true;
     });
     builder.addCase(resetMatrix.rejected, (state, action) => {
-      console.error('Error resetting matrix:', action.payload);
+      state.errorMessage = 'Error resetting matrix';
+      state.successMessage = '';
     });
     builder.addCase(deleteConsumer.fulfilled, (state, action) => {
       state.consumers = state.consumers.filter(consumer => consumer.id !== action.payload);
+      state.successMessage = 'Matrix consumer deleted successfully';
+      state.errorMessage = '';
+      // Add shouldfetchMatrix flag after deletion
+      state.shouldfetchMatrix = true;
     });
     builder.addCase(deleteConsumer.rejected, (state, action) => {
-      console.error('Error deleting consumer:', action.payload);
+      state.errorMessage = 'Error deleting consumer';
+      state.successMessage = '';
     });
     builder.addCase(deleteSensorsFromMatrix.fulfilled, (state, action) => {
       const { consumerId, sensorIds } = action.payload;
@@ -167,22 +197,30 @@ const matrixSlice = createSlice({
           ? { ...consumer, sensors: consumer.sensors.filter(sensor => !sensorIds.includes(sensor.id)) }
           : consumer
       );
+      state.successMessage = 'Sensors deleted successfully';
+      state.errorMessage = '';
+      state.shouldfetchMatrix = true;
     });
     builder.addCase(deleteSensorsFromMatrix.rejected, (state, action) => {
-      console.error('Error deleting sensors from matrix:', action.payload);
+      state.errorMessage = 'Error deleting sensors from matrix';
+      state.successMessage = '';
     });
     builder.addCase(updateMatrix.fulfilled, (state, action) => {
       const updatedConsumer = action.payload;
       state.consumers = state.consumers.map(consumer =>
         consumer.id === updatedConsumer.id ? updatedConsumer : consumer
       );
+      state.successMessage = 'Matrix updated successfully';
+      state.errorMessage = '';
+      state.shouldfetchMatrix = true;
     });
     builder.addCase(updateMatrix.rejected, (state, action) => {
-      console.error('Error updating matrix:', action.payload);
+      state.errorMessage = 'Error updating matrix';
+      state.successMessage = '';
     });
   },
 });
 
-export const { setConsumers, updateConsumer, clearAllSensors } = matrixSlice.actions;
+export const { setConsumers, updateConsumer, clearAllSensors, clearMessages } = matrixSlice.actions;
 export { defaultSentences }; // Correctly export default sentences
 export default matrixSlice.reducer;
