@@ -19,6 +19,7 @@ import IconLogOut from "../Assets/Svg/Sidebar/IconLogOut";
 import MatrixIcon from "../Assets/Svg/Sidebar/MatrixIcon";
 import MobileNavbar from "./MobileNavbar";
 import EditSourceModal from "./EditSourceModal";
+import Cookies from 'js-cookie';
 
 const HomeLayout = (props) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -96,6 +97,11 @@ const HomeLayout = (props) => {
     return () => clearInterval(interval); // Clean up the interval on component unmount
   }, []);
 
+  const handleLogout = () => {
+    Cookies.remove('token');
+    window.location.href = '/signin';
+  };
+
   const footerLinks = [
     { to: "/dashboard", icon: HomeIcon, label: "Home" },
     { to: "/simulator", icon: SimulatorIcon, label: "Simulator" },
@@ -108,7 +114,7 @@ const HomeLayout = (props) => {
       label: "Self Test",
       alert: "danger",
     },
-    { to: "#", icon: IconLogOut, label: "Log Out" },
+    { to: "#", icon: IconLogOut, label: "Log Out", onClick: handleLogout },
   ];
 
   return (
@@ -239,7 +245,7 @@ const HomeLayout = (props) => {
         <ul className="flex gap-4 flex-wrap items-center mt-2 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
           {footerLinks.map((link, index) => (
             <li key={index} className="relative">
-              <Link to={link.to} className="mr-2 flex flex-col items-center">
+              <Link to={link.to} className="mr-2 flex flex-col items-center" onClick={link.onClick}>
                 <link.icon className="w-6 h-6" />
                 <p className="text-maincolor dark:text-white mt-1">
                   {link.label}
