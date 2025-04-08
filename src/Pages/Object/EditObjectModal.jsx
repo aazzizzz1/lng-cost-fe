@@ -1,74 +1,59 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useDispatch } from "react-redux";
-import { updateObject } from "../../Provider/objectSlice";
 
 // Modal untuk edit sensor yang sudah ada
-const EditObjectModal = ({ isOpen, onClose, object }) => {
-  const dispatch = useDispatch();
-  const [name, setName] = useState(object?.name || "");
-  const [objectType, setObjectType] = useState(object?.objectType || "sensor");
+const EditObjectModal = ({ isOpen, onClose, onUpdate, sensor }) => {
+  const [name, setName] = useState(sensor?.name || "");
+  const [objectId, setObjectId] = useState(sensor?.objectId || 1);
   const [interfaceType, setInterfaceType] = useState(
-    object?.interfaceType || ""
+    sensor?.interfaceType || ""
   );
-  const [serialType, setSerialType] = useState(object?.serialType || "RS-232");
-  const [baudRate, setBaudRate] = useState(object?.baudRate || 9600);
-  const [cardId, setCardId] = useState(object?.cardId || 1);
-  const [protocol, setProtocol] = useState(object?.protocol || "TCP");
-  const [clientIp, setClientIp] = useState(object?.clientIp || "");
-  const [netmask, setNetmask] = useState(object?.netmask || "");
-  const [port, setPort] = useState(object?.port || "");
-  const [digitalType, setDigitalType] = useState(object?.digitalType || "");
-  const [signalType, setSignalType] = useState(object?.signalType || "");
+  const [serialType, setSerialType] = useState(sensor?.serialType || "RS-232");
+  const [baudRate, setBaudRate] = useState(sensor?.baudRate || 9600);
+  const [cardId, setCardId] = useState(sensor?.cardId || 1);
+  const [protocol, setProtocol] = useState(sensor?.protocol || "TCP/IP");
+  const [ipClient, setIpClient] = useState(sensor?.ipClient || "");
+  const [netmask, setNetmask] = useState(sensor?.netmask || "");
+  const [port, setPort] = useState(sensor?.port || "");
+  const [digitalOption, setDigitalOption] = useState(
+    sensor?.digitalOption || ""
+  );
+  const [signalType, setSignalType] = useState(sensor?.signalType || "digital");
 
   useEffect(() => {
-    if (object) {
-      setName(object.name);
-      setObjectType(object.objectType);
-      setInterfaceType(object.interfaceType);
-      setSerialType(object.serialType);
-      setBaudRate(object.baudRate);
-      setCardId(object.cardId);
-      setProtocol(object.protocol);
-      setClientIp(object.clientIp);
-      setNetmask(object.netmask);
-      setPort(object.port);
-      setDigitalType(object.digitalType);
-      setSignalType(object.signalType);
+    if (sensor) {
+      setName(sensor.name);
+      setObjectId(sensor.objectId);
+      setInterfaceType(sensor.interfaceType);
+      setSerialType(sensor.serialType);
+      setBaudRate(sensor.baudRate);
+      setCardId(sensor.cardId);
+      setProtocol(sensor.protocol);
+      setIpClient(sensor.ipClient);
+      setNetmask(sensor.netmask);
+      setPort(sensor.port);
+      setDigitalOption(sensor.digitalOption);
+      setSignalType(sensor.signalType);
     }
-  }, [object]);
+  }, [sensor]);
 
-  useEffect(() => {
-    if (signalType === "digital") {
-      setDigitalType("high-z");
-    } else if (signalType === "pulse") {
-      setDigitalType("positive-pulse");
-    }
-  }, [signalType]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (interfaceType === "digital" && !digitalType) {
-      alert("Digital Type is required when Signal Type is selected.");
-      return;
-    }
-    const updatedObject = {
-      objectName: name,
-      objectType,
+  const handleSubmit = () => {
+    const updatedSensor = {
+      ...sensor,
+      name,
+      objectId,
       interfaceType,
-      cardID: cardId,
-      updateRate: 1, // Assuming updateRate is 1
       serialType,
-      baudrate: baudRate,
-      ipClient: clientIp,
+      baudRate,
+      cardId,
+      protocol,
+      ipClient,
       netmask,
       port,
-      ethernetProtocol: protocol,
+      digitalOption,
       signalType,
-      digitalType,
     };
-
-    dispatch(updateObject({ id: object.id, updatedObject }));
+    onUpdate(updatedSensor);
     onClose();
   };
 
@@ -79,23 +64,23 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
             Edit Object {name}
           </h2>
-          <form onSubmit={handleSubmit}>
+          <form action="#">
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div>
                 <label
-                  htmlFor="object-type"
+                  htmlFor="object-id"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Object Type
                 </label>
                 <select
-                  id="object-type"
+                  id="object-id"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  value={objectType}
-                  onChange={(e) => setObjectType(e.target.value)}
+                  value={objectId}
+                  onChange={(e) => setObjectId(Number(e.target.value))}
                 >
-                  <option value="sensor">Sensor</option>
-                  <option value="consumer">Consumer</option>
+                  <option value={1}>Data Source</option>
+                  <option value={2}>Data Consumer</option>
                 </select>
               </div>
               <div className="sm:col-span-2">
@@ -129,14 +114,14 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
                   onChange={(e) => setInterfaceType(e.target.value)}
                 >
                   <option value="">Select Interface</option>
-                  <option value="serial">Serial</option>
-                  <option value="ethernet">Ethernet</option>
-                  <option value="digital">Digital</option>
-                  <option value="analog">Analog</option>
+                  <option value="Serial">Serial</option>
+                  <option value="Ethernet">Ethernet</option>
+                  <option value="Digital">Digital</option>
+                  <option value="Analog">Analog</option>
                 </select>
               </div>
 
-              {interfaceType === "serial" && (
+              {interfaceType === "Serial" && (
                 <>
                   <div>
                     <label
@@ -202,7 +187,7 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
                 </>
               )}
 
-              {interfaceType === "ethernet" && (
+              {interfaceType === "Ethernet" && (
                 <>
                   <div>
                     <label
@@ -228,18 +213,22 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
                   {protocol !== "MQTT" && protocol !== "UDPB" && (
                     <div>
                       <label
-                        htmlFor="client-ip"
+                        htmlFor="ip-client"
                         className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                       >
-                        Client IP
+                        IP Client
                       </label>
                       <input
                         type="text"
-                        id="client-ip"
-                        value={clientIp}
-                        onChange={(e) => setClientIp(e.target.value)}
+                        id="ip-client"
+                        value={ipClient}
+                        onChange={(e) => setIpClient(e.target.value)}
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                        placeholder="Client IP"
+                        placeholder={
+                          protocol === "UDPM"
+                            ? "Add IP Multicast"
+                            : "Add IP Client"
+                        }
                       />
                     </div>
                   )}
@@ -282,17 +271,17 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
                 </>
               )}
 
-              {interfaceType === "digital" && (
+              {interfaceType === "Digital" && (
                 <>
                   <div>
                     <label
-                      htmlFor="signal-type"
+                      htmlFor="digital-option"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Signal Type
+                      Signal Type:
                     </label>
                     <select
-                      id="signal-type"
+                      id="digital-option"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                       value={signalType}
                       onChange={(e) => setSignalType(e.target.value)}
@@ -301,59 +290,145 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
                       <option value="pulse">Pulse</option>
                     </select>
                   </div>
-                  <div>
-                    <label
-                      htmlFor="digital-type"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Digital Type
-                    </label>
-                    <select
-                      id="digital-type"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      value={digitalType}
-                      onChange={(e) => setDigitalType(e.target.value)}
-                    >
+                  {objectId === 1 ? (
+                    <>
                       {signalType === "digital" ? (
-                        <>
-                          <option value="high-z">High Z</option>
-                          <option value="enable-pull-up">Enable Pull Up</option>
-                          <option value="enable-pull-down">
-                            Enable Pull Down
-                          </option>
-                        </>
+                        <div>
+                          <label
+                            htmlFor="digital-option"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            Digital Option (Digital)
+                          </label>
+                          <select
+                            id="digital-option"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            value={digitalOption}
+                            onChange={(e) => setDigitalOption(e.target.value)}
+                          >
+                            <option value="High-Z">High-Z</option>
+                            <option value="Enable Pull Up">
+                              Enable Pull Up
+                            </option>
+                            <option value="Enable Pull Down">
+                              Enable Pull Down
+                            </option>
+                          </select>
+                        </div>
                       ) : (
-                        <>
-                          <option value="positive-pulse">
-                            Positive Pulse
-                          </option>
-                          <option value="negative-pulse">
-                            Negative Pulse
-                          </option>
-                        </>
+                        <div>
+                          <label
+                            htmlFor="digital-option"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            Digital Option (Pulse)
+                          </label>
+                          <select
+                            id="digital-option"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            value={digitalOption}
+                            onChange={(e) => setDigitalOption(e.target.value)}
+                          >
+                            <option value="Positive Pulse">
+                              Positive Pulse
+                            </option>
+                            <option value="Negative Pulse">
+                              Negative Pulse
+                            </option>
+                          </select>
+                        </div>
                       )}
-                    </select>
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="card-id"
-                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                    >
-                      Card ID
-                    </label>
-                    <select
-                      id="card-id"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      value={cardId}
-                      onChange={(e) => setCardId(Number(e.target.value))}
-                    >
-                      {[1, 2, 3, 4, 5].map((id) => (
-                        <option key={id} value={id}>
-                          Card ID {id}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      <div>
+                        <label
+                          htmlFor="card-id"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          Card ID:
+                        </label>
+                        <select
+                          id="card-id"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                          value={cardId}
+                          onChange={(e) => setCardId(Number(e.target.value))}
+                        >
+                          {[1, 2, 3, 4, 5].map((id) => (
+                            <option key={id} value={id}>
+                              Card ID {id}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {signalType === "digital" ? (
+                        <div>
+                          <label
+                            htmlFor="digital-option"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            Digital Option (Digital)
+                          </label>
+                          <select
+                            id="digital-option"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            value={digitalOption}
+                            onChange={(e) => setDigitalOption(e.target.value)}
+                          >
+                            <option value="High-Z">High-Z</option>
+                            <option value="Enable Pull Up">
+                              Enable Pull Up
+                            </option>
+                            <option value="Enable Pull Down">
+                              Enable Pull Down
+                            </option>
+                          </select>
+                        </div>
+                      ) : (
+                        <div>
+                          <label
+                            htmlFor="digital-option"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            Digital Option (Pulse)
+                          </label>
+                          <select
+                            id="digital-option"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            value={digitalOption}
+                            onChange={(e) => setDigitalOption(e.target.value)}
+                          >
+                            <option value="Positive Pulse">
+                              Positive Pulse
+                            </option>
+                            <option value="Negative Pulse">
+                              Negative Pulse
+                            </option>
+                          </select>
+                        </div>
+                      )}
+                      <div>
+                        <label
+                          htmlFor="card-id"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          Card ID:
+                        </label>
+                        <select
+                          id="card-id"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                          value={cardId}
+                          onChange={(e) => setCardId(Number(e.target.value))}
+                        >
+                          {[1, 2, 3, 4, 5].map((id) => (
+                            <option key={id} value={id}>
+                              Card ID {id}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -384,7 +459,8 @@ const EditObjectModal = ({ isOpen, onClose, object }) => {
 EditObjectModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  object: PropTypes.object.isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  sensor: PropTypes.object.isRequired,
 };
 
 export default EditObjectModal;

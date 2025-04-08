@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { GlobalProvider } from "../Provider/GlobalContext";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
@@ -12,16 +12,8 @@ import AccountSetting from "../Pages/Account/AccountSetting";
 import SelfTestPages from "../Pages/SelfTest/SelfTestPages";
 import SelfTestDisplay from "../Pages/SelfTest/SelfTestDisplay";
 import MatrixPages from "../Pages/Matrix/MatrixPages";
-import Cookies from 'js-cookie';
-
-const RequireAuth = ({ children }) => {
-  const token = Cookies.get('token');
-  return token ? children : <Navigate to="/signin" />;
-};
 
 const RouteComponents = () => {
-  const token = Cookies.get('token');
-
   return (
     <BrowserRouter>
       <GlobalProvider>
@@ -29,83 +21,61 @@ const RouteComponents = () => {
           <Route
             path="/dashboard"
             element={
-              <RequireAuth>
-                <HomeLayout>
-                  <Dashboard />
-                </HomeLayout>
-              </RequireAuth>
+              <HomeLayout>
+                <Dashboard />
+              </HomeLayout>
             }
           />
           <Route
             path="/simulator"
             element={
-              <RequireAuth>
-                <HomeLayout>
-                  <Simulator />
-                </HomeLayout>
-              </RequireAuth>
+              <HomeLayout>
+                <Simulator />
+              </HomeLayout>
             }
           />
           <Route
             path="/object"
             element={
-              <RequireAuth>
-                <HomeLayout>
-                  <ObjectPages />
-                </HomeLayout>
-              </RequireAuth>
+              <HomeLayout>
+                <ObjectPages />
+              </HomeLayout>
             }
           />
           <Route
             path="/matrix"
             element={
-              <RequireAuth>
-                <HomeLayout>
-                  <MatrixPages />
-                </HomeLayout>
-              </RequireAuth>
+              <HomeLayout>
+                <MatrixPages />
+              </HomeLayout>
             }
           />
           <Route
             path="/account"
             element={
-              <RequireAuth>
-                <HomeLayout>
-                  <AccountSetting />
-                </HomeLayout>
-              </RequireAuth>
+              <HomeLayout>
+                <AccountSetting />
+              </HomeLayout>
             }
           />
           <Route
             path="/selftest"
             element={
-              <RequireAuth>
-                <HomeLayout>
-                  <SelfTestPages />
-                </HomeLayout>
-              </RequireAuth>
+              <HomeLayout>
+                <SelfTestPages />
+              </HomeLayout>
             }
           />
-          <Route
-            path="/selftest/display"
-            element={
-              <RequireAuth>
-                <SelfTestDisplay />
-              </RequireAuth>
-            }
-          />
+          <Route path="/selftest/display" element={<SelfTestDisplay />} />
           <Route
             path="/"
-            element={token ? <Navigate to="/dashboard" /> : <SignIn />}
+            element={
+              <SignIn />
+              // <Dashboard />
+            }
           />
-          <Route
-            path="/signin"
-            element={token ? <Navigate to="/dashboard" /> : <SignIn />}
-          />
-          <Route
-            path="/signup"
-            element={token ? <Navigate to="/dashboard" /> : <SignUp />}
-          />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/*" element={<ErrorPage />} />
         </Routes>
       </GlobalProvider>

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import EditIcon from "../../Assets/Svg/Object/EditIcon";
-import { useDispatch } from "react-redux";
-import { deleteSensorsFromMatrix, updateMatrix, defaultSentences } from "../../Provider/matrixSlice";
 
-const EditMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
-  const dispatch = useDispatch();
+const EditMatrixModal = ({ isOpen, onClose, onUpdate, sensors, consumer }) => {
   const [selectedSensors, setSelectedSensors] = useState(consumer ? consumer.sensors : []);
   const [selectedSensor, setSelectedSensor] = useState(null);
   const [selectedSentences, setSelectedSentences] = useState([]);
@@ -19,15 +16,14 @@ const EditMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
 
   const handleEditSensor = (sensor) => {
     setSelectedSensor(sensor);
-    setSelectedSentences(sensor.sentence_enable || []); // use sentence_enable from consumer sensor
+    setSelectedSentences(sensor.sentences || []);
     setIsNestedModalOpen(true);
   };
 
   const handleSaveSensor = () => {
     const updatedSensor = {
       ...selectedSensor,
-      sentence_enable: selectedSentences,
-      sentence_disable: defaultSentences.filter(s => !selectedSentences.includes(s)),
+      sentences: selectedSentences,
     };
     setSelectedSensors((prevSensors) =>
       prevSensors.map((sensor) => (sensor.id === updatedSensor.id ? updatedSensor : sensor))
@@ -38,7 +34,6 @@ const EditMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
   };
 
   const handleRemoveSensor = (sensorId) => {
-    dispatch(deleteSensorsFromMatrix({ consumerId: consumer.id, sensorIds: [sensorId] }));
     setSelectedSensors((prevSensors) => prevSensors.filter((sensor) => sensor.id !== sensorId));
   };
 
@@ -51,7 +46,11 @@ const EditMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
   };
 
   const handleSubmit = () => {
-    dispatch(updateMatrix({ consumerId: consumer.id, sensors: selectedSensors }));
+    const updatedConsumer = {
+      ...consumer,
+      sensors: selectedSensors,
+    };
+    onUpdate(updatedConsumer);
     onClose();
   };
 
@@ -134,25 +133,27 @@ const EditMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
                 Select Sentences for {selectedSensor.name}
               </h2>
               <ul className="grid gap-4 sm:grid-cols-2 sm:gap-6 w-full">
-                {defaultSentences.map((sentence) => (
-                  <li key={sentence} className="flex items-center justify-between">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={selectedSentences.includes(sentence)}
-                        onChange={() =>
-                          setSelectedSentences((prev) =>
-                            prev.includes(sentence)
-                              ? prev.filter(s => s !== sentence)
-                              : [...prev, sentence]
-                          )
-                        }
-                        className="mr-2"
-                      />
-                      {sentence}
-                    </label>
-                  </li>
-                ))}
+                {sensors
+                  .find((sensor) => sensor.id === selectedSensor.id)
+                  ?.sentences.map((sentence) => (
+                    <li key={sentence.id} className="flex items-center justify-between">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={selectedSentences.some((s) => s.id === sentence.id)}
+                          onChange={() =>
+                            setSelectedSentences((prev) =>
+                              prev.includes(sentence)
+                                ? prev.filter((s) => s.id !== sentence.id)
+                                : [...prev, sentence]
+                            )
+                          }
+                          className="mr-2"
+                        />
+                        {sentence.name}
+                      </label>
+                    </li>
+                  ))}
               </ul>
               <div className="gap-2 flex flex-row mt-4">
                 <button
@@ -181,6 +182,7 @@ const EditMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
 EditMatrixModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
   sensors: PropTypes.array.isRequired,
   consumer: PropTypes.object,
 };

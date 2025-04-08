@@ -12,123 +12,95 @@ import CreateIcon from "../../Assets/Svg/Object/CreateIcon";
 import DeleteIcon from "../../Assets/Svg/Object/DeleteIcon";
 import PreviewIcon from "../../Assets/Svg/Object/PreviewIcon";
 import EditIcon from "../../Assets/Svg/Object/EditIcon";
-import { createObject, updateObject, deleteObject, deleteMultipleObjects, fetchObjects, clearMessages } from "../../Provider/objectSlice";
-import SuccessAlertObject from "../../Components/Alerts/ObjectAlert/SuccessAlertObject";
-import ErrorAlertObject from "../../Components/Alerts/ObjectAlert/ErrorAlertObject";
+import { createSensor, editSensor, deleteSensor } from "../../Provider/objectSlice";
 
-// Object Management Table Component
+// Sensor Management Table Component
 const ObjectManagementTable = () => {
   const dispatch = useDispatch();
-  const objects = useSelector((state) => state.objects.objects);
-  const successMessage = useSelector((state) => state.objects.successMessage);
-  const errorMessage = useSelector((state) => state.objects.errorMessage);
-  const shouldfetchObjects = useSelector((state) => state.objects.shouldfetchObjects);
-
-  useEffect(() => {
-    dispatch(fetchObjects());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (shouldfetchObjects) {
-      dispatch(fetchObjects());
-    }
-  }, [shouldfetchObjects, dispatch]);
-
-  useEffect(() => {
-    if (successMessage || errorMessage) {
-      const timer = setTimeout(() => {
-        dispatch(clearMessages());
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage, errorMessage, dispatch]);
+  const sensors = useSelector((state) => state.objects.sensors);
 
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isPreviewModalOpen, setPreviewModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isDeleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
-  const [selectedObject, setSelectedObject] = useState(null);
+  const [selectedSensor, setSelectedSensor] = useState(null);
 
-  const handleCreateObject = (newObject) => {
-    dispatch(createObject(newObject));
+  const handleCreateSensor = (newSensor) => {
+    dispatch(createSensor(newSensor));
   };
 
-  const handleEditObject = (updatedObject) => {
-    dispatch(updateObject({ id: updatedObject.id, updatedObject }));
+  const handleEditSensor = (updatedSensor) => {
+    dispatch(editSensor(updatedSensor));
   };
 
-  const handleDeleteObject = (objectId) => {
-    dispatch(deleteObject(objectId));
-  };
-
-  const handleDeleteMultipleObjects = () => {
-    dispatch(deleteMultipleObjects(selectedObjects));
-    setDeleteConfirmationOpen(false);
-    setSelectedObjects([]);
+  const handleDeleteSensor = (sensorId) => {
+    dispatch(deleteSensor(sensorId));
   };
 
   const [isAllSelected, setIsAllSelected] = useState(false);
-  const [selectedObjects, setSelectedObjects] = useState([]);
+  const [selectedSensors, setSelectedSensors] = useState([]);
 
-  const handleCheckboxChange = (objectId) => {
-    setSelectedObjects((prevSelected) => {
-      if (prevSelected.includes(objectId)) {
-        return prevSelected.filter((id) => id !== objectId);
+  const handleCheckboxChange = (sensorId) => {
+    setSelectedSensors((prevSelected) => {
+      if (prevSelected.includes(sensorId)) {
+        return prevSelected.filter((id) => id !== sensorId);
       } else {
-        return [...prevSelected, objectId];
+        return [...prevSelected, sensorId];
       }
     });
   };
 
   const handleSelectAll = () => {
     if (isAllSelected) {
-      setSelectedObjects([]);
+      setSelectedSensors([]);
     } else {
-      setSelectedObjects(objects.map((object) => object.id));
+      setSelectedSensors(sensors.map((sensor) => sensor.id));
     }
     setIsAllSelected(!isAllSelected);
   };
 
+  const handleDeleteConfirmation = () => {
+    if (selectedSensors.length === 0) {
+      alert("Please select at least one sensor to delete.");
+      return;
+    }
+    selectedSensors.forEach((sensorId) => {
+      dispatch(deleteSensor(sensorId));
+    });
+    setDeleteConfirmationOpen(false);
+    setSelectedSensors([]);
+  };
+
   const [toggleStates, setToggleStates] = useState({});
 
-  const handleToggleChange = (objectId) => {
+  const handleToggleChange = (sensorId) => {
     setToggleStates((prevStates) => ({
       ...prevStates,
-      [objectId]: !prevStates[objectId],
+      [sensorId]: !prevStates[sensorId],
     }));
   };
 
   useEffect(() => {
-    const initialToggleStates = objects.reduce((acc, object) => {
-      acc[object.id] = false;
+    const initialToggleStates = sensors.reduce((acc, sensor) => {
+      acc[sensor.id] = false;
       return acc;
     }, {});
     setToggleStates(initialToggleStates);
-  }, [objects]);
+  }, [sensors]);
 
   useEffect(() => {
-    if (selectedObjects.length === objects.length) {
+    if (selectedSensors.length === sensors.length) {
       setIsAllSelected(true);
     } else {
       setIsAllSelected(false);
     }
-  }, [selectedObjects, objects.length]);
+  }, [selectedSensors, sensors.length]);
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto">
         <div className="bg-white dark:bg-gray-800 relative shadow-md rounded-lg overflow-hidden">
-          <SuccessAlertObject
-            message={successMessage}
-            onClose={() => dispatch(clearMessages())}
-            isVisible={!!successMessage}
-          />
-          <ErrorAlertObject
-            message={errorMessage}
-            onClose={() => dispatch(clearMessages())}
-            isVisible={!!errorMessage}
-          />
           <div className="flex flex-col md:flex-row items-stretch md:items-center md:space-x-3 space-y-3 md:space-y-0 justify-between mx-4 py-4 border-t dark:border-gray-700">
             <div className="w-full md:w-1/2 flex flex-row gap-2">
               <button
@@ -141,7 +113,7 @@ const ObjectManagementTable = () => {
                 <CreateIcon />
                 Add Object
               </button>
-              {selectedObjects.length > 0 && (
+              {selectedSensors.length > 0 && (
                 <button
                   type="button"
                   data-modal-target="delete-modal"
@@ -174,7 +146,7 @@ const ObjectManagementTable = () => {
                     </div>
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Object name
+                    Sensor name
                   </th>
                   <th scope="col" className="px-4 py-3">
                     Object
@@ -185,8 +157,8 @@ const ObjectManagementTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {objects.map((object) => (
-                  <tr key={object.id} className="border-b dark:border-gray-700">
+                {sensors.map((sensor) => (
+                  <tr key={sensor.id} className="border-b dark:border-gray-700">
                     <td className="p-4 w-4">
                       <div className="flex items-center">
                         <input
@@ -194,8 +166,8 @@ const ObjectManagementTable = () => {
                           type="checkbox"
                           onclick="event.stopPropagation()"
                           className="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                          checked={selectedObjects.includes(object.id)}
-                          onChange={() => handleCheckboxChange(object.id)}
+                          checked={selectedSensors.includes(sensor.id)}
+                          onChange={() => handleCheckboxChange(sensor.id)}
                         />
                         <label
                           htmlFor="checkbox-table-search-1"
@@ -206,18 +178,18 @@ const ObjectManagementTable = () => {
                       </div>
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                      {object.name}
+                      {sensor.name}
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                       <div className="flex flex-row gap-2">
                         <div>
                           {(() => {
-                            if (object.objectType === "sensor") return <SensorIcon />;
-                            if (object.objectType === "consumer") return <ConsumerIcon />;
-                            return object.objectType;
+                            if (sensor.objectId === 1) return <SensorIcon />;
+                            if (sensor.objectId === 2) return <ConsumerIcon />;
+                            return sensor.objectId;
                           })()}
                         </div>
-                        {objectObjectType(object.objectType)}
+                        {sensorObjectType(sensor.objectId)}
                       </div>
                     </td>
                     <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
@@ -229,7 +201,7 @@ const ObjectManagementTable = () => {
                           aria-controls="drawer-update-product"
                           className="py-2 px-3 flex items-center text-sm font-medium text-center text-white bg-primary-700 rounded-lg hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                           onClick={() => {
-                            setSelectedObject(object);
+                            setSelectedSensor(sensor);
                             setEditModalOpen(true);
                           }}
                         >
@@ -243,7 +215,7 @@ const ObjectManagementTable = () => {
                           aria-controls="drawer-read-product-advanced"
                           className="py-2 px-3 flex items-center text-sm font-medium text-center text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                           onClick={() => {
-                            setSelectedObject(object);
+                            setSelectedSensor(sensor);
                             setPreviewModalOpen(true);
                           }}
                         >
@@ -256,7 +228,7 @@ const ObjectManagementTable = () => {
                           data-modal-toggle="delete-modal"
                           className="flex items-center text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
                           onClick={() => {
-                            setSelectedObject(object);
+                            setSelectedSensor(sensor);
                             setDeleteModalOpen(true);
                           }}
                         >
@@ -267,12 +239,12 @@ const ObjectManagementTable = () => {
                           <input
                             type="checkbox"
                             className="sr-only peer"
-                            checked={toggleStates[object.id] || false}
-                            onChange={() => handleToggleChange(object.id)}
+                            checked={toggleStates[sensor.id] || false}
+                            onChange={() => handleToggleChange(sensor.id)}
                           />
                           <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600" />
                           <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            {toggleStates[object.id] ? "Enabled" : "Disabled"}
+                            {toggleStates[sensor.id] ? "Enabled" : "Disabled"}
                           </span>
                         </label>
                       </div>
@@ -286,49 +258,49 @@ const ObjectManagementTable = () => {
         <CreateObjectModal
           isOpen={isCreateModalOpen}
           onClose={() => setCreateModalOpen(false)}
-          onCreate={handleCreateObject}
+          onCreate={handleCreateSensor}
         />
         <EditObjectModal
           isOpen={isEditModalOpen}
           onClose={() => setEditModalOpen(false)}
-          onUpdate={handleEditObject}
-          object={selectedObject}
+          onUpdate={handleEditSensor}
+          sensor={selectedSensor}
         />
         <DeleteObjectModal
           isOpen={isDeleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
-          onDelete={handleDeleteObject}
-          object={selectedObject}
+          onDelete={handleDeleteSensor}
+          sensor={selectedSensor}
         />
         <PreviewObjectModal
           isOpen={isPreviewModalOpen}
           onClose={() => setPreviewModalOpen(false)}
-          object={selectedObject}
+          sensor={selectedSensor}
         />
         <DeleteConfirmationModal
           isOpen={isDeleteConfirmationOpen}
           onClose={() => setDeleteConfirmationOpen(false)}
-          onConfirm={handleDeleteMultipleObjects}
-          selectedCount={selectedObjects.length}
+          onConfirm={handleDeleteConfirmation}
+          selectedCount={selectedSensors.length}
         />
       </div>
     </section>
   );
 };
 
-const objectObjectType = (objectType) => {
-  if (objectType === "sensor") return "source";
-  if (objectType === "consumer") return "consumer";
-  return objectType;
+const sensorObjectType = (objectId) => {
+  if (objectId === 1) return "source";
+  if (objectId === 2) return "consumer";
+  return objectId;
 };
 
 ObjectManagementTable.propTypes = {
-  objects: PropTypes.arrayOf(
+  sensors: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
       consumers: PropTypes.arrayOf(PropTypes.string).isRequired,
       parameters: PropTypes.arrayOf(PropTypes.string).isRequired,
-      objectType: PropTypes.string.isRequired,
+      objectId: PropTypes.string.isRequired,
       port: PropTypes.number.isRequired,
       communication: PropTypes.number.isRequired,
       baudRate: PropTypes.number.isRequired,
@@ -338,7 +310,7 @@ ObjectManagementTable.propTypes = {
 };
 
 ObjectManagementTable.defaultProps = {
-  objects: [],
+  sensors: [],
 };
 
 export default ObjectManagementTable;

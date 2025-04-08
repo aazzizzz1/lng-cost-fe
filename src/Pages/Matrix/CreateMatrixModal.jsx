@@ -1,22 +1,17 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { useDispatch, useSelector } from "react-redux";
-import { updateConsumer, fetchSensors, postMatrix, defaultSentences } from "../../Provider/matrixSlice";
+import { useDispatch } from "react-redux";
+import { updateConsumer } from "../../Provider/matrixSlice";
 
-const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
+const CreateMatrixModal = ({ isOpen, onClose, sensors, consumer }) => {
   const dispatch = useDispatch();
-  const sensors = useSelector((state) => state.matrix.sensors);
   const [selectedSensors, setSelectedSensors] = useState(consumer ? consumer.sensors : []);
   const [selectedSensor, setSelectedSensor] = useState(null);
   const [selectedSentences, setSelectedSentences] = useState([]);
   const [isNestedModalOpen, setIsNestedModalOpen] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchSensors());
-  }, [dispatch]);
-
   const handleAddSensor = (sensor) => {
-    setSelectedSensor({ ...sensor, sentences: defaultSentences });
+    setSelectedSensor(sensor);
     setIsNestedModalOpen(true);
   };
 
@@ -28,8 +23,6 @@ const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
     const updatedSensor = {
       ...selectedSensor,
       sentences: selectedSentences,
-      sentence_enable: selectedSentences,
-      sentence_disable: defaultSentences.filter(sentence => !selectedSentences.includes(sentence)),
     };
     setSelectedSensors([...selectedSensors, updatedSensor]);
     setIsNestedModalOpen(false);
@@ -37,22 +30,12 @@ const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
     setSelectedSentences([]);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const updatedConsumer = {
       ...consumer,
       sensors: selectedSensors,
     };
     dispatch(updateConsumer(updatedConsumer));
-
-    try {
-      await dispatch(postMatrix({
-        consumerId: consumer.id,
-        sensors: selectedSensors,
-      }));
-    } catch (error) {
-      console.error("Error saving matrix:", error);
-    }
-
     onClose();
   };
 
@@ -73,7 +56,7 @@ const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
                   Available Sensors
                 </label>
                 <div className="grid gap-4 grid-cols-4 sm:gap-6 w-full">
-                  {Array.isArray(sensors) && sensors.map(sensor => ( // Ensure sensors is an array
+                  {sensors.map(sensor => (
                     <div
                       key={sensor.id}
                       className={`flex items-center border p-2 rounded ${selectedSensors.some(s => s.id === sensor.id) ? 'border-green-500 bg-green-100 dark:bg-green-600 dark:border-green-700' : 'border-gray-300'}`}
@@ -119,18 +102,18 @@ const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 w-full">
                 {selectedSensor.sentences.map(sentence => (
                   <div
-                    key={sentence}
+                    key={sentence.id}
                     className={`flex items-center border p-2 rounded ${selectedSentences.includes(sentence) ? 'border-green-500 bg-green-100 dark:bg-green-600 dark:border-green-600' : 'border-gray-300'}`}
                   >
                     <input
                       type="checkbox"
-                      id={`sentence-${sentence}`}
+                      id={`sentence-${sentence.id}`}
                       className="mr-2"
                       onChange={() => handleAddSentence(sentence)}
                       checked={selectedSentences.includes(sentence)}
                     />
-                    <label htmlFor={`sentence-${sentence}`} className="text-gray-900 dark:text-white">
-                      {sentence}
+                    <label htmlFor={`sentence-${sentence.id}`} className="text-gray-900 dark:text-white">
+                      {sentence.name}
                     </label>
                   </div>
                 ))}
@@ -162,6 +145,7 @@ const CreateMatrixModal = ({ isOpen, onClose, consumer }) => {
 CreateMatrixModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  sensors: PropTypes.array.isRequired,
   consumer: PropTypes.object,
 };
 
