@@ -4,7 +4,6 @@ import { GlobalProvider } from "../Provider/GlobalContext";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
 import SignUp from "../Pages/Auth/SignUp";
-import Dashboard from "../Pages/Home/Dashboard";
 import HomeLayout from "../Layout/HomeLayout";
 import Simulator from "../Pages/Simulator/Simulator";
 import ObjectPages from "../Pages/Object/ObjectPages";
@@ -13,6 +12,7 @@ import SelfTestPages from "../Pages/SelfTest/SelfTestPages";
 import SelfTestDisplay from "../Pages/SelfTest/SelfTestDisplay";
 import MatrixPages from "../Pages/Matrix/MatrixPages";
 import LayoutPages from "../Layout/LayoutPages";
+import DashboardPages from "../Pages/Home/DashboardPages";
 
 const RouteComponents = () => {
   return (
@@ -23,7 +23,7 @@ const RouteComponents = () => {
             path="/dashboard"
             element={
               <LayoutPages>
-                <Dashboard />
+                <DashboardPages />
               </LayoutPages>
             }
           />

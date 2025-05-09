@@ -7,8 +7,10 @@ import ErrorButton from "../../Components/Button/ErrorButton";
 import SuccessToastAuth from "../../Components/Toast/SucessToastAuth";
 import ErrorToastAuth from "../../Components/Toast/ErrorToastAuth";
 import TooltipAuth from "../../Components/Tooltip/TooltipAuth";
-import LogoLen from "../../Assets/Images/logonddu.svg";
-import BackGround from "../../Assets/Svg/Auth/BackgorundAuth.png";
+// import LogoLen from "../../Assets/Images/logonddu.svg";
+import LogoLng from "../../Assets/Images/Logolng.png";
+import BackgroundLNG from "../../Assets/Images/PLI.jpeg";
+// import BackGround from "../../Assets/Svg/Auth/BackgorundAuth.png";
 
 const SignIn = () => {
   //Memanggil state dari GlobalContext dan dari destructuring dibawah ini
@@ -32,7 +34,7 @@ const SignIn = () => {
     <>
     <div className="min-h-screen flex items-center justify-center"
       style={{
-        backgroundImage: `url(${BackGround})`,
+        backgroundImage: `url(${BackgroundLNG})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -41,7 +43,7 @@ const SignIn = () => {
           <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
             <img
               className="w-40 h-30"
-              src={LogoLen}
+              src={LogoLng}
               alt="Logo-Len"
               border="0"
             />
@@ -78,7 +80,7 @@ const SignIn = () => {
                         ? "border-red-600"
                         : ""
                     }`}
-                    placeholder="PT Len Industri"
+                    placeholder="PGN LNG Indoensia"
                     required
                   />
                   {validation === false ? (

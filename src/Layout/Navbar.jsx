@@ -1,5 +1,5 @@
 import React from 'react'
-import LogoStorage from '../Assets/storage.png'
+import LogoStorage from '../Assets/Images/storage.png'
 
 const Navbar = () => {
   return (
