@@ -12,6 +12,7 @@ import AccountSetting from "../Pages/Account/AccountSetting";
 import SelfTestPages from "../Pages/SelfTest/SelfTestPages";
 import SelfTestDisplay from "../Pages/SelfTest/SelfTestDisplay";
 import MatrixPages from "../Pages/Matrix/MatrixPages";
+import LayoutPages from "../Layout/LayoutPages";
 
 const RouteComponents = () => {
   return (
@@ -21,9 +22,9 @@ const RouteComponents = () => {
           <Route
             path="/dashboard"
             element={
-              <HomeLayout>
+              <LayoutPages>
                 <Dashboard />
-              </HomeLayout>
+              </LayoutPages>
             }
           />
           <Route
