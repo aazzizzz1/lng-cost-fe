@@ -80,7 +80,7 @@ const SignIn = () => {
                         ? "border-red-600"
                         : ""
                     }`}
-                    placeholder="PGN LNG Indoensia"
+                    placeholder="PGN LNG Indonesia"
                     required
                   />
                   {validation === false ? (
