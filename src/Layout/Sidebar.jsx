@@ -78,7 +78,7 @@ const Sidebar = () => {
               />
             </svg>
             <span className="flex-1 ml-3 text-left whitespace-nowrap">
-              Harga Satuan Dasar
+              Basic Unit Price
             </span>
             <svg
               aria-hidden="true"
@@ -185,7 +185,7 @@ const Sidebar = () => {
               />
             </svg>
             <span className="flex-1 ml-3 text-left whitespace-nowrap">
-              Harga Perkiraan
+              Construction Cost
             </span>
             <svg
               aria-hidden="true"
@@ -314,7 +314,7 @@ const Sidebar = () => {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="ml-3">Docs</span>
+            <span className="ml-3">Docs Reference</span>
           </a>
         </li>
         <li>
