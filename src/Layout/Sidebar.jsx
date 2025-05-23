@@ -181,6 +181,7 @@ const Sidebar = () => {
                     Receiving Terminal
                   </a>
                 </li>
+                <Link to="/material-konstruksi">
                 <li>
                   <a
                     href="#askjd"
@@ -189,6 +190,7 @@ const Sidebar = () => {
                     Material Konstruksi
                   </a>
                 </li>
+                </Link>
                 <li>
                   <a
                     href="#askjd"
@@ -205,14 +207,16 @@ const Sidebar = () => {
                     Upah
                   </a>
                 </li>
+                <Link to="/jasa">
                 <li>
                   <a
                     href="#askjd"
                     className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                   >
-                    Manajemen Kontraktor
+                    Jasa
                   </a>
                 </li>
+                </Link>
                 <li>
                   <a
                     href="#askjd"

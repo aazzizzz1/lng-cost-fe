@@ -6,6 +6,7 @@ import matrixReducer from './matrixSlice';
 import objectReducer from './objectSlice';
 import authReducer from './AuthSlice'; // Import auth reducer
 import projectReducer from './ProjectSlice'; // Import project reducer
+import jasaReducer from './jasaSlice'; // Import jasa reducer
 
 export default configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export default configureStore({
     objects: objectReducer,
     auth: authReducer,
     projects: projectReducer, // Add project reducer
+    jasa: jasaReducer, // Add jasa reducer
   },
 });
