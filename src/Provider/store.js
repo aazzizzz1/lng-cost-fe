@@ -5,6 +5,7 @@ import selftestReducer from './selftestSlice';
 import matrixReducer from './matrixSlice';
 import objectReducer from './objectSlice';
 import authReducer from './AuthSlice'; // Import auth reducer
+import projectReducer from './ProjectSlice'; // Import project reducer
 
 export default configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export default configureStore({
     selftest: selftestReducer,
     matrix: matrixReducer,
     objects: objectReducer,
-    auth: authReducer, // Add auth reducer
+    auth: authReducer,
+    projects: projectReducer, // Add project reducer
   },
 });

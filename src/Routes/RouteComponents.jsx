@@ -13,6 +13,8 @@ import SelfTestDisplay from "../Pages/SelfTest/SelfTestDisplay";
 import MatrixPages from "../Pages/Matrix/MatrixPages";
 import LayoutPages from "../Layout/LayoutPages";
 import DashboardPages from "../Pages/Home/DashboardPages";
+import ProjectPages from "../Pages/Project/ProjectPages";
+import ManageDataPages from "../Pages/ManageData/ManageDataPages";
 
 const RouteComponents = () => {
   return (
@@ -24,6 +26,22 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <DashboardPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/project"
+            element={
+              <LayoutPages>
+                <ProjectPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/manage-data"
+            element={
+              <LayoutPages>
+                <ManageDataPages />
               </LayoutPages>
             }
           />
