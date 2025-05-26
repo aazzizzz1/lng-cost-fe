@@ -50,7 +50,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
       <div className="flex flex-wrap justify-between items-center">
-        <div className="flex justify-start items-center">
+        <div className="flex justify-start items-center flex-1 min-w-0">
           <button
             data-drawer-target="drawer-navigation"
             data-drawer-toggle="drawer-navigation"
@@ -94,11 +94,17 @@ const Navbar = () => {
               LNG COSTX
             </span>
           </a>
-          <form action="#" method="GET" className="hidden md:block md:pl-2">
+        </div>
+        <div className="flex-1 flex justify-center">
+          <form
+            action="#"
+            method="GET"
+            className="hidden md:block md:pl-2 w-full max-w-md"
+          >
             <label htmlFor="topbar-search" className="sr-only">
               Search
             </label>
-            <div className="relative md:w-64">
+            <div className="relative w-full">
               <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                 <svg
                   className="w-5 h-5 text-gray-500 dark:text-gray-400"
@@ -123,7 +129,7 @@ const Navbar = () => {
             </div>
           </form>
         </div>
-        <div className="flex items-center lg:order-2">
+        <div className="flex items-center lg:order-2 flex-1 justify-end">
           <button
             type="button"
             data-drawer-toggle="drawer-navigation"

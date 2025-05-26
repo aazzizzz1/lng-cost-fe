@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   exportToSQL,
@@ -25,6 +25,9 @@ const JasaTable = () => {
 
   const [showExportModal, setShowExportModal] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+
+  const exportModalRef = useRef(null);
+  const filterDropdownRef = useRef(null);
 
   const handleFilterChange = (kategori) => {
     let newFilter;
@@ -72,7 +75,32 @@ const JasaTable = () => {
   }, [downloadUrl, exportType, dispatch]);
 
   // Get all kategori for filter
-  const allKategori = Array.from(new Set(sortedJasa.map((j) => j.kategori)));
+  const allKategori = Array.from(new Set(
+    useSelector((state) => state.jasa.jasa).map((j) => j.kategori)
+  ));
+
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        exportModalRef.current &&
+        !exportModalRef.current.contains(event.target)
+      ) {
+        setShowExportModal(false);
+      }
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target)
+      ) {
+        setShowFilterDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [exportModalRef, filterDropdownRef]);
 
   return (
     <>
@@ -154,7 +182,7 @@ const JasaTable = () => {
                     <input
                       type="text"
                       id="simple-search"
-                      placeholder="Search for products"
+                      placeholder="Search for pekerjaan"
                       value={search}
                       onChange={handleSearchChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -186,6 +214,7 @@ const JasaTable = () => {
                 </button>
                 <div className="flex items-center space-x-3 w-full md:w-auto">
                   {/* Export Dropdown */}
+                  <div className="relative">
                   <button
                     id="actionsDropdownButton"
                     className="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
@@ -208,7 +237,10 @@ const JasaTable = () => {
                     </svg>
                   </button>
                   {showExportModal && (
-                    <div className="absolute z-50 mt-2 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                    <div
+                      className="absolute z-50 mt-2 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+                      ref={exportModalRef}
+                    >
                       <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
                         <li>
                           <button
@@ -229,6 +261,7 @@ const JasaTable = () => {
                       </ul>
                     </div>
                   )}
+                  </div>
                   {/* Filter Dropdown */}
                   <div className="relative">
                     <button
@@ -252,10 +285,16 @@ const JasaTable = () => {
                       </svg>
                     </button>
                     {showFilterDropdown && (
-                      <div className="absolute z-50 mt-2 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                      <div
+                        className="absolute z-50 mt-2 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+                        ref={filterDropdownRef}
+                      >
                         <ul className="py-1 text-sm text-gray-700 dark:text-gray-200">
                           {allKategori.map((kat) => (
-                            <li key={kat} className="px-2 py-1 flex items-center">
+                            <li
+                              key={kat}
+                              className="px-2 py-1 flex items-center"
+                            >
                               <input
                                 type="checkbox"
                                 checked={filterJenis.includes(kat)}
@@ -308,7 +347,7 @@ const JasaTable = () => {
                         />
                       </svg>
                       {sortField === "kelasAACE" && (
-                        <span>{sortDirection === "asc" ? "▲" : "▼"}</span>
+                        <span>{sortDirection === "asc" ? "" : ""}</span>
                       )}
                     </th>
                     <th scope="col" className="p-4">
@@ -341,7 +380,7 @@ const JasaTable = () => {
                         />
                       </svg>
                       {sortField === "harga" && (
-                        <span>{sortDirection === "asc" ? "▲" : "▼"}</span>
+                        <span>{sortDirection === "asc" ? "" : ""}</span>
                       )}
                     </th>
                   </tr>
