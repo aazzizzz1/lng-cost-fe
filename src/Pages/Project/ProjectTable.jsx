@@ -125,6 +125,9 @@ const ProjectTable = () => {
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col" className="px-4 py-3">
+                  No
+                </th>
+                <th scope="col" className="px-4 py-3">
                   Nama Project
                 </th>
                 <th scope="col" className="px-4 py-3">
@@ -151,8 +154,9 @@ const ProjectTable = () => {
               </tr>
             </thead>
             <tbody>
-              {projects.map((project) => (
+              {projects.map((project, index) => (
                 <tr key={project.id} className="border-b dark:border-gray-700">
+                  <td className="px-4 py-3">{index + 1}</td>
                   <th
                     scope="row"
                     className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -165,7 +169,7 @@ const ProjectTable = () => {
                   <td className="px-4 py-3">{project.tahun}</td>
                   <td className="px-4 py-3">{project.levelAACE}</td>
                   <td className="px-4 py-3">
-                    Rp <span className="text-green-500 font-semibold">{project.harga.toLocaleString()}</span>
+                    Rp<span className="text-green-500 font-semibold">{project.harga.toLocaleString()}</span>
                   </td>
                   <td className="flex items-center justify-center">
                     <button

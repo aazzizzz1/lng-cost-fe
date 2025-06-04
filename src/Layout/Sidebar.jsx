@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 const Sidebar = () => {
   const [isHargaSatuanOpen, setHargaSatuanOpen] = useState(false);
   const [isHargaPerkiraanOpen, setHargaPerkiraanOpen] = useState(false);
+  const [isLNGPlantOpen, setLNGPlantOpen] = useState(false);
 
   return (
     <aside
@@ -157,73 +158,176 @@ const Sidebar = () => {
             </button>
             {isHargaSatuanOpen && (
               <ul className="py-2 space-y-2">
+                {/* LNG Plant Dropdown */}
                 <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                  <button
+                    type="button"
+                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    onClick={() => setLNGPlantOpen(!isLNGPlantOpen)}
                   >
-                    LNG Plant
-                  </a>
+                    <span className="flex-1 ml-3 text-left whitespace-nowrap">
+                      LNG Plant
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      className={`w-6 h-6 transform transition-transform ${
+                        isLNGPlantOpen ? "rotate-180" : ""
+                      }`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                  {isLNGPlantOpen && (
+                    <ul className="py-2 space-y-2">
+                      <Link to="/material-konstruksi">
+                        <li>
+                          <a
+                            href="#askjd"
+                            className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                          >
+                            Material Konstruksi
+                          </a>
+                        </li>
+                      </Link>
+                      <li>
+                        <a
+                          href="#askjd"
+                          className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                        >
+                          Peralatan
+                        </a>
+                      </li>
+                      <li>
+                        <a
+                          href="#askjd"
+                          className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                        >
+                          Upah
+                        </a>
+                      </li>
+                      <Link to="/jasa">
+                        <li>
+                          <a
+                            href="#askjd"
+                            className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                          >
+                            Jasa
+                          </a>
+                        </li>
+                      </Link>
+                      <li>
+                        <a
+                          href="#askjd"
+                          className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                        >
+                          Testing
+                        </a>
+                      </li>
+                    </ul>
+                  )}
                 </li>
+                {/* Transportasi Dropdown */}
                 <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Transportasi
-                  </a>
+                  <DropdownMenu
+                    title="Transportasi"
+                    items={[
+                      {
+                        label: "Material Konstruksi",
+                        link: "/material-konstruksi",
+                      },
+                      { label: "Peralatan" },
+                      { label: "Upah" },
+                      { label: "Jasa", link: "/jasa" },
+                      { label: "Testing" },
+                    ]}
+                  />
                 </li>
+                {/* Receiving Terminal Dropdown */}
                 <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Receiving Terminal
-                  </a>
+                  <DropdownMenu
+                    title="Receiving Terminal"
+                    items={[
+                      {
+                        label: "Material Konstruksi",
+                        link: "/material-konstruksi",
+                      },
+                      { label: "Peralatan" },
+                      { label: "Upah" },
+                      { label: "Jasa", link: "/jasa" },
+                      { label: "Testing" },
+                    ]}
+                  />
                 </li>
-                <Link to="/material-konstruksi">
+                {/* Offtake Station Dropdown */}
                 <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Material Konstruksi
-                  </a>
+                  <DropdownMenu
+                    title="Offtake Station"
+                    items={[
+                      {
+                        label: "Material Konstruksi",
+                        link: "/material-konstruksi",
+                      },
+                      { label: "Peralatan" },
+                      { label: "Upah" },
+                      { label: "Jasa", link: "/jasa" },
+                      { label: "Testing" },
+                    ]}
+                  />
                 </li>
-                </Link>
+                {/* ORF Dropdown */}
                 <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Peralatan
-                  </a>
+                  <DropdownMenu
+                    title="ORF"
+                    items={[
+                      {
+                        label: "Material Konstruksi",
+                        link: "/material-konstruksi",
+                      },
+                      { label: "Peralatan" },
+                      { label: "Upah" },
+                      { label: "Jasa", link: "/jasa" },
+                      { label: "Testing" },
+                    ]}
+                  />
                 </li>
+                {/* Transmission Pipeline Dropdown */}
                 <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Upah
-                  </a>
+                  <DropdownMenu
+                    title="Trans Pipeline"
+                    items={[
+                      {
+                        label: "Material Konstruksi",
+                        link: "/material-konstruksi",
+                      },
+                      { label: "Peralatan" },
+                      { label: "Upah" },
+                      { label: "Jasa", link: "/jasa" },
+                      { label: "Testing" },
+                    ]}
+                  />
                 </li>
-                <Link to="/jasa">
+                {/* Material & Package Dropdown */}
                 <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Jasa
-                  </a>
-                </li>
-                </Link>
-                <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Testing
-                  </a>
+                  <DropdownMenu
+                    title="Material & Package"
+                    items={[
+                      {
+                        label: "Material Konstruksi",
+                        link: "/material-konstruksi",
+                      },
+                      { label: "Peralatan" },
+                      { label: "Upah" },
+                      { label: "Jasa", link: "/jasa" },
+                      { label: "Testing" },
+                    ]}
+                  />
                 </li>
               </ul>
             )}
@@ -268,38 +372,16 @@ const Sidebar = () => {
             </button>
             {isHargaPerkiraanOpen && (
               <ul className="py-2 space-y-2">
-                <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    LNG Plant
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Transportasi
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Receiving Terminal
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#askjd"
-                    className="flex items-center p-2 pl-11 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  >
-                    Material Konstruksi
-                  </a>
-                </li>
+                <Link to="/material-konstruksi">
+                  <li>
+                    <a
+                      href="#askjd"
+                      className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                    >
+                      Material Konstruksi
+                    </a>
+                  </li>
+                </Link>
                 <li>
                   <a
                     href="#askjd"
@@ -332,6 +414,16 @@ const Sidebar = () => {
                     Testing
                   </a>
                 </li>
+                <Link to="/jasa">
+                  <li>
+                    <a
+                      href="#askjd"
+                      className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                    >
+                      Jasa
+                    </a>
+                  </li>
+                </Link>
               </ul>
             )}
           </li>
@@ -665,5 +757,62 @@ const Sidebar = () => {
     </aside>
   );
 };
+
+function DropdownMenu({ title, items }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+        onClick={() => setOpen(!open)}
+      >
+        <span className="flex-1 ml-3 text-left whitespace-nowrap">{title}</span>
+        <svg
+          aria-hidden="true"
+          className={`w-6 h-6 transform transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+      {open && (
+        <ul className="py-2 space-y-2">
+          {items.map((item, idx) =>
+            item.link ? (
+              <Link to={item.link} key={item.label}>
+                <li>
+                  <a
+                    href="#askjd"
+                    className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              </Link>
+            ) : (
+              <li key={item.label}>
+                <a
+                  href="#askjd"
+                  className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                >
+                  {item.label}
+                </a>
+              </li>
+            )
+          )}
+        </ul>
+      )}
+    </>
+  );
+}
 
 export default Sidebar;
