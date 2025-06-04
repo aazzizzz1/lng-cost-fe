@@ -1,21 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  toggleNotificationDropdown,
+  toggleAppsDropdown,
+  toggleProfileDropdown,
+  closeAllDropdowns,
+  toggleDarkMode,
+} from "../Provider/layoutSlice";
 import LogoStorage from "../Assets/Images/storage.png";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isAppsOpen, setIsAppsOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check system color scheme preference and stored preference in localStorage
-    const storedPreference = localStorage.getItem("darkMode");
-    if (storedPreference) {
-      return storedPreference === "dark";
-    }
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
+  const dispatch = useDispatch();
+  const { isNotificationOpen, isAppsOpen, isProfileOpen, isDarkMode } =
+    useSelector((state) => state.layout);
 
+  // Refs for dropdowns
+  const notificationRef = useRef(null);
+  const appsRef = useRef(null);
+  const profileRef = useRef(null);
+
+  // Sync dark mode to body and localStorage
   useEffect(() => {
-    // Apply dark mode based on isDarkMode state
     if (isDarkMode) {
       document.body.classList.add("dark");
       localStorage.setItem("darkMode", "dark");
@@ -25,27 +31,44 @@ const Navbar = () => {
     }
   }, [isDarkMode]);
 
-  const toggleDarkMode = () => {
-    setIsDarkMode((prevMode) => !prevMode);
-  };
-
-  const toggleNotificationDropdown = () => {
-    setIsNotificationOpen(!isNotificationOpen);
-    setIsAppsOpen(false);
-    setIsProfileOpen(false);
-  };
-
-  const toggleAppsDropdown = () => {
-    setIsAppsOpen(!isAppsOpen);
-    setIsNotificationOpen(false);
-    setIsProfileOpen(false);
-  };
-
-  const toggleProfileDropdown = () => {
-    setIsProfileOpen(!isProfileOpen);
-    setIsNotificationOpen(false);
-    setIsAppsOpen(false);
-  };
+  // Click outside handler
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        isNotificationOpen &&
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target) &&
+        isAppsOpen &&
+        appsRef.current &&
+        !appsRef.current.contains(event.target) &&
+        isProfileOpen &&
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
+        dispatch(closeAllDropdowns());
+      }
+      // If any dropdown is open and click is outside all, close all
+      if (
+        (isNotificationOpen &&
+          notificationRef.current &&
+          !notificationRef.current.contains(event.target)) ||
+        (isAppsOpen &&
+          appsRef.current &&
+          !appsRef.current.contains(event.target)) ||
+        (isProfileOpen &&
+          profileRef.current &&
+          !profileRef.current.contains(event.target))
+      ) {
+        dispatch(closeAllDropdowns());
+      }
+    }
+    if (isNotificationOpen || isAppsOpen || isProfileOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isNotificationOpen, isAppsOpen, isProfileOpen, dispatch]);
 
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
@@ -153,51 +176,59 @@ const Navbar = () => {
           </button>
           {/* dark mode */}
           <button
-            className="w-10 h-10 mt-1 mr-4 hover:text-gray-700 dark:hover:text-gray-200 text-gray-900 dark:text-white"
-            onClick={toggleDarkMode}
+            className="w-10 h-10  hover:text-gray-700 dark:hover:text-gray-200 text-gray-900 dark:text-white"
+            onClick={() => dispatch(toggleDarkMode())}
           >
             <svg
-              width="40"
-              height="41"
-              viewBox="0 0 40 41"
-              fill="currentColor"
+              className="w-6 h-6 text-gray-800 dark:text-white"
+              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
             >
               <path
-                d="M20 27.1666C23.6819 27.1666 26.6667 24.1819 26.6667 20.5C26.6667 16.8181 23.6819 13.8333 20 13.8333C16.3181 13.8333 13.3334 16.8181 13.3334 20.5C13.3334 24.1819 16.3181 27.1666 20 27.1666Z"
                 stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M33.3333 20.5H35M5 20.5H6.66667M20 33.8333V35.5M20 5.5V7.16667M29.4283 29.9283L30.6067 31.1067M9.39333 9.89333L10.5717 11.0717M10.5717 29.9283L9.39333 31.1067M30.6067 9.89333L29.4283 11.0717"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 5V3m0 18v-2M7.05 7.05 5.636 5.636m12.728 12.728L16.95 16.95M5 12H3m18 0h-2M7.05 16.95l-1.414 1.414M18.364 5.636 16.95 7.05M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
               />
             </svg>
           </button>
           {/* Notifications */}
           <button
             type="button"
-            onClick={toggleNotificationDropdown}
+            onClick={() => dispatch(toggleNotificationDropdown())}
             className="p-2 mr-1 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
           >
             <span className="sr-only">View notifications</span>
             {/* Bell icon */}
             <svg
+              className="w-6 h-6 text-gray-800 dark:text-white"
               aria-hidden="true"
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
             >
-              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.193-.538 1.193H5.538c-.538 0-.538-.6-.538-1.193 0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365Zm-8.134 5.368a8.458 8.458 0 0 1 2.252-5.714m14.016 5.714a8.458 8.458 0 0 0-2.252-5.714M8.54 17.901a3.48 3.48 0 0 0 6.92 0H8.54Z"
+              />
             </svg>
           </button>
           {/* Dropdown menu */}
           {isNotificationOpen && (
-            <div className="absolute top-12 right-0 bg-white shadow-lg rounded-lg p-4 divide-y divide-gray-100 dark:divide-gray-600 dark:bg-gray-700">
+            <div
+              ref={notificationRef}
+              className="absolute top-12 right-0 mt-2 bg-white shadow-lg rounded-lg p-4 divide-y divide-gray-100 dark:divide-gray-600 dark:bg-gray-700"
+            >
               <div className="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-600 dark:text-gray-300">
                 Notifications
               </div>
@@ -346,23 +377,35 @@ const Navbar = () => {
           {/* Apps */}
           <button
             type="button"
-            onClick={toggleAppsDropdown}
+            onClick={() => dispatch(toggleAppsDropdown())}
             className="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
           >
             <span className="sr-only">View notifications</span>
             {/* Icon */}
             <svg
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
+              className="w-6 h-6 text-gray-800 dark:text-white"
+              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
             >
-              <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9.143 4H4.857A.857.857 0 0 0 4 4.857v4.286c0 .473.384.857.857.857h4.286A.857.857 0 0 0 10 9.143V4.857A.857.857 0 0 0 9.143 4Zm10 0h-4.286a.857.857 0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286A.857.857 0 0 0 20 9.143V4.857A.857.857 0 0 0 19.143 4Zm-10 10H4.857a.857.857 0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286a.857.857 0 0 0 .857-.857v-4.286A.857.857 0 0 0 9.143 14Zm10 0h-4.286a.857.857 0 0 0-.857.857v4.286c0 .473.384.857.857.857h4.286a.857.857 0 0 0 .857-.857v-4.286a.857.857 0 0 0-.857-.857Z"
+              />
             </svg>
           </button>
           {/* Dropdown menu */}
           {isAppsOpen && (
-            <div className="absolute top-12 right-0 bg-white shadow-lg rounded-lg p-4 divide-y divide-gray-100 dark:bg-gray-700 dark:divide-gray-600">
+            <div
+              ref={appsRef}
+              className="absolute top-12 right-0 mt-2 bg-white shadow-lg rounded-lg p-4 divide-y divide-gray-100 dark:bg-gray-700 dark:divide-gray-600"
+            >
               <div className="block py-2 px-4 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-600 dark:text-gray-300">
                 Apps
               </div>
@@ -452,7 +495,7 @@ const Navbar = () => {
           )}
           <button
             type="button"
-            onClick={toggleProfileDropdown}
+            onClick={() => dispatch(toggleProfileDropdown())}
             className="flex mx-3 text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
             id="user-menu-button"
             aria-expanded="false"
@@ -467,7 +510,10 @@ const Navbar = () => {
           </button>
           {/* Dropdown menu */}
           {isProfileOpen && (
-            <div className="absolute top-12 right-0 bg-white shadow-lg rounded-lg p-4 divide-y divide-gray-100 dark:bg-gray-700 dark:divide-gray-600">
+            <div
+              ref={profileRef}
+              className="absolute top-12 right-0 mt-2 bg-white shadow-lg rounded-lg p-4 divide-y divide-gray-100 dark:bg-gray-700 dark:divide-gray-600"
+            >
               <div className="py-3 px-4">
                 <span className="block text-sm font-semibold text-gray-900 dark:text-white">
                   Neil Sims
@@ -578,14 +624,12 @@ const Navbar = () => {
                 className="py-1 text-gray-700 dark:text-gray-300"
                 aria-labelledby="dropdown"
               >
-                <li>
-                  <a
-                    href="#asd"
-                    className="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
-                    Sign out
-                  </a>
-                </li>
+                <Link
+                  to="/signin"
+                  className="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  Sign out
+                </Link>
               </ul>
             </div>
           )}
