@@ -7,7 +7,7 @@ import {
   closeAllDropdowns,
   toggleDarkMode,
 } from "../Provider/layoutSlice";
-import LogoStorage from "../Assets/Images/storage.png";
+import PLILogo from "../Assets/Images/plilogo.png";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
@@ -112,9 +112,9 @@ const Navbar = () => {
             href="https://pgnlng.co.id/"
             className="flex items-center justify-between mr-4"
           >
-            <img src={LogoStorage} className="mr-3 h-8" alt="Flowbite Logo" />
+            <img src={PLILogo} className="mr-3 h-8" alt="Flowbite Logo" />
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              LNG COSTX
+              COSTX
             </span>
           </a>
         </div>

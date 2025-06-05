@@ -8,6 +8,7 @@ import authReducer from './AuthSlice'; // Import auth reducer
 import projectReducer from './ProjectSlice'; // Import project reducer
 import jasaReducer from './jasaSlice'; // Import jasa reducer
 import layoutReducer from './layoutSlice'; // Import layout reducer
+import materialReducer from './materialSlice'; // Import material reducer
 
 export default configureStore({
   reducer: {
@@ -20,5 +21,6 @@ export default configureStore({
     projects: projectReducer, // Add project reducer
     jasa: jasaReducer, // Add jasa reducer
     layout: layoutReducer, // Add layout reducer
+    material: materialReducer, // Add material reducer
   },
 });
