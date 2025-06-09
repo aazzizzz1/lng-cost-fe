@@ -82,7 +82,6 @@ const initialState = {
     },
     // ...tambahkan data lain sesuai kebutuhan
   ],
-  filteredMaterial: [],
 };
 
 const materialSlice = createSlice({
@@ -95,17 +94,8 @@ const materialSlice = createSlice({
         (item) => item.jenis === jenis
       );
     },
-    filterByKelompok: (state, action) => {
-      const kelompok = action.payload;
-      state.filteredMaterial = state.dataMaterial.filter(
-        (item) => item.kelompok === kelompok
-      );
-    },
-    clearFilter: (state) => {
-      state.filteredMaterial = [];
-    },
   },
 });
 
-export const { filterByJenis, filterByKelompok, clearFilter } = materialSlice.actions;
+export const { filterByJenis } = materialSlice.actions;
 export default materialSlice.reducer;

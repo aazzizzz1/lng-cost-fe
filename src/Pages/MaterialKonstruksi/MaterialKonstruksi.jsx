@@ -15,7 +15,6 @@ const MaterialKonstruksi = () => {
   };
 
   return (
-    <div>
       <div className="flex gap-2 mb-4">
         {jenisMaterial.map((jenis) => (
           <button
@@ -39,7 +38,6 @@ const MaterialKonstruksi = () => {
           </button>
         ))}
       </div>
-    </div>
   );
 };
 
