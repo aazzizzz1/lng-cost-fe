@@ -15,7 +15,7 @@ const MaterialKonstruksi = () => {
   };
 
   return (
-      <div className="flex gap-2 mb-4">
+      <div className="grid grid-cols-4 gap-4">
         {jenisMaterial.map((jenis) => (
           <button
             key={jenis.id}
