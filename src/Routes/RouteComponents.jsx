@@ -16,7 +16,7 @@ import DashboardPages from "../Pages/Home/DashboardPages";
 import ProjectPages from "../Pages/Project/ProjectPages";
 import ManageDataPages from "../Pages/ManageData/ManageDataPages";
 import JasaPages from "../Pages/Jasa/JasaPages";
-import MaterialKonstruksi from "../Pages/MaterialKonstruksi/MaterialKonstruksi";
+import MaterialKonstruksiPages from "../Pages/MaterialKonstruksi/MaterialKonstruksiPages";
 import TableMaterial from "../Pages/MaterialKonstruksi/TableMaterial";
 
 const RouteComponents = () => {
@@ -60,7 +60,7 @@ const RouteComponents = () => {
             path="/material-konstruksi"
             element={
               <LayoutPages>
-                <MaterialKonstruksi />
+                <MaterialKonstruksiPages />
               </LayoutPages>
             }
           />
