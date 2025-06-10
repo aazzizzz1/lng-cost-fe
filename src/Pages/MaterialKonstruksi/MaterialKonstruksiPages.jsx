@@ -38,12 +38,12 @@ const MaterialKonstruksiPages = () => {
 
   return (
     <ErrorBoundary>
-      <div className="p-4 dark:bg-darkmode md:h-screen">
+      <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          Management and Configuration Object
+          Management and Configuration Material Konstruksi
         </p>
         <p className="text-xl text-gray-600 dark:text-white mb-2">
-          Management and Configuration Object Detail
+          Management and Configuration Material Konstruksi Detail
         </p>
         <div className="grid grid-cols-4 gap-4">
           {jenisMaterial.map((jenis) => (
