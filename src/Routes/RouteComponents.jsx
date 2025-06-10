@@ -18,6 +18,7 @@ import ManageDataPages from "../Pages/ManageData/ManageDataPages";
 import JasaPages from "../Pages/Jasa/JasaPages";
 import MaterialKonstruksiPages from "../Pages/MaterialKonstruksi/MaterialKonstruksiPages";
 import TableMaterial from "../Pages/MaterialKonstruksi/TableMaterial";
+import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPages";
 
 const RouteComponents = () => {
   return (
@@ -113,6 +114,14 @@ const RouteComponents = () => {
             }
           />
           <Route path="/selftest/display" element={<SelfTestDisplay />} />
+          <Route
+            path="/construction-cost"
+            element={
+              <LayoutPages>
+                <ConstractionCostPages />
+              </LayoutPages>
+            }
+          />
           <Route
             path="/"
             element={
