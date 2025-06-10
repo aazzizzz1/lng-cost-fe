@@ -32,6 +32,6 @@
   border-radius: 3px; /* Sudut track scroll bar */
 }
 
-/* body {
-  background-color: #f9fafb;
-} */
+::-webkit-scrollbar:horizontal {
+  height: 8px; /* Tinggi scrollbar horizontal */
+}
