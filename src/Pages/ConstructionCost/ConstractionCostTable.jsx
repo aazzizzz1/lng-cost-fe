@@ -40,6 +40,34 @@ const ConstractionCostTable = () => {
   const { costs, filterJenis } = useSelector((state) => state.constractionCost);
   const hotRef = useRef(null);
 
+  // Theme state for Handsontable
+  const [themeName, setThemeName] = useState(
+    document.querySelector('html')?.classList.contains('dark')
+      ? 'ht-theme-horizon-dark'
+      : 'ht-theme-horizon'
+  );
+
+  useEffect(() => {
+    // Sync theme with Tailwind dark mode
+    const observer = new MutationObserver(() => {
+      setThemeName(
+        document.querySelector('html')?.classList.contains('dark')
+          ? 'ht-theme-horizon-dark'
+          : 'ht-theme-horizon'
+      );
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!hotRef.current?.hotInstance) {
+      return;
+    }
+    hotRef.current.hotInstance.useTheme?.(themeName);
+    hotRef.current.hotInstance.render();
+  }, [themeName]);
+
   const filteredCosts = filterJenis
     ? costs.filter((item) => item.tipe === filterJenis)
     : costs;
@@ -135,8 +163,16 @@ const ConstractionCostTable = () => {
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 overflow-x-auto">
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm text-sm bg-white dark:bg-gray-900">
+              {/* 
+              // Optional: theme switcher for demo
+              <select value={themeName} onChange={handleOnChange} className="mb-2">
+                <option value="ht-theme-horizon">Light</option>
+                <option value="ht-theme-horizon-dark">Dark</option>
+              </select>
+              */}
               <HotTable
-                className="htMiddle"
+                className={`htMiddle ${themeName}`}
+                themeName={themeName}
                 ref={hotRef}
                 data={hotData}
                 colHeaders={[
