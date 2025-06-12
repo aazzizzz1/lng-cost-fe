@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   toggleNotificationDropdown,
@@ -15,6 +15,13 @@ const Navbar = () => {
   const { isNotificationOpen, isAppsOpen, isProfileOpen, isDarkMode } =
     useSelector((state) => state.layout);
 
+  // Add state to track dark mode for icon
+  const [isDark, setIsDark] = useState(
+    typeof window !== "undefined" &&
+      (document.documentElement.classList.contains("dark") ||
+        document.body.classList.contains("dark"))
+  );
+
   // Refs for dropdowns
   const notificationRef = useRef(null);
   const appsRef = useRef(null);
@@ -30,6 +37,19 @@ const Navbar = () => {
       localStorage.setItem("darkMode", "light");
     }
   }, [isDarkMode]);
+
+  // Listen for dark mode changes to update icon
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(
+        document.documentElement.classList.contains("dark") ||
+        document.body.classList.contains("dark")
+      );
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   // Click outside handler
   useEffect(() => {
@@ -176,26 +196,48 @@ const Navbar = () => {
           </button>
           {/* dark mode */}
           <button
-            className="w-10 h-10  hover:text-gray-700 dark:hover:text-gray-200 text-gray-900 dark:text-white"
+            className="w-10 h-10 hover:text-gray-700 dark:hover:text-gray-200 text-gray-900 dark:text-white"
             onClick={() => dispatch(toggleDarkMode())}
           >
-            <svg
-              className="w-6 h-6 text-gray-800 dark:text-white"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 5V3m0 18v-2M7.05 7.05 5.636 5.636m12.728 12.728L16.95 16.95M5 12H3m18 0h-2M7.05 16.95l-1.414 1.414M18.364 5.636 16.95 7.05M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
-              />
-            </svg>
+            {isDark ? (
+              // Moon icon for dark mode
+              <svg
+                className="w-6 h-6 text-gray-800 dark:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 21a9 9 0 0 1-.5-17.986V3c-.354.966-.5 1.911-.5 3a9 9 0 0 0 9 9c.239 0 .254.018.488 0A9.004 9.004 0 0 1 12 21Z"
+                />
+              </svg>
+            ) : (
+              // Sun icon for light mode
+              <svg
+                className="w-6 h-6 text-gray-800 dark:text-white"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 5V3m0 18v-2M7.05 7.05 5.636 5.636m12.728 12.728L16.95 16.95M5 12H3m18 0h-2M7.05 16.95l-1.414 1.414M18.364 5.636 16.95 7.05M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
+                />
+              </svg>
+            )}
           </button>
           {/* Notifications */}
           <button
@@ -410,44 +452,54 @@ const Navbar = () => {
                 Apps
               </div>
               <div className="grid grid-cols-3 gap-4 p-4">
-                <a
-                  href="#kajd"
+                <Link
+                  to="/project"
                   className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
                 >
                   <svg
-                    aria-hidden="true"
                     className="mx-auto mb-1 w-7 h-7 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                    aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M3 4.92857C3 3.90506 3.80497 3 4.88889 3H19.1111C20.195 3 21 3.90506 21 4.92857V13h-3v-2c0-.5523-.4477-1-1-1h-4c-.5523 0-1 .4477-1 1v2H3V4.92857ZM3 15v1.0714C3 17.0949 3.80497 18 4.88889 18h3.47608L7.2318 19.3598c-.35356.4243-.29624 1.0548.12804 1.4084.42428.3536 1.05484.2962 1.40841-.128L10.9684 18h2.0632l2.2002 2.6402c.3535.4242.9841.4816 1.4084.128.4242-.3536.4816-.9841.128-1.4084L15.635 18h3.4761C20.195 18 21 17.0949 21 16.0714V15H3Z" />
+                    <path d="M16 12v1h-2v-1h2Z" />
+                  </svg>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    Project
+                  </div>
+                </Link>
+                <Link
+                  to="/estimasi"
+                  className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
+                >
+                  <svg
+                    className="mx-auto mb-1 w-7 h-7 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-                      clipRule="evenodd"
+                      fill-rule="evenodd"
+                      d="M12.512 8.72a2.46 2.46 0 0 1 3.479 0 2.461 2.461 0 0 1 0 3.479l-.004.005-1.094 1.08a.998.998 0 0 0-.194-.272l-3-3a1 1 0 0 0-.272-.193l1.085-1.1Zm-2.415 2.445L7.28 14.017a1 1 0 0 0-.289.702v2a1 1 0 0 0 1 1h2a1 1 0 0 0 .703-.288l2.851-2.816a.995.995 0 0 1-.26-.189l-3-3a.998.998 0 0 1-.19-.26Z"
+                      clip-rule="evenodd"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      d="M7 3a1 1 0 0 1 1 1v1h3V4a1 1 0 1 1 2 0v1h3V4a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h6a2 2 0 0 0 2-2Zm10.67 8H19v8H5v-8h3.855l.53-.537a1 1 0 0 1 .87-.285c.097.015.233.13.277.087.045-.043-.073-.18-.09-.276a1 1 0 0 1 .274-.873l1.09-1.104a3.46 3.46 0 0 1 4.892 0l.001.002A3.461 3.461 0 0 1 17.67 11Z"
+                      clip-rule="evenodd"
                     />
                   </svg>
                   <div className="text-sm text-gray-900 dark:text-white">
-                    Sales
+                    Estimasi
                   </div>
-                </a>
-                <a
-                  href="#kajd"
-                  className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="mx-auto mb-1 w-7 h-7 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                  </svg>
-                  <div className="text-sm text-gray-900 dark:text-white">
-                    Users
-                  </div>
-                </a>
+                </Link>
                 <a
                   href="sajdj"
                   className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
@@ -578,7 +630,7 @@ const Navbar = () => {
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                      <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 002-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
                     </svg>
                     Collections
                   </a>
