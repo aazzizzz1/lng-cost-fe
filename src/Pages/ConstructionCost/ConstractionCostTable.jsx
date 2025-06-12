@@ -1,17 +1,128 @@
-import React from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { HotTable } from '@handsontable/react-wrapper'
+import { registerAllModules } from 'handsontable/registry'
+import 'handsontable/styles/handsontable.css'
+import 'handsontable/styles/ht-theme-main.css'
+
+// register Handsontable's modules
+registerAllModules()
+
+// Custom currency renderer for Handsontable
+function currencyRenderer(instance, td, row, col, prop, value, cellProperties) {
+  const v = typeof value === 'number' ? value : Number(value);
+  td.innerText = isNaN(v) ? '' : 'Rp' + v.toLocaleString();
+  td.className = 'htRight';
+}
+
+const columns = [
+  { data: 'no', type: 'numeric', readOnly: true, width: 50 },
+  { data: 'uraian', width: 200 },
+  { data: 'satuan', width: 70 },
+  { data: 'qty', type: 'numeric', width: 60 },
+  { data: 'hargaSatuan', type: 'numeric', width: 120, renderer: currencyRenderer },
+  { data: 'totalHarga', type: 'numeric', width: 120, renderer: currencyRenderer },
+  { data: 'aaceClass', width: 80 },
+  { data: 'accuracy', width: 90 },
+  { data: 'kelompok', width: 120 },
+  { data: 'tahun', width: 70 },
+  { data: 'infrastruktur', width: 120 },
+  { data: 'volume', width: 80 },
+  { data: 'satuanVolume', width: 100 },
+  { data: 'kapasitasRegasifikasi', width: 120 },
+  { data: 'satuanKapasitas', width: 110 },
+  { data: 'proyek', width: 120 },
+  { data: 'lokasi', width: 100 },
+  { data: 'tipe', width: 80 },
+];
 
 const ConstractionCostTable = () => {
   const { costs, filterJenis } = useSelector((state) => state.constractionCost);
+  const hotRef = useRef(null);
+
   const filteredCosts = filterJenis
     ? costs.filter((item) => item.tipe === filterJenis)
     : costs;
 
-  // Perhitungan total
-  const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (item.totalHarga || 0), 0);
-  const ppn = totalHargaPekerjaan * 0.11;
-  const asuransi = totalHargaPekerjaan * 0.0025;
-  const totalPerkiraan = totalHargaPekerjaan + ppn + asuransi;
+  // Prepare data for Handsontable
+  const initialHotData = filteredCosts.map((item, idx) => ({
+    no: idx + 1,
+    uraian: item.uraian,
+    satuan: item.satuan,
+    qty: item.qty,
+    hargaSatuan: item.hargaSatuan,
+    totalHarga: item.totalHarga,
+    aaceClass: item.aaceClass,
+    accuracy: `${item.accuracyLow}% ~ ${item.accuracyHigh}%`,
+    kelompok: item.kelompok,
+    tahun: item.tahun,
+    infrastruktur: item.infrastruktur,
+    volume: item.volume,
+    satuanVolume: item.satuanVolume,
+    kapasitasRegasifikasi: item.kapasitasRegasifikasi,
+    satuanKapasitas: item.satuanKapasitas,
+    proyek: item.proyek,
+    lokasi: item.lokasi,
+    tipe: item.tipe,
+  }));
+
+  // State for table data and summary
+  const [hotData, setHotData] = useState(initialHotData);
+  const [summary, setSummary] = useState({
+    totalHargaPekerjaan: 0,
+    ppn: 0,
+    asuransi: 0,
+    totalPerkiraan: 0,
+  });
+
+  // Calculate summary
+  const recalculateSummary = (data) => {
+    const totalHargaPekerjaan = data.reduce((sum, item) => sum + (Number(item.totalHarga) || 0), 0);
+    const ppn = totalHargaPekerjaan * 0.11;
+    const asuransi = totalHargaPekerjaan * 0.0025;
+    const totalPerkiraan = totalHargaPekerjaan + ppn + asuransi;
+    setSummary({
+      totalHargaPekerjaan,
+      ppn,
+      asuransi,
+      totalPerkiraan,
+    });
+  };
+
+  // Initial calculation
+  useEffect(() => {
+    setHotData(initialHotData);
+    recalculateSummary(initialHotData);
+    // eslint-disable-next-line
+  }, [filterJenis, costs]);
+
+  // Update totalHarga otomatis jika hargaSatuan atau qty diubah
+  const afterChange = (changes, source) => {
+    if (!changes) return;
+    if (source === 'loadData') return;
+    const hot = hotRef.current.hotInstance;
+    let newData = hot.getSourceData().map(row => ({ ...row }));
+    let changed = false;
+    changes.forEach(([row, prop, oldValue, newValue]) => {
+      if (prop === 'hargaSatuan' || prop === 'qty') {
+        const hargaSatuan = Number(hot.getDataAtRowProp(row, 'hargaSatuan')) || 0;
+        const qty = Number(hot.getDataAtRowProp(row, 'qty')) || 0;
+        const totalHarga = hargaSatuan * qty;
+        hot.setDataAtRowProp(row, 'totalHarga', totalHarga, 'auto');
+        newData[row].totalHarga = totalHarga;
+        changed = true;
+      }
+    });
+    // If any changes, update state and summary
+    if (changed) {
+      setHotData(newData);
+      recalculateSummary(newData);
+    } else {
+      // recalculate summary in case of direct edit to totalHarga (shouldn't happen, but safe)
+      setHotData(newData);
+      recalculateSummary(newData);
+    }
+  };
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -23,79 +134,55 @@ const ConstractionCostTable = () => {
         </div>
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th className="px-4 py-3">No</th>
-                  <th className="px-4 py-3">Uraian</th>
-                  <th className="px-4 py-3">Satuan</th>
-                  <th className="px-4 py-3">Qty</th>
-                  <th className="px-4 py-3">Harga Satuan</th>
-                  <th className="px-4 py-3">Total Harga</th>
-                  <th className="px-4 py-3">AACE Class</th>
-                  <th className="px-4 py-3">Accuracy %</th>
-                  <th className="px-4 py-3">Kelompok</th>
-                  <th className="px-4 py-3">Tahun</th>
-                  <th className="px-4 py-3">Infrastruktur</th>
-                  <th className="px-4 py-3">Volume</th>
-                  <th className="px-4 py-3">Satuan Volume</th>
-                  <th className="px-4 py-3">Kapasitas Regasifikasi</th>
-                  <th className="px-4 py-3">Satuan Kapasitas</th>
-                  <th className="px-4 py-3">Proyek</th>
-                  <th className="px-4 py-3">Lokasi</th>
-                  <th className="px-4 py-3">Tipe</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredCosts.map((item, idx) => (
-                  <tr key={item.id} className="border-b dark:border-gray-700">
-                    <td className="px-4 py-3">{idx + 1}</td>
-                    <td className="px-4 py-3">{item.uraian}</td>
-                    <td className="px-4 py-3">{item.satuan}</td>
-                    <td className="px-4 py-3">{item.qty}</td>
-                    <td className="px-4 py-3">Rp{item.hargaSatuan?.toLocaleString()}</td>
-                    <td className="px-4 py-3">Rp{item.totalHarga?.toLocaleString()}</td>
-                    <td className="px-4 py-3">{item.aaceClass}</td>
-                    <td className="px-4 py-3">{item.accuracyLow}% ~ {item.accuracyHigh}%</td>
-                    <td className="px-4 py-3">{item.kelompok}</td>
-                    <td className="px-4 py-3">{item.tahun}</td>
-                    <td className="px-4 py-3">{item.infrastruktur}</td>
-                    <td className="px-4 py-3">{item.volume}</td>
-                    <td className="px-4 py-3">{item.satuanVolume}</td>
-                    <td className="px-4 py-3">{item.kapasitasRegasifikasi}</td>
-                    <td className="px-4 py-3">{item.satuanKapasitas}</td>
-                    <td className="px-4 py-3">{item.proyek}</td>
-                    <td className="px-4 py-3">{item.lokasi}</td>
-                    <td className="px-4 py-3">{item.tipe}</td>
-                  </tr>
-                ))}
-                {filteredCosts.length === 0 && (
-                  <tr>
-                    <td colSpan={18} className="text-center py-4 text-gray-400 dark:text-gray-500">
-                      Tidak ada data.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            <HotTable
+              ref={hotRef}
+              data={hotData}
+              colHeaders={[
+                'No', 'Uraian', 'Satuan', 'Qty', 'Harga Satuan', 'Total Harga', 'AACE Class', 'Accuracy %',
+                'Kelompok', 'Tahun', 'Infrastruktur', 'Volume', 'Satuan Volume', 'Kapasitas Regasifikasi',
+                'Satuan Kapasitas', 'Proyek', 'Lokasi', 'Tipe'
+              ]}
+              columns={columns}
+              width="100%"
+              height="auto"
+              stretchH="all"
+              licenseKey="non-commercial-and-evaluation"
+              manualColumnResize={true}
+              manualRowResize={true}
+              className="htMiddle"
+              rowHeaders={false}
+              autoWrapRow={true}
+              autoWrapCol={true}
+              renderAllRows={false}
+              afterChange={afterChange}
+              cells={(row, col) => {
+                if (col === 0 || col === 5) return { readOnly: true };
+                return {};
+              }}
+            />
+            {filteredCosts.length === 0 && (
+              <div className="text-center py-4 text-gray-400 dark:text-gray-500">
+                Tidak ada data.
+              </div>
+            )}
           </div>
           <div className="w-full md:w-80 md:min-w-[320px] md:max-w-xs p-4 bg-gray-100 dark:bg-gray-700 mt-2 md:mt-0 md:ml-4 rounded h-fit self-start">
             <div className="flex flex-col gap-1 text-sm dark:text-white">
               <div>
                 <span className="font-semibold">Total Harga Pekerjaan (A+B+C+D+E+F): </span>
-                Rp{totalHargaPekerjaan.toLocaleString()}
+                Rp{summary.totalHargaPekerjaan.toLocaleString()}
               </div>
               <div>
                 <span className="font-semibold">PPN 11% (11% x G): </span>
-                Rp{ppn.toLocaleString()}
+                Rp{summary.ppn.toLocaleString()}
               </div>
               <div>
                 <span className="font-semibold">Asuransi (2,5‰ x G): </span>
-                Rp{asuransi.toLocaleString()}
+                Rp{summary.asuransi.toLocaleString()}
               </div>
               <div>
                 <span className="font-semibold">Total Perkiraan Harga Pekerjaan (G+H+I): </span>
-                Rp{totalPerkiraan.toLocaleString()}
+                Rp{summary.totalPerkiraan.toLocaleString()}
               </div>
             </div>
           </div>
