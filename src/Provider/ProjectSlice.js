@@ -2,6 +2,37 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   projects: [
+    // --- Project yang sesuai dengan constraction cost ---
+    {
+      id: 100,
+      name: "FSRU Lampung",
+      jenis: "FSRU",
+      kategori: "Big Scale FSRU > 150.000 m³",
+      lokasi: "Jawa Timur",
+      tahun: 2023,
+      levelAACE: 2,
+      harga: 5000000000,
+    },
+    {
+      id: 101,
+      name: "Small LNG Plant Bau Bau",
+      jenis: "LNG Plant",
+      kategori: "Small-Scale Liquefaction Plant (100 - 800 TPD)",
+      lokasi: "Sulawesi",
+      tahun: 2020,
+      levelAACE: 5,
+      harga: 3000000000,
+    },
+    {
+      id: 102,
+      name: "LNGC Papua",
+      jenis: "LNGC",
+      kategori: "Big Scale LNGC > 100.000 m³",
+      lokasi: "Kepulauan Riau",
+      tahun: 2023,
+      levelAACE: 2,
+      harga: 7000000000,
+    },
     {
       id: 4,
       name: "LNG Storage Bali",
