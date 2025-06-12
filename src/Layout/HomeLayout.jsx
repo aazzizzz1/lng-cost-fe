@@ -9,7 +9,6 @@ import SpeedSensorIcon from "../Assets/Svg/Layout/SpeedSensorIcon";
 import TemperatureSensorIcon from "../Assets/Svg/Layout/TemperatureSensorIcon";
 import Clock from "../Components/Clock/Clock";
 import CurrentPosition from "../Components/Position/Position";
-import "../Style/CustomScrollbar.css";
 import SimulatorIcon from "../Assets/Svg/Sidebar/SimulatorIcon";
 import SensorIcon from "../Assets/Svg/Sidebar/SensorIcon";
 import AccountIcon from "../Assets/Svg/Sidebar/AccountIcon";

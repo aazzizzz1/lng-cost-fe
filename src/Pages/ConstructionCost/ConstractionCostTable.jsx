@@ -134,32 +134,34 @@ const ConstractionCostTable = () => {
         </div>
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 overflow-x-auto">
-            <HotTable
-              ref={hotRef}
-              data={hotData}
-              colHeaders={[
-                'No', 'Uraian', 'Satuan', 'Qty', 'Harga Satuan', 'Total Harga', 'AACE Class', 'Accuracy %',
-                'Kelompok', 'Tahun', 'Infrastruktur', 'Volume', 'Satuan Volume', 'Kapasitas Regasifikasi',
-                'Satuan Kapasitas', 'Proyek', 'Lokasi', 'Tipe'
-              ]}
-              columns={columns}
-              width="100%"
-              height="auto"
-              stretchH="all"
-              licenseKey="non-commercial-and-evaluation"
-              manualColumnResize={true}
-              manualRowResize={true}
-              className="htMiddle"
-              rowHeaders={false}
-              autoWrapRow={true}
-              autoWrapCol={true}
-              renderAllRows={false}
-              afterChange={afterChange}
-              cells={(row, col) => {
-                if (col === 0 || col === 5) return { readOnly: true };
-                return {};
-              }}
-            />
+            <div className="rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm text-sm bg-white dark:bg-gray-900">
+              <HotTable
+                className="htMiddle"
+                ref={hotRef}
+                data={hotData}
+                colHeaders={[
+                  'No', 'Uraian', 'Satuan', 'Qty', 'Harga Satuan', 'Total Harga', 'AACE Class', 'Accuracy %',
+                  'Kelompok', 'Tahun', 'Infrastruktur', 'Volume', 'Satuan Volume', 'Kapasitas Regasifikasi',
+                  'Satuan Kapasitas', 'Proyek', 'Lokasi', 'Tipe'
+                ]}
+                columns={columns}
+                width="100%"
+                height="auto"
+                stretchH="all"
+                licenseKey="non-commercial-and-evaluation"
+                manualColumnResize={true}
+                manualRowResize={true}
+                rowHeaders={false}
+                autoWrapRow={true}
+                autoWrapCol={true}
+                renderAllRows={false}
+                afterChange={afterChange}
+                cells={(row, col) => {
+                  if (col === 0 || col === 5) return { readOnly: true };
+                  return {};
+                }}
+              />
+            </div>
             {filteredCosts.length === 0 && (
               <div className="text-center py-4 text-gray-400 dark:text-gray-500">
                 Tidak ada data.
@@ -167,7 +169,7 @@ const ConstractionCostTable = () => {
             )}
           </div>
           <div className="w-full md:w-80 md:min-w-[320px] md:max-w-xs p-4 bg-gray-100 dark:bg-gray-700 mt-2 md:mt-0 md:ml-4 rounded h-fit self-start">
-            <div className="flex flex-col gap-1 text-sm dark:text-white">
+            <div className="flex flex-col gap-1 text-sm text-gray-900 dark:text-white">
               <div>
                 <span className="font-semibold">Total Harga Pekerjaan (A+B+C+D+E+F): </span>
                 Rp{summary.totalHargaPekerjaan.toLocaleString()}
@@ -188,6 +190,45 @@ const ConstractionCostTable = () => {
           </div>
         </div>
       </div>
+      <style>
+        {`
+        .htCore th, .htCore td {
+          font-size: 0.95rem;
+          padding: 0.5rem 0.75rem;
+        }
+        .htCore th {
+          font-weight: 600;
+          background-color: #f3f4f6;
+        }
+        .dark .htCore th {
+          background-color: #374151 !important;
+          color: #e5e7eb !important;
+        }
+        .htCore td {
+          font-weight: 400;
+          color: #111827;
+        }
+        .dark .htCore td {
+          color: #fff !important;
+          background-color: #111827 !important; /* gray-900 */
+        }
+        .ht_master .htCore {
+          border-radius: 0.5rem;
+        }
+        .htCore tr:nth-child(even) td {
+          background-color: #f9fafb;
+        }
+        .dark .htCore tr:nth-child(even) td {
+          background-color: #1f2937 !important; /* gray-800 */
+        }
+        .htCore tr:hover td {
+          background-color: #e0e7ef;
+        }
+        .dark .htCore tr:hover td {
+          background-color: #374151 !important; /* gray-700 */
+        }
+        `}
+      </style>
     </section>
   )
 }
