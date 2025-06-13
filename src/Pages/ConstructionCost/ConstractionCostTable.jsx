@@ -68,34 +68,57 @@ const ConstractionCostTable = () => {
     hotRef.current.hotInstance.render();
   }, [themeName]);
 
+  // Filter data sesuai jenis project
   const filteredCosts = filterJenis
     ? costs.filter((item) => item.tipe === filterJenis)
     : costs;
 
-  // Prepare data for Handsontable
-  const initialHotData = filteredCosts.map((item, idx) => ({
-    no: idx + 1,
-    uraian: item.uraian,
-    satuan: item.satuan,
-    qty: item.qty,
-    hargaSatuan: item.hargaSatuan,
-    totalHarga: item.totalHarga,
-    aaceClass: item.aaceClass,
-    accuracy: `${item.accuracyLow}% ~ ${item.accuracyHigh}%`,
-    kelompok: item.kelompok,
-    tahun: item.tahun,
-    infrastruktur: item.infrastruktur,
-    volume: item.volume,
-    satuanVolume: item.satuanVolume,
-    kapasitasRegasifikasi: item.kapasitasRegasifikasi,
-    satuanKapasitas: item.satuanKapasitas,
-    proyek: item.proyek,
-    lokasi: item.lokasi,
-    tipe: item.tipe,
-  }));
+  // Kelompokkan data berdasarkan 'kelompok'
+  const grouped = filteredCosts.reduce((acc, item) => {
+    if (!acc[item.kelompok]) acc[item.kelompok] = [];
+    acc[item.kelompok].push(item);
+    return acc;
+  }, {});
+
+  // Prepare data untuk Handsontable (flat, tapi dengan baris judul kelompok)
+  let hotData = [];
+  let rowNo = 1;
+  Object.entries(grouped).forEach(([kelompok, items]) => {
+    // Baris judul kelompok
+    hotData.push({
+      isGroupHeader: true,
+      kelompok,
+      no: "",
+      uraian: kelompok,
+      satuan: "",
+      qty: "",
+      hargaSatuan: "",
+      totalHarga: "",
+      aaceClass: "",
+      accuracy: "",
+      tahun: "",
+      infrastruktur: "",
+      volume: "",
+      satuanVolume: "",
+      kapasitasRegasifikasi: "",
+      satuanKapasitas: "",
+      proyek: "",
+      lokasi: "",
+      tipe: "",
+    });
+    // Baris data
+    items.forEach((item, idx) => {
+      hotData.push({
+        ...item,
+        no: rowNo++,
+        accuracy: `${item.accuracyLow}% ~ ${item.accuracyHigh}%`,
+        isGroupHeader: false,
+      });
+    });
+  });
 
   // State for table data and summary
-  const [hotData, setHotData] = useState(initialHotData);
+  const [tableData, setTableData] = useState(hotData);
   const [summary, setSummary] = useState({
     totalHargaPekerjaan: 0,
     ppn: 0,
@@ -119,8 +142,8 @@ const ConstractionCostTable = () => {
 
   // Initial calculation
   useEffect(() => {
-    setHotData(initialHotData);
-    recalculateSummary(initialHotData);
+    setTableData(hotData);
+    recalculateSummary(hotData);
     // eslint-disable-next-line
   }, [filterJenis, costs]);
 
@@ -143,14 +166,45 @@ const ConstractionCostTable = () => {
     });
     // If any changes, update state and summary
     if (changed) {
-      setHotData(newData);
+      setTableData(newData);
       recalculateSummary(newData);
     } else {
-      // recalculate summary in case of direct edit to totalHarga (shouldn't happen, but safe)
-      setHotData(newData);
+      setTableData(newData);
       recalculateSummary(newData);
     }
   };
+
+  // Custom renderer untuk baris judul kelompok
+  function groupHeaderRenderer(instance, td, row, col, prop, value, cellProperties) {
+    td.colSpan = columns.length;
+    td.innerHTML = `<b>${value}</b>`;
+    td.style.background = instance.rootElement.classList.contains('ht-theme-horizon-dark')
+      ? '#1f2937'
+      : '#f3f4f6';
+    td.style.color = instance.rootElement.classList.contains('ht-theme-horizon-dark')
+      ? '#fff'
+      : '#111827';
+    td.style.textAlign = 'left';
+    td.style.fontWeight = 'bold';
+    td.style.fontSize = '1rem';
+    td.style.borderBottom = '2px solid #d1d5db';
+  }
+
+  // Patch columns agar baris judul kelompok pakai renderer khusus
+  const columnsWithGroup = columns.map((col, idx) => ({
+    ...col,
+    renderer: function (instance, td, row, colIdx, prop, value, cellProperties) {
+      const rowData = tableData[row];
+      if (rowData && rowData.isGroupHeader && colIdx === 1) {
+        groupHeaderRenderer(instance, td, row, colIdx, prop, value, cellProperties);
+      } else if (col.renderer) {
+        col.renderer(instance, td, row, colIdx, prop, value, cellProperties);
+      } else {
+        // default
+        td.innerText = value ?? "";
+      }
+    }
+  }));
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -163,24 +217,17 @@ const ConstractionCostTable = () => {
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 overflow-x-auto">
             <div className="rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm text-sm bg-white dark:bg-gray-900">
-              {/* 
-              // Optional: theme switcher for demo
-              <select value={themeName} onChange={handleOnChange} className="mb-2">
-                <option value="ht-theme-horizon">Light</option>
-                <option value="ht-theme-horizon-dark">Dark</option>
-              </select>
-              */}
               <HotTable
                 className={`htMiddle ${themeName}`}
                 themeName={themeName}
                 ref={hotRef}
-                data={hotData}
+                data={tableData}
                 colHeaders={[
                   'No', 'Uraian', 'Satuan', 'Qty', 'Harga Satuan', 'Total Harga', 'AACE Class', 'Accuracy %',
                   'Kelompok', 'Tahun', 'Infrastruktur', 'Volume', 'Satuan Volume', 'Kapasitas Regasifikasi',
                   'Satuan Kapasitas', 'Proyek', 'Lokasi', 'Tipe'
                 ]}
-                columns={columns}
+                columns={columnsWithGroup}
                 width="100%"
                 height="auto"
                 stretchH="all"
@@ -193,6 +240,10 @@ const ConstractionCostTable = () => {
                 renderAllRows={false}
                 afterChange={afterChange}
                 cells={(row, col) => {
+                  const rowData = tableData[row];
+                  if (rowData && rowData.isGroupHeader) {
+                    return { readOnly: true, className: "bg-gray-100 dark:bg-gray-800 font-bold" };
+                  }
                   if (col === 0 || col === 5) return { readOnly: true };
                   return {};
                 }}
