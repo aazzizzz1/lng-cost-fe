@@ -7,6 +7,9 @@ const Sidebar = () => {
   const [isHargaSatuanOpen, setHargaSatuanOpen] = useState(false);
   const [isHargaPerkiraanOpen, setHargaPerkiraanOpen] = useState(false);
   const [isLNGPlantOpen, setLNGPlantOpen] = useState(false);
+  const [isTransportationOpen, setTransportationOpen] = useState(false);
+  const [isReceivingTerminalOpen, setReceivingTerminalOpen] = useState(false);
+  const [isMaterialPackageOpen, setMaterialPackageOpen] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -164,7 +167,7 @@ const Sidebar = () => {
                     onClick={() => setLNGPlantOpen(!isLNGPlantOpen)}
                   >
                     <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                      LNG Plant
+                      Liquifection Plant
                     </span>
                     <svg
                       aria-hidden="true"
@@ -183,149 +186,267 @@ const Sidebar = () => {
                     </svg>
                   </button>
                   {isLNGPlantOpen && (
-                    <ul className="py-2 space-y-2">
-                      <Link to="/material-konstruksi">
-                        <li>
-                          <a
-                            href="#askjd"
-                            className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                          >
-                            Material Konstruksi
-                          </a>
-                        </li>
-                      </Link>
-                      <li>
-                        <a
-                          href="#askjd"
-                          className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                        >
-                          Peralatan
-                        </a>
+                    <ul className="py-2 space-y-2 ml-2">
+                      <li className="">
+                        <DropdownMenu
+                          title="Onshore LNG Plant"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
                       </li>
                       <li>
-                        <a
-                          href="#askjd"
-                          className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                        >
-                          Upah
-                        </a>
-                      </li>
-                      <Link to="/jasa">
-                        <li>
-                          <a
-                            href="#askjd"
-                            className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                          >
-                            Jasa
-                          </a>
-                        </li>
-                      </Link>
-                      <li>
-                        <a
-                          href="#askjd"
-                          className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                        >
-                          Testing
-                        </a>
+                        <DropdownMenu
+                          title="Offshore LNG Plant"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
                       </li>
                     </ul>
                   )}
                 </li>
                 {/* Transportasi Dropdown */}
                 <li>
-                  <DropdownMenu
-                    title="Transportasi"
-                    items={[
-                      {
-                        label: "Material Konstruksi",
-                        link: "/material-konstruksi",
-                      },
-                      { label: "Peralatan" },
-                      { label: "Upah" },
-                      { label: "Jasa", link: "/jasa" },
-                      { label: "Testing" },
-                    ]}
-                  />
+                  <button
+                    type="button"
+                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    onClick={() => setTransportationOpen(!isTransportationOpen)}
+                  >
+                    <span className="flex-1 ml-3 text-left whitespace-nowrap">
+                      Transportasi
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      className={`w-6 h-6 transform transition-transform ${
+                        isTransportationOpen ? "rotate-180" : ""
+                      }`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                  {isTransportationOpen && (
+                    <ul className="py-2 space-y-2 ml-2">
+                      <li className="">
+                        <DropdownMenu
+                          title="LNG Carier (LNGC)"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                      <li>
+                        <DropdownMenu
+                          title="Barge LNG"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                      <li>
+                        <DropdownMenu
+                          title="LNG Trucking"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                    </ul>
+                  )}
                 </li>
                 {/* Receiving Terminal Dropdown */}
                 <li>
-                  <DropdownMenu
-                    title="Receiving Terminal"
-                    items={[
-                      {
-                        label: "Material Konstruksi",
-                        link: "/material-konstruksi",
-                      },
-                      { label: "Peralatan" },
-                      { label: "Upah" },
-                      { label: "Jasa", link: "/jasa" },
-                      { label: "Testing" },
-                    ]}
-                  />
-                </li>
-                {/* Offtake Station Dropdown */}
-                <li>
-                  <DropdownMenu
-                    title="Offtake Station"
-                    items={[
-                      {
-                        label: "Material Konstruksi",
-                        link: "/material-konstruksi",
-                      },
-                      { label: "Peralatan" },
-                      { label: "Upah" },
-                      { label: "Jasa", link: "/jasa" },
-                      { label: "Testing" },
-                    ]}
-                  />
-                </li>
-                {/* ORF Dropdown */}
-                <li>
-                  <DropdownMenu
-                    title="ORF"
-                    items={[
-                      {
-                        label: "Material Konstruksi",
-                        link: "/material-konstruksi",
-                      },
-                      { label: "Peralatan" },
-                      { label: "Upah" },
-                      { label: "Jasa", link: "/jasa" },
-                      { label: "Testing" },
-                    ]}
-                  />
-                </li>
-                {/* Transmission Pipeline Dropdown */}
-                <li>
-                  <DropdownMenu
-                    title="Trans Pipeline"
-                    items={[
-                      {
-                        label: "Material Konstruksi",
-                        link: "/material-konstruksi",
-                      },
-                      { label: "Peralatan" },
-                      { label: "Upah" },
-                      { label: "Jasa", link: "/jasa" },
-                      { label: "Testing" },
-                    ]}
-                  />
+                  <button
+                    type="button"
+                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    onClick={() => setReceivingTerminalOpen(!isReceivingTerminalOpen)}
+                  >
+                    <span className="flex-1 ml-3 text-left whitespace-nowrap">
+                      Receiving Terminal
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      className={`w-6 h-6 transform transition-transform ${
+                        isReceivingTerminalOpen ? "rotate-180" : ""
+                      }`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                  {isReceivingTerminalOpen && (
+                    <ul className="py-2 space-y-2 ml-2">
+                      <li className="">
+                        <DropdownMenu
+                          title="FSRU"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                      <li>
+                        <DropdownMenu
+                          title="ORF"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                      <li>
+                        <DropdownMenu
+                          title="OTS"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                      <li>
+                        <DropdownMenu
+                          title="ORU"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                    </ul>
+                  )}
                 </li>
                 {/* Material & Package Dropdown */}
                 <li>
-                  <DropdownMenu
-                    title="Material & Package"
-                    items={[
-                      {
-                        label: "Material Konstruksi",
-                        link: "/material-konstruksi",
-                      },
-                      { label: "Peralatan" },
-                      { label: "Upah" },
-                      { label: "Jasa", link: "/jasa" },
-                      { label: "Testing" },
-                    ]}
-                  />
+                  <button
+                    type="button"
+                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    onClick={() => setMaterialPackageOpen(!isMaterialPackageOpen)}
+                  >
+                    <span className="flex-1 ml-3 text-left whitespace-nowrap">
+                      Material & Package
+                    </span>
+                    <svg
+                      aria-hidden="true"
+                      className={`w-6 h-6 transform transition-transform ${
+                        isMaterialPackageOpen ? "rotate-180" : ""
+                      }`}
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                  {isMaterialPackageOpen && (
+                    <ul className="py-2 space-y-2 ml-2">
+                      <li className="">
+                        <DropdownMenu
+                          title="Material"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                      <li>
+                        <DropdownMenu
+                          title="Package"
+                          items={[
+                            {
+                              label: "Material Konstruksi",
+                              link: "/material-konstruksi",
+                            },
+                            { label: "Peralatan" },
+                            { label: "Upah" },
+                            { label: "Jasa", link: "/jasa" },
+                            { label: "Testing" },
+                          ]}
+                        />
+                      </li>
+                    </ul>
+                  )}
                 </li>
               </ul>
             )}
@@ -865,7 +986,7 @@ function DropdownMenu({ title, items }) {
         </svg>
       </button>
       {open && (
-        <ul className="py-2 space-y-2">
+        <ul className="py-2 space-y-2 ml-4">
           {items.map((item, idx) =>
             item.link ? (
               <Link to={item.link} key={item.label}>
