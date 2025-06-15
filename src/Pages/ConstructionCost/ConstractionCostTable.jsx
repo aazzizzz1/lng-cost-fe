@@ -1,114 +1,55 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
-import { HotTable } from '@handsontable/react-wrapper'
-import { registerAllModules } from 'handsontable/registry'
-import 'handsontable/styles/handsontable.css'
-import 'handsontable/styles/ht-theme-main.css'
 
-// register Handsontable's modules
-registerAllModules()
-
-// Custom currency renderer for Handsontable
-function currencyRenderer(instance, td, row, col, prop, value, cellProperties) {
-  const v = typeof value === 'number' ? value : Number(value);
-  td.innerText = isNaN(v) ? '' : 'Rp' + v.toLocaleString();
-  td.className = 'htRight';
-}
+// Helper for currency formatting
+const formatCurrency = (value) =>
+  value ? `Rp${Number(value).toLocaleString()}` : '';
 
 const columns = [
-  { data: 'no', type: 'numeric', readOnly: true, width: 50 },
-  { data: 'uraian', width: 200 },
-  { data: 'satuan', width: 70 },
-  { data: 'qty', type: 'numeric', width: 60 },
-  { data: 'hargaSatuan', type: 'numeric', width: 120, renderer: currencyRenderer },
-  { data: 'totalHarga', type: 'numeric', width: 120, renderer: currencyRenderer },
-  { data: 'aaceClass', width: 80 },
-  { data: 'accuracy', width: 90 },
-  { data: 'kelompok', width: 120 },
-  { data: 'tahun', width: 70 },
-  { data: 'infrastruktur', width: 120 },
-  { data: 'volume', width: 80 },
-  { data: 'satuanVolume', width: 100 },
-  { data: 'kapasitasRegasifikasi', width: 120 },
-  { data: 'satuanKapasitas', width: 110 },
-  { data: 'proyek', width: 120 },
-  { data: 'lokasi', width: 100 },
-  { data: 'tipe', width: 80 },
+  { key: 'no', label: 'No', className: 'text-center', width: 50 },
+  { key: 'uraian', label: 'Uraian', width: 200 },
+  { key: 'satuan', label: 'Satuan', width: 70 },
+  { key: 'qty', label: 'Qty', className: 'text-right', width: 60 },
+  { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', width: 120, isCurrency: true },
+  { key: 'totalHarga', label: 'Total Harga', className: 'text-right', width: 120, isCurrency: true },
+  { key: 'aaceClass', label: 'AACE Class', width: 80 },
+  { key: 'accuracy', label: 'Accuracy %', width: 90 },
+  { key: 'kelompok', label: 'Kelompok', width: 120 },
+  { key: 'tahun', label: 'Tahun', width: 70 },
+  { key: 'infrastruktur', label: 'Infrastruktur', width: 120 },
+  { key: 'volume', label: 'Volume', className: 'text-right', width: 80 },
+  { key: 'satuanVolume', label: 'Satuan Volume', width: 100 },
+  { key: 'kapasitasRegasifikasi', label: 'Kapasitas Regasifikasi', className: 'text-right', width: 120 },
+  { key: 'satuanKapasitas', label: 'Satuan Kapasitas', width: 110 },
+  { key: 'proyek', label: 'Proyek', width: 120 },
+  { key: 'lokasi', label: 'Lokasi', width: 100 },
+  { key: 'tipe', label: 'Tipe', width: 80 },
 ];
 
 const ConstractionCostTable = () => {
   const { costs, filterJenis } = useSelector((state) => state.constractionCost);
-  const hotRef = useRef(null);
-
-  // Theme state for Handsontable
-  const [themeName, setThemeName] = useState(
-    document.querySelector('html')?.classList.contains('dark')
-      ? 'ht-theme-horizon-dark'
-      : 'ht-theme-horizon'
-  );
-
-  useEffect(() => {
-    // Sync theme with Tailwind dark mode
-    const observer = new MutationObserver(() => {
-      setThemeName(
-        document.querySelector('html')?.classList.contains('dark')
-          ? 'ht-theme-horizon-dark'
-          : 'ht-theme-horizon'
-      );
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!hotRef.current?.hotInstance) {
-      return;
-    }
-    hotRef.current.hotInstance.useTheme?.(themeName);
-    hotRef.current.hotInstance.render();
-  }, [themeName]);
 
   // Filter data sesuai jenis project
-  const filteredCosts = filterJenis
-    ? costs.filter((item) => item.tipe === filterJenis)
-    : costs;
+  const filteredCosts = useMemo(() => (
+    filterJenis ? costs.filter((item) => item.tipe === filterJenis) : costs
+  ), [costs, filterJenis]);
 
   // Kelompokkan data berdasarkan 'kelompok'
-  const grouped = filteredCosts.reduce((acc, item) => {
-    if (!acc[item.kelompok]) acc[item.kelompok] = [];
-    acc[item.kelompok].push(item);
-    return acc;
-  }, {});
+  const grouped = useMemo(() => {
+    return filteredCosts.reduce((acc, item) => {
+      if (!acc[item.kelompok]) acc[item.kelompok] = [];
+      acc[item.kelompok].push(item);
+      return acc;
+    }, {});
+  }, [filteredCosts]);
 
-  // Prepare data untuk Handsontable (flat, tapi dengan baris judul kelompok)
-  let hotData = [];
+  // Prepare data untuk table (flat, tapi dengan baris judul kelompok)
+  let tableRows = [];
   let rowNo = 1;
   Object.entries(grouped).forEach(([kelompok, items]) => {
-    // Baris judul kelompok
-    hotData.push({
-      isGroupHeader: true,
-      kelompok,
-      no: "",
-      uraian: kelompok,
-      satuan: "",
-      qty: "",
-      hargaSatuan: "",
-      totalHarga: "",
-      aaceClass: "",
-      accuracy: "",
-      tahun: "",
-      infrastruktur: "",
-      volume: "",
-      satuanVolume: "",
-      kapasitasRegasifikasi: "",
-      satuanKapasitas: "",
-      proyek: "",
-      lokasi: "",
-      tipe: "",
-    });
-    // Baris data
-    items.forEach((item, idx) => {
-      hotData.push({
+    tableRows.push({ isGroupHeader: true, kelompok });
+    items.forEach((item) => {
+      tableRows.push({
         ...item,
         no: rowNo++,
         accuracy: `${item.accuracyLow}% ~ ${item.accuracyHigh}%`,
@@ -117,94 +58,14 @@ const ConstractionCostTable = () => {
     });
   });
 
-  // State for table data and summary
-  const [tableData, setTableData] = useState(hotData);
-  const [summary, setSummary] = useState({
-    totalHargaPekerjaan: 0,
-    ppn: 0,
-    asuransi: 0,
-    totalPerkiraan: 0,
-  });
-
-  // Calculate summary
-  const recalculateSummary = (data) => {
-    const totalHargaPekerjaan = data.reduce((sum, item) => sum + (Number(item.totalHarga) || 0), 0);
+  // Summary
+  const summary = useMemo(() => {
+    const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (Number(item.totalHarga) || 0), 0);
     const ppn = totalHargaPekerjaan * 0.11;
     const asuransi = totalHargaPekerjaan * 0.0025;
     const totalPerkiraan = totalHargaPekerjaan + ppn + asuransi;
-    setSummary({
-      totalHargaPekerjaan,
-      ppn,
-      asuransi,
-      totalPerkiraan,
-    });
-  };
-
-  // Initial calculation
-  useEffect(() => {
-    setTableData(hotData);
-    recalculateSummary(hotData);
-    // eslint-disable-next-line
-  }, [filterJenis, costs]);
-
-  // Update totalHarga otomatis jika hargaSatuan atau qty diubah
-  const afterChange = (changes, source) => {
-    if (!changes) return;
-    if (source === 'loadData') return;
-    const hot = hotRef.current.hotInstance;
-    let newData = hot.getSourceData().map(row => ({ ...row }));
-    let changed = false;
-    changes.forEach(([row, prop, oldValue, newValue]) => {
-      if (prop === 'hargaSatuan' || prop === 'qty') {
-        const hargaSatuan = Number(hot.getDataAtRowProp(row, 'hargaSatuan')) || 0;
-        const qty = Number(hot.getDataAtRowProp(row, 'qty')) || 0;
-        const totalHarga = hargaSatuan * qty;
-        hot.setDataAtRowProp(row, 'totalHarga', totalHarga, 'auto');
-        newData[row].totalHarga = totalHarga;
-        changed = true;
-      }
-    });
-    // If any changes, update state and summary
-    if (changed) {
-      setTableData(newData);
-      recalculateSummary(newData);
-    } else {
-      setTableData(newData);
-      recalculateSummary(newData);
-    }
-  };
-
-  // Custom renderer untuk baris judul kelompok
-  function groupHeaderRenderer(instance, td, row, col, prop, value, cellProperties) {
-    td.colSpan = columns.length;
-    td.innerHTML = `<b>${value}</b>`;
-    td.style.background = instance.rootElement.classList.contains('ht-theme-horizon-dark')
-      ? '#1f2937'
-      : '#f3f4f6';
-    td.style.color = instance.rootElement.classList.contains('ht-theme-horizon-dark')
-      ? '#fff'
-      : '#111827';
-    td.style.textAlign = 'left';
-    td.style.fontWeight = 'bold';
-    td.style.fontSize = '1rem';
-    td.style.borderBottom = '2px solid #d1d5db';
-  }
-
-  // Patch columns agar baris judul kelompok pakai renderer khusus
-  const columnsWithGroup = columns.map((col, idx) => ({
-    ...col,
-    renderer: function (instance, td, row, colIdx, prop, value, cellProperties) {
-      const rowData = tableData[row];
-      if (rowData && rowData.isGroupHeader && colIdx === 1) {
-        groupHeaderRenderer(instance, td, row, colIdx, prop, value, cellProperties);
-      } else if (col.renderer) {
-        col.renderer(instance, td, row, colIdx, prop, value, cellProperties);
-      } else {
-        // default
-        td.innerText = value ?? "";
-      }
-    }
-  }));
+    return { totalHargaPekerjaan, ppn, asuransi, totalPerkiraan };
+  }, [filteredCosts]);
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -216,106 +77,74 @@ const ConstractionCostTable = () => {
         </div>
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 overflow-x-auto">
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm text-sm bg-white dark:bg-gray-900">
-              <HotTable
-                className={`htMiddle ${themeName}`}
-                themeName={themeName}
-                ref={hotRef}
-                data={tableData}
-                colHeaders={[
-                  'No', 'Uraian', 'Satuan', 'Qty', 'Harga Satuan', 'Total Harga', 'AACE Class', 'Accuracy %',
-                  'Kelompok', 'Tahun', 'Infrastruktur', 'Volume', 'Satuan Volume', 'Kapasitas Regasifikasi',
-                  'Satuan Kapasitas', 'Proyek', 'Lokasi', 'Tipe'
-                ]}
-                columns={columnsWithGroup}
-                width="100%"
-                height="auto"
-                stretchH="all"
-                licenseKey="non-commercial-and-evaluation"
-                manualColumnResize={true}
-                manualRowResize={true}
-                rowHeaders={false}
-                autoWrapRow={true}
-                autoWrapCol={true}
-                renderAllRows={false}
-                afterChange={afterChange}
-                cells={(row, col) => {
-                  const rowData = tableData[row];
-                  if (rowData && rowData.isGroupHeader) {
-                    return { readOnly: true, className: "bg-gray-100 dark:bg-gray-800 font-bold" };
-                  }
-                  if (col === 0 || col === 5) return { readOnly: true };
-                  return {};
-                }}
-              />
-            </div>
-            {filteredCosts.length === 0 && (
-              <div className="text-center py-4 text-gray-400 dark:text-gray-500">
-                Tidak ada data.
-              </div>
-            )}
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  {columns.map((col) => (
+                    <th
+                      key={col.key}
+                      className={`px-4 py-3 font-semibold border-b border-gray-200 dark:border-gray-700 ${col.className || ''}`}
+                    >
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {tableRows.length === 0 && (
+                  <tr>
+                    <td colSpan={columns.length} className="text-center py-4 text-gray-400 dark:text-gray-500">
+                      Tidak ada data.
+                    </td>
+                  </tr>
+                )}
+                {tableRows.map((row, idx) =>
+                  row.isGroupHeader ? (
+                    <tr key={`group-${row.kelompok}-${idx}`}>
+                      <td colSpan={columns.length} className="bg-gray-100 dark:bg-gray-800 font-bold text-left text-base border-b border-gray-200 dark:border-gray-700 py-2 pl-2">
+                        {row.kelompok}
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={row.id || idx} className="border-b dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700">
+                      {columns.map((col) => (
+                        <td
+                          key={col.key}
+                          className={`px-4 py-3 ${col.className || ''}`}
+                        >
+                          {col.isCurrency
+                            ? formatCurrency(row[col.key])
+                            : row[col.key] ?? ''}
+                        </td>
+                      ))}
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
           </div>
-          <div className="w-full md:w-80 md:min-w-[320px] md:max-w-xs p-4 bg-gray-100 dark:bg-gray-700 mt-2 md:mt-0 md:ml-4 rounded h-fit self-start">
-            <div className="flex flex-col gap-1 text-sm text-gray-900 dark:text-white">
+          <div className="w-full md:w-96 md:min-w-[320px] md:max-w-md p-4 bg-gray-100 dark:bg-gray-700 mt-2 md:mt-0 md:ml-4 rounded h-fit self-start">
+            <div className="flex flex-col gap-2 text-sm text-gray-900 dark:text-white">
               <div>
                 <span className="font-semibold">Total Harga Pekerjaan (A+B+C+D+E+F): </span>
-                Rp{summary.totalHargaPekerjaan.toLocaleString()}
+                {formatCurrency(summary.totalHargaPekerjaan)}
               </div>
               <div>
                 <span className="font-semibold">PPN 11% (11% x G): </span>
-                Rp{summary.ppn.toLocaleString()}
+                {formatCurrency(summary.ppn)}
               </div>
               <div>
                 <span className="font-semibold">Asuransi (2,5‰ x G): </span>
-                Rp{summary.asuransi.toLocaleString()}
+                {formatCurrency(summary.asuransi)}
               </div>
               <div>
                 <span className="font-semibold">Total Perkiraan Harga Pekerjaan (G+H+I): </span>
-                Rp{summary.totalPerkiraan.toLocaleString()}
+                {formatCurrency(summary.totalPerkiraan)}
               </div>
             </div>
           </div>
         </div>
       </div>
-      <style>
-        {`
-        .htCore th, .htCore td {
-          font-size: 0.95rem;
-          padding: 0.5rem 0.75rem;
-        }
-        .htCore th {
-          font-weight: 600;
-          background-color: #f3f4f6;
-        }
-        .dark .htCore th {
-          background-color: #374151 !important;
-          color: #e5e7eb !important;
-        }
-        .htCore td {
-          font-weight: 400;
-          color: #111827;
-        }
-        .dark .htCore td {
-          color: #fff !important;
-          background-color: #111827 !important; /* gray-900 */
-        }
-        .ht_master .htCore {
-          border-radius: 0.5rem;
-        }
-        .htCore tr:nth-child(even) td {
-          background-color: #f9fafb;
-        }
-        .dark .htCore tr:nth-child(even) td {
-          background-color: #1f2937 !important; /* gray-800 */
-        }
-        .htCore tr:hover td {
-          background-color: #e0e7ef;
-        }
-        .dark .htCore tr:hover td {
-          background-color: #374151 !important; /* gray-700 */
-        }
-        `}
-      </style>
     </section>
   )
 }
