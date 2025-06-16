@@ -247,7 +247,7 @@ const RecapProject = () => {
   }, [uniqueItems, selectedProjects, projectCostMap, columns.length]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-gray-50 dark:bg-gray-900">
       {/* Header: Judul di kiri, tombol di kanan */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
         <div className="flex-1">
@@ -258,20 +258,20 @@ const RecapProject = () => {
             type="text"
             value={rekapTitle}
             onChange={(e) => setRekapTitle(e.target.value)}
-            className="w-full max-w-lg border rounded px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+            className="w-full max-w-lg border rounded px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-700 transition"
           />
         </div>
         <div className="flex flex-row gap-2 items-end md:items-center">
           <button
             type="button"
-            className="bg-primary-700 hover:bg-primary-800 text-white px-4 py-2 rounded font-semibold"
+            className="bg-primary-700 hover:bg-primary-800 text-white px-4 py-2 rounded font-semibold shadow transition dark:bg-primary-600 dark:hover:bg-primary-700"
             onClick={() => setModalOpen(true)}
           >
             Tambah Project ke Rekap
           </button>
           <button
             type="button"
-            className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded font-semibold"
+            className="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded font-semibold shadow transition dark:bg-green-600 dark:hover:bg-green-700"
             onClick={handleExportExcel}
             disabled={selectedProjects.length === 0}
           >
@@ -280,15 +280,13 @@ const RecapProject = () => {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full border dark:border-gray-700 bg-white dark:bg-gray-900 rounded mb-8">
+        <table className="w-full border dark:border-gray-700 bg-white dark:bg-gray-900 rounded mb-8 shadow">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-3 py-2 border dark:border-gray-700 text-gray-900 dark:text-white ${
-                    col.className || ""
-                  }`}
+                  className={`px-3 py-2 border dark:border-gray-700 text-gray-900 dark:text-white font-semibold ${col.className || ""}`}
                   style={col.width ? { minWidth: col.width } : {}}
                 >
                   {col.label}
@@ -312,19 +310,17 @@ const RecapProject = () => {
                 <tr key={`kelompok-${row.kelompok}-${idx}`}>
                   <td
                     colSpan={row.colSpan}
-                    className="bg-primary-100 dark:bg-primary-900 font-bold text-left text-base border-b border-gray-300 dark:border-gray-700 py-2 pl-2 uppercase"
+                    className="bg-primary-100 dark:bg-primary-900 font-bold text-left text-base border-b border-gray-300 dark:border-gray-700 py-2 pl-2 uppercase text-primary-800 dark:text-primary-200"
                   >
                     {row.kelompok}
                   </td>
                 </tr>
               ) : (
-                <tr key={idx} className="border-b dark:border-gray-700">
+                <tr key={idx} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                   {columns.map((col) => (
                     <td
                       key={col.key}
-                      className={`px-3 py-2 border dark:border-gray-700 ${
-                        col.className || ""
-                      }`}
+                      className={`px-3 py-2 border dark:border-gray-700 ${col.className || ""} text-gray-900 dark:text-white`}
                     >
                       {col.key.startsWith("idr_") || col.key.startsWith("usd_")
                         ? row[col.key]
