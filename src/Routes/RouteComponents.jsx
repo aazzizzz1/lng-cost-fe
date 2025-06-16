@@ -20,6 +20,7 @@ import MaterialKonstruksiPages from "../Pages/MaterialKonstruksi/MaterialKonstru
 import TableMaterial from "../Pages/MaterialKonstruksi/TableMaterial";
 import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPages";
 import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
+import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 
 const RouteComponents = () => {
   return (
@@ -39,6 +40,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <ProjectPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/rekap"
+            element={
+              <LayoutPages>
+                <RecapitulationPages />
               </LayoutPages>
             }
           />
