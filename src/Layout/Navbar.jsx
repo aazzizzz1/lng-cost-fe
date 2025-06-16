@@ -43,11 +43,17 @@ const Navbar = () => {
     const observer = new MutationObserver(() => {
       setIsDark(
         document.documentElement.classList.contains("dark") ||
-        document.body.classList.contains("dark")
+          document.body.classList.contains("dark")
       );
     });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
     return () => observer.disconnect();
   }, []);
 
@@ -498,6 +504,30 @@ const Navbar = () => {
                   </svg>
                   <div className="text-sm text-gray-900 dark:text-white">
                     Estimasi
+                  </div>
+                </Link>
+                <Link
+                  to="/rekap"
+                  className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
+                >
+                  <svg
+                    className="mx-auto mb-1 w-7 h-7 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M15 4H9v16h6V4Zm2 16h3a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3v16ZM4 4h3v16H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    Rekap
                   </div>
                 </Link>
                 <a

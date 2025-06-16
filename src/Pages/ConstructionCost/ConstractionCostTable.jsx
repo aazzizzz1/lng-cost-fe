@@ -75,7 +75,7 @@ const ConstractionCostTable = () => {
             <h1 className="text-base dark:text-white">Construction Cost Overview</h1>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col">
           <div className="flex-1 overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -123,22 +123,23 @@ const ConstractionCostTable = () => {
               </tbody>
             </table>
           </div>
-          <div className="w-full md:w-96 md:min-w-[320px] md:max-w-md p-4 bg-gray-100 dark:bg-gray-700 mt-2 md:mt-0 md:ml-4 rounded h-fit self-start">
+          {/* Summary moved below the table */}
+          <div className="w-full p-4 bg-gray-100 dark:bg-gray-700 mt-4 rounded">
             <div className="flex flex-col gap-2 text-sm text-gray-900 dark:text-white">
               <div>
-                <span className="font-semibold">Total Harga Pekerjaan (A+B+C+D+E+F): </span>
+                <span className="font-semibold">Total Harga Pekerjaan: </span>
                 {formatCurrency(summary.totalHargaPekerjaan)}
               </div>
               <div>
-                <span className="font-semibold">PPN 11% (11% x G): </span>
+                <span className="font-semibold">PPN 11%: </span>
                 {formatCurrency(summary.ppn)}
               </div>
               <div>
-                <span className="font-semibold">Asuransi (2,5‰ x G): </span>
+                <span className="font-semibold">Asuransi 2,5‰: </span>
                 {formatCurrency(summary.asuransi)}
               </div>
               <div>
-                <span className="font-semibold">Total Perkiraan Harga Pekerjaan (G+H+I): </span>
+                <span className="font-semibold">Total Perkiraan Harga Pekerjaan: </span>
                 {formatCurrency(summary.totalPerkiraan)}
               </div>
             </div>
