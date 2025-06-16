@@ -639,8 +639,8 @@ const Sidebar = () => {
             )}
           </li>
           <li>
-            <a
-              href="#askjd"
+            <Link
+              to={"/rab"}
               className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
             >
               <svg
@@ -663,12 +663,11 @@ const Sidebar = () => {
                   clip-rule="evenodd"
                 />
               </svg>
-
-              <span className="flex-1 ml-3 whitespace-nowrap">Estimasi</span>
+              <span className="flex-1 ml-3 whitespace-nowrap">RAB</span>
               <span className="inline-flex justify-center items-center w-5 h-5 text-xs font-semibold rounded-full text-primary-800 bg-primary-100 dark:bg-primary-200 dark:text-primary-800">
-                4
+                1
               </span>
-            </a>
+            </Link>
           </li>
         </ul>
         <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">

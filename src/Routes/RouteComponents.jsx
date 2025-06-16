@@ -21,6 +21,7 @@ import TableMaterial from "../Pages/MaterialKonstruksi/TableMaterial";
 import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPages";
 import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
 import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
+import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
 
 const RouteComponents = () => {
   return (
@@ -48,6 +49,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <RecapitulationPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/rab"
+            element={
+              <LayoutPages>
+                <RabPages />
               </LayoutPages>
             }
           />
