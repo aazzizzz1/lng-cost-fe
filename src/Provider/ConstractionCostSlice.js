@@ -257,9 +257,13 @@ const constractionCostSlice = createSlice({
     setFilterJenis: (state, action) => {
       state.filterJenis = action.payload;
     },
+    addProjectCosts: (state, action) => {
+      // action.payload: array of items
+      state.costs = [...state.costs, ...action.payload];
+    },
     // reducer lain jika diperlukan
   },
 });
 
-export const { setFilterJenis } = constractionCostSlice.actions;
+export const { setFilterJenis, addProjectCosts } = constractionCostSlice.actions;
 export default constractionCostSlice.reducer;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
   const [name, setName] = useState("");
@@ -8,10 +9,11 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
   const [tahun, setTahun] = useState(new Date().getFullYear());
   const [levelAACE, setLevelAACE] = useState("Level 4");
   const [harga, setHarga] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreate({
+    const newProject = {
       id: Date.now(),
       name,
       jenis,
@@ -20,7 +22,8 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       tahun: Number(tahun),
       levelAACE,
       harga: Number(harga),
-    });
+    };
+    onCreate(newProject);
     onClose();
     // reset form
     setName("");
@@ -30,6 +33,8 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
     setTahun(new Date().getFullYear());
     setLevelAACE("Level 4");
     setHarga("");
+    // redirect ke detail construction cost
+    navigate(`/project/${newProject.id}/detail-construction`);
   };
 
   return isOpen ? (
@@ -40,7 +45,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
             Add a new Project
           </h2>
           <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 w-full">
+            <div className="grid gap-4 grid-cols-3 sm:grid-cols-2 sm:gap-6 w-full">
               <div className="sm:col-span-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Nama Project
@@ -63,8 +68,15 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                   onChange={e => setJenis(e.target.value)}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 >
-                  <option value="LNG Plant">LNG Plant</option>
-                  <option value="OTS/ORF">OTS/ORF</option>
+                  <option value="LNG Plant">Onshore LNG Plant</option>
+                  <option value="LNG Plant">Offshore LNG Plant</option>
+                  <option value="Transportation">LNG Carier</option>
+                  <option value="Transportation">Barge LNG</option>
+                  <option value="Transportation">LNG Trucking</option>
+                  <option value="Terminal">FSRU</option> 
+                  <option value="Terminal">ORF</option>
+                  <option value="Terminal">OTS</option>
+                  <option value="Terminal">ORU</option>
                 </select>
               </div>
               <div>

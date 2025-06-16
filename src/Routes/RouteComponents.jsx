@@ -19,6 +19,7 @@ import JasaPages from "../Pages/Jasa/JasaPages";
 import MaterialKonstruksiPages from "../Pages/MaterialKonstruksi/MaterialKonstruksiPages";
 import TableMaterial from "../Pages/MaterialKonstruksi/TableMaterial";
 import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPages";
+import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
 
 const RouteComponents = () => {
   return (
@@ -119,6 +120,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <ConstractionCostPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/project/:id/detail-construction"
+            element={
+              <LayoutPages>
+                <DetailCreateProjectConstruction />
               </LayoutPages>
             }
           />

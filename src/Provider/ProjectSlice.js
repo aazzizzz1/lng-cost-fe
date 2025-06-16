@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, combineReducers } from '@reduxjs/toolkit';
 
 const initialState = {
   projects: [
@@ -33,36 +33,6 @@ const initialState = {
       levelAACE: 2,
       harga: 7000000000,
     },
-    {
-      id: 4,
-      name: "LNG Storage Bali",
-      jenis: "LNG Storage",
-      kategori: "5k",
-      lokasi: "Bali",
-      tahun: 2026,
-      levelAACE: 5,
-      harga: 3000000,
-    },
-    {
-      id: 5,
-      name: "LNG Regasification Terminal Lampung",
-      jenis: "Regasification Terminal",
-      kategori: "30k",
-      lokasi: "Lampung",
-      tahun: 2022,
-      levelAACE: 4,
-      harga: 12000000,
-    },
-    {
-      id: 6,
-      name: "LNG Bunkering Jakarta",
-      jenis: "Bunkering",
-      kategori: "15k",
-      lokasi: "Jakarta",
-      tahun: 2025,
-      levelAACE: 4,
-      harga: 7000000,
-    },
   ],
 };
 
@@ -77,5 +47,24 @@ const projectSlice = createSlice({
   },
 });
 
+const projectConstructionCostSlice = createSlice({
+  name: 'projectConstructionCost',
+  initialState: {},
+  reducers: {
+    saveProjectCost: (state, action) => {
+      const { projectId, items } = action.payload;
+      state[projectId] = items;
+    },
+  },
+});
+
 export const { createProject } = projectSlice.actions;
+export const { saveProjectCost } = projectConstructionCostSlice.actions;
+
+// Gabungkan reducer jika perlu
+export const rootReducer = combineReducers({
+  projects: projectSlice.reducer,
+  projectConstructionCost: projectConstructionCostSlice.reducer,
+});
+
 export default projectSlice.reducer;
