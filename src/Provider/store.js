@@ -11,6 +11,7 @@ import layoutReducer from './layoutSlice'; // Import layout reducer
 import materialReducer from './materialSlice'; // Import material reducer
 import constractionCostReducer from './ConstractionCostSlice'; // Import constraction cost reducer
 import materialAndPackageReducer from './MaterialAndPackageSlice'; // Import materialAndPackage reducer
+import globalReducer from './GlobalSlice'; // Tambahkan ini
 
 export default configureStore({
   reducer: {
@@ -26,6 +27,6 @@ export default configureStore({
     material: materialReducer, // Add material reducer
     constractionCost: constractionCostReducer, // Add constraction cost reducer
     materialAndPackage: materialAndPackageReducer, // Add materialAndPackage reducer
-    
+    global: globalReducer, // Tambahkan ini
   },
 });

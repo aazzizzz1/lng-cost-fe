@@ -1,29 +1,55 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setFilterJenis } from "../Provider/ConstractionCostSlice";
+import {
+  toggleSidebar,
+  toggleHargaSatuan,
+  toggleHargaPerkiraan,
+  toggleLNGPlant,
+  toggleTransportation,
+  toggleReceivingTerminal,
+  toggleMaterialPackage,
+} from "../Provider/GlobalSlice";
 
 const Sidebar = () => {
-  const [isHargaSatuanOpen, setHargaSatuanOpen] = useState(false);
-  const [isHargaPerkiraanOpen, setHargaPerkiraanOpen] = useState(false);
-  const [isLNGPlantOpen, setLNGPlantOpen] = useState(false);
-  const [isTransportationOpen, setTransportationOpen] = useState(false);
-  const [isReceivingTerminalOpen, setReceivingTerminalOpen] = useState(false);
-  const [isMaterialPackageOpen, setMaterialPackageOpen] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const {
+    isSidebarOpen,
+    isHargaSatuanOpen,
+    isHargaPerkiraanOpen,
+    isLNGPlantOpen,
+    isTransportationOpen,
+    isReceivingTerminalOpen,
+    isMaterialPackageOpen,
+  } = useSelector((state) => state.global);
 
   // Helper to check if a path is active
   const isActive = (path) => location.pathname === path;
 
+  // Sidebar hidden jika !isSidebarOpen
   return (
     <aside
-      className="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform -translate-x-full bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700 rounded-r-xl"
+      className={`fixed top-0 left-0 z-40 w-64 h-screen pt-14 bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-r-xl
+        transition-all duration-300 ease-in-out
+        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
       aria-label="Sidenav"
       id="drawer-navigation"
     >
       <div className="overflow-y-auto py-5 px-3 h-full bg-white dark:bg-gray-800">
+        {/* Button close sidebar, selalu tampil */}
+        <button
+          className="absolute top-2 right-2 z-50 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+          onClick={() => dispatch(toggleSidebar())}
+        >
+          <svg className="w-6 h-6 text-gray-800 dark:text-white" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
         <form action="#" method="GET" className="md:hidden mb-2">
           <label htmlFor="sidebar-search" className="sr-only">
             Search
@@ -155,7 +181,7 @@ const Sidebar = () => {
             <button
               type="button"
               className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              onClick={() => setHargaSatuanOpen(!isHargaSatuanOpen)}
+              onClick={() => dispatch(toggleHargaSatuan())}
             >
               <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
@@ -177,9 +203,7 @@ const Sidebar = () => {
               </span>
               <svg
                 aria-hidden="true"
-                className={`w-6 h-6 transform transition-transform ${
-                  isHargaSatuanOpen ? "rotate-180" : ""
-                }`}
+                className={`w-6 h-6 transform transition-transform ${isHargaSatuanOpen ? "rotate-180" : ""}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -198,16 +222,14 @@ const Sidebar = () => {
                   <button
                     type="button"
                     className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    onClick={() => setLNGPlantOpen(!isLNGPlantOpen)}
+                    onClick={() => dispatch(toggleLNGPlant())}
                   >
                     <span className="flex-1 ml-3 text-left whitespace-nowrap">
                       Liquifection Plant
                     </span>
                     <svg
                       aria-hidden="true"
-                      className={`w-6 h-6 transform transition-transform ${
-                        isLNGPlantOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-6 h-6 transform transition-transform ${isLNGPlantOpen ? "rotate-180" : ""}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
@@ -259,16 +281,14 @@ const Sidebar = () => {
                   <button
                     type="button"
                     className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    onClick={() => setTransportationOpen(!isTransportationOpen)}
+                    onClick={() => dispatch(toggleTransportation())}
                   >
                     <span className="flex-1 ml-3 text-left whitespace-nowrap">
                       Transportasi
                     </span>
                     <svg
                       aria-hidden="true"
-                      className={`w-6 h-6 transform transition-transform ${
-                        isTransportationOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-6 h-6 transform transition-transform ${isTransportationOpen ? "rotate-180" : ""}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
@@ -335,18 +355,14 @@ const Sidebar = () => {
                   <button
                     type="button"
                     className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    onClick={() =>
-                      setReceivingTerminalOpen(!isReceivingTerminalOpen)
-                    }
+                    onClick={() => dispatch(toggleReceivingTerminal())}
                   >
                     <span className="flex-1 ml-3 text-left whitespace-nowrap">
                       Receiving Terminal
                     </span>
                     <svg
                       aria-hidden="true"
-                      className={`w-6 h-6 transform transition-transform ${
-                        isReceivingTerminalOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-6 h-6 transform transition-transform ${isReceivingTerminalOpen ? "rotate-180" : ""}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
@@ -428,18 +444,14 @@ const Sidebar = () => {
                   <button
                     type="button"
                     className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    onClick={() =>
-                      setMaterialPackageOpen(!isMaterialPackageOpen)
-                    }
+                    onClick={() => dispatch(toggleMaterialPackage())}
                   >
                     <span className="flex-1 ml-3 text-left whitespace-nowrap">
                       Material & Package
                     </span>
                     <svg
                       aria-hidden="true"
-                      className={`w-6 h-6 transform transition-transform ${
-                        isMaterialPackageOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-6 h-6 transform transition-transform ${isMaterialPackageOpen ? "rotate-180" : ""}`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                       xmlns="http://www.w3.org/2000/svg"
@@ -475,7 +487,7 @@ const Sidebar = () => {
             <button
               type="button"
               className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              onClick={() => setHargaPerkiraanOpen(!isHargaPerkiraanOpen)}
+              onClick={() => dispatch(toggleHargaPerkiraan())}
             >
               <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
@@ -497,9 +509,7 @@ const Sidebar = () => {
               </span>
               <svg
                 aria-hidden="true"
-                className={`w-6 h-6 transform transition-transform ${
-                  isHargaPerkiraanOpen ? "rotate-180" : ""
-                }`}
+                className={`w-6 h-6 transform transition-transform ${isHargaPerkiraanOpen ? "rotate-180" : ""}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -520,7 +530,7 @@ const Sidebar = () => {
                       dispatch(setFilterJenis("FSRU"));
                       navigate("/construction-cost");
                     }}
-                    className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                    className="flex items-center p-2 w-full textBase font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                   >
                     FSRU
                   </button>
@@ -708,7 +718,7 @@ const Sidebar = () => {
           <li>
             <a
               href="#askjd"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+              className="flex items-center p-2 textBase font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
             >
               <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
@@ -858,7 +868,7 @@ const Sidebar = () => {
                       />
                       <path
                         fill="#fff"
-                        d="M8.2 3l1 2.8H12L9.7 7.5l.9 2.7-2.4-1.7L6 10.2l.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7L74 8.5l-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 7.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm-74.1 7l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7H65zm16.4 0l1 2.8H86l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm-74 7l.8 2.8h3l-2.4 1.7.9 2.7-2.4-1.7L6 24.2l.9-2.7-2.4-1.7h3zm16.4 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 21.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm-74.1 7l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7H65zm16.4 0l1 2.8H86l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm-74.1 7l.8 2.8h3l-2.4 1.7.9 2.7-2.4-1.7L6 38.2l.9-2.7-2.4-1.7h3zm16.4 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 35.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm-74.1 7l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7H65zm16.4 0l1 2.8H86l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm-74.1 7l.8 2.8h3l-2.4 1.7.9 2.7-2.4-1.7L6 66.2l.9-2.7-2.4-1.7h3zm16.4 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 63.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm-74.1 7l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7H65zm16.4 0l1 2.8H86l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm-74.1 7l.8 2.8h3l-2.4 1.7.9 2.7-2.4-1.7L6 86.2l.9-2.7-2.4-1.7h3zm16.4 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 83.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9z"
+                        d="M8.2 3l1 2.8H12L9.7 7.5l.9 2.7-2.4-1.7L6 10.2l.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7L74 8.5l-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 7.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm-74.1 7l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7H65zm16.4 0l1 2.8H86l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm-74 7l.8 2.8h3l-2.4 1.7.9 2.7-2.4-1.7L6 24.2l.9-2.7-2.4-1.7h3zm16.4 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 21.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm-74.1 7l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7H65zm16.4 0l1 2.8H86l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm-74.1 7l.8 2.8h3l-2.4 1.7.9 2.7-2.4-1.7L6 38.2l.9-2.7-2.4-1.7h3zm16.4 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8H45l-2.4 1.7 1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9zm16.4 0l1 2.8h2.8l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h3zm16.5 0l.9 2.8h2.9l-2.3 1.7.9 2.7-2.4-1.7-2.3 1.7.9-2.7-2.4-1.7h2.9zm16.5 0l.9 2.8h2.9L92 63.5l1 2.7-2.4-1.7-2.4 1.7 1-2.7-2.4-1.7h2.9z"
                         transform="scale(3.9385)"
                       />
                     </g>
