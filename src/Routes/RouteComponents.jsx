@@ -22,6 +22,7 @@ import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPag
 import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
 import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
+import MaterialAndPackagePages from "../Pages/MaterialAndPackage/MaterialAndPackagePages";
 
 const RouteComponents = () => {
   return (
@@ -146,6 +147,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <DetailCreateProjectConstruction />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/material-package"
+            element={
+              <LayoutPages>
+                <MaterialAndPackagePages />
               </LayoutPages>
             }
           />

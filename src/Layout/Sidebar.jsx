@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setFilterJenis } from "../Provider/ConstractionCostSlice";
 
@@ -335,7 +335,9 @@ const Sidebar = () => {
                   <button
                     type="button"
                     className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    onClick={() => setReceivingTerminalOpen(!isReceivingTerminalOpen)}
+                    onClick={() =>
+                      setReceivingTerminalOpen(!isReceivingTerminalOpen)
+                    }
                   >
                     <span className="flex-1 ml-3 text-left whitespace-nowrap">
                       Receiving Terminal
@@ -426,7 +428,9 @@ const Sidebar = () => {
                   <button
                     type="button"
                     className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    onClick={() => setMaterialPackageOpen(!isMaterialPackageOpen)}
+                    onClick={() =>
+                      setMaterialPackageOpen(!isMaterialPackageOpen)
+                    }
                   >
                     <span className="flex-1 ml-3 text-left whitespace-nowrap">
                       Material & Package
@@ -449,36 +453,18 @@ const Sidebar = () => {
                   </button>
                   {isMaterialPackageOpen && (
                     <ul className="py-2 space-y-2 ml-2">
-                      <li className="">
-                        <DropdownMenu
-                          title="Material"
-                          items={[
-                            {
-                              label: "Material Konstruksi",
-                              link: "/material-konstruksi",
-                            },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
-                          ]}
-                        />
-                      </li>
-                      <li>
-                        <DropdownMenu
-                          title="Package"
-                          items={[
-                            {
-                              label: "Material Konstruksi",
-                              link: "/material-konstruksi",
-                            },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
-                          ]}
-                        />
-                      </li>
+                      <Link
+                        to={"/material-package?tab=material"}
+                        className="flex items-center p-2 pl-8 w-full font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 text-sm flex-1 ml-3 text-left whitespace-nowrap"
+                      >
+                        Material
+                      </Link>
+                      <Link
+                        to={"/material-package?tab=package"}
+                        className="flex items-center p-2 pl-8 w-full font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 text-sm flex-1 ml-3 text-left whitespace-nowrap"
+                      >
+                        Package
+                      </Link>
                     </ul>
                   )}
                 </li>
@@ -546,7 +532,7 @@ const Sidebar = () => {
                       dispatch(setFilterJenis("LNG Plant"));
                       navigate("/construction-cost");
                     }}
-                    className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                    className="flex items-center p-2 w-full textBase font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                   >
                     LNG Plant
                   </button>
@@ -558,7 +544,7 @@ const Sidebar = () => {
                       dispatch(setFilterJenis("LNGC"));
                       navigate("/construction-cost");
                     }}
-                    className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                    className="flex items-center p-2 w-full textBase font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                   >
                     LNGC
                   </button>
@@ -1040,9 +1026,7 @@ function DropdownMenu({ title, items }) {
                   <a
                     href="#askjd"
                     className={`text-xs flex items-center p-2 w-full font-medium rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8 ${
-                      isActive(item.link)
-                        ? "text-blue-600"
-                        : "text-gray-900"
+                      isActive(item.link) ? "text-blue-600" : "text-gray-900"
                     }`}
                   >
                     {item.label}

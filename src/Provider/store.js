@@ -10,6 +10,7 @@ import jasaReducer from './jasaSlice'; // Import jasa reducer
 import layoutReducer from './layoutSlice'; // Import layout reducer
 import materialReducer from './materialSlice'; // Import material reducer
 import constractionCostReducer from './ConstractionCostSlice'; // Import constraction cost reducer
+import materialAndPackageReducer from './MaterialAndPackageSlice'; // Import materialAndPackage reducer
 
 export default configureStore({
   reducer: {
@@ -24,5 +25,7 @@ export default configureStore({
     layout: layoutReducer, // Add layout reducer
     material: materialReducer, // Add material reducer
     constractionCost: constractionCostReducer, // Add constraction cost reducer
+    materialAndPackage: materialAndPackageReducer, // Add materialAndPackage reducer
+    
   },
 });
