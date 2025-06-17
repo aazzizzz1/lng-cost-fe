@@ -168,6 +168,82 @@ const DetailCreateProjectConstruction = () => {
     return acc;
   }, {});
 
+  // Ambil data material, jasa, dan package dari redux
+  const materialList = useSelector(state => state.material.dataMaterial || []);
+  const jasaList = useSelector(state => state.jasa.jasa || []);
+  const packageList = useSelector(state => state.materialAndPackage.packages || []);
+
+  // State untuk modal ambil harga satuan
+  const [modal, setModal] = useState({
+    open: false,
+    type: null, // 'material' | 'jasa' | 'package'
+    itemIdx: null,
+    search: "",
+  });
+
+  // Handler buka modal
+  const handleOpenModal = (type, idx) => {
+    setModal({ open: true, type, itemIdx: idx, search: "" });
+  };
+  // Handler tutup modal
+  const handleCloseModal = () => {
+    setModal({ open: false, type: null, itemIdx: null, search: "" });
+  };
+
+  // Handler pilih data dari modal
+  const handleSelectFromModal = (row) => {
+    setItems(items.map((item, i) =>
+      i === modal.itemIdx
+        ? {
+            ...item,
+            uraian: row.uraian || row.nama || "",
+            satuan: row.satuan || row.satuan || "",
+            hargaSatuan: row.hargaSatuan || row.harga || 0,
+            // qty tetap, totalHarga update
+            totalHarga: item.qty * (row.hargaSatuan || row.harga || 0),
+          }
+        : item
+    ));
+    handleCloseModal();
+  };
+
+  // Data dan kolom untuk modal
+  let modalData = [];
+  let modalColumns = [];
+  if (modal.type === "material") {
+    modalData = materialList.filter(m =>
+      m.uraian.toLowerCase().includes(modal.search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "uraian", label: "Uraian" },
+      { key: "satuan", label: "Satuan" },
+      { key: "hargaSatuan", label: "Harga Satuan" },
+      { key: "tahun", label: "Tahun" },
+      { key: "proyek", label: "Proyek" },
+    ];
+  } else if (modal.type === "jasa") {
+    modalData = jasaList.filter(j =>
+      j.nama.toLowerCase().includes(modal.search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "nama", label: "Nama Jasa" },
+      { key: "satuan", label: "Satuan" },
+      { key: "harga", label: "Harga Satuan" },
+      { key: "kategori", label: "Kategori" },
+    ];
+  } else if (modal.type === "package") {
+    modalData = packageList.filter(p =>
+      p.uraian.toLowerCase().includes(modal.search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "uraian", label: "Uraian" },
+      { key: "spesifikasi", label: "Spesifikasi" },
+      { key: "satuan", label: "Satuan" },
+      { key: "hargaSatuan", label: "Harga Satuan" },
+      { key: "tahun", label: "Tahun" },
+    ];
+  }
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
@@ -193,6 +269,7 @@ const DetailCreateProjectConstruction = () => {
                     <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Harga Satuan</th>
                     <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Total Harga</th>
                     <th className="px-2 py-2 border dark:border-gray-700 w-16"></th>
+                    <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Ambil Harga</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -277,6 +354,33 @@ const DetailCreateProjectConstruction = () => {
                             </button>
                           )}
                         </td>
+                        <td className="border dark:border-gray-700 px-2 py-1 align-top">
+                          {!item.isCategory && (
+                            <div className="flex flex-col gap-1">
+                              <button
+                                type="button"
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs mb-1"
+                                onClick={() => handleOpenModal("material", absIdx)}
+                              >
+                                Ambil dari Material
+                              </button>
+                              <button
+                                type="button"
+                                className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs mb-1"
+                                onClick={() => handleOpenModal("jasa", absIdx)}
+                              >
+                                Ambil dari Jasa
+                              </button>
+                              <button
+                                type="button"
+                                className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs"
+                                onClick={() => handleOpenModal("package", absIdx)}
+                              >
+                                Ambil dari Package
+                              </button>
+                            </div>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}
@@ -301,6 +405,71 @@ const DetailCreateProjectConstruction = () => {
           </button>
         </div>
       </form>
+      {/* Modal Pilih Harga Satuan */}
+      {modal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white dark:bg-gray-800 rounded shadow-lg max-w-2xl w-full p-4">
+            <div className="flex justify-between items-center mb-2">
+              <div className="font-bold text-lg text-gray-900 dark:text-white">
+                Pilih {modal.type === "material" ? "Material" : modal.type === "jasa" ? "Jasa" : "Package"}
+              </div>
+              <button
+                className="text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
+                onClick={handleCloseModal}
+              >
+                &times;
+              </button>
+            </div>
+            <input
+              type="text"
+              className="w-full mb-2 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white"
+              placeholder="Cari..."
+              value={modal.search}
+              onChange={e => setModal({ ...modal, search: e.target.value })}
+              autoFocus
+            />
+            <div className="overflow-x-auto max-h-80">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    {modalColumns.map(col => (
+                      <th key={col.key} className="px-2 py-1 border-b dark:border-gray-600 text-gray-900 dark:text-white">{col.label}</th>
+                    ))}
+                    <th className="px-2 py-1 border-b dark:border-gray-600"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {modalData.length === 0 && (
+                    <tr>
+                      <td colSpan={modalColumns.length + 1} className="text-center text-gray-400 py-4">
+                        Tidak ada data.
+                      </td>
+                    </tr>
+                  )}
+                  {modalData.map((row, idx) => (
+                    <tr key={row.id || idx}>
+                      {modalColumns.map(col => (
+                        <td key={col.key} className="px-2 py-1 border-b dark:border-gray-700">
+                          {row[col.key]}
+                        </td>
+                      ))}
+                      <td className="px-2 py-1 border-b dark:border-gray-700">
+                        <button
+                          type="button"
+                          className="bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
+                          onClick={() => handleSelectFromModal(row)}
+                        >
+                          Pilih
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
