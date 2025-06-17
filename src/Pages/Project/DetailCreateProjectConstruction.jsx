@@ -407,56 +407,62 @@ const DetailCreateProjectConstruction = () => {
       </form>
       {/* Modal Pilih Harga Satuan */}
       {modal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white dark:bg-gray-800 rounded shadow-lg max-w-2xl w-full p-4">
-            <div className="flex justify-between items-center mb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 transition-colors">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-2xl w-full p-4 transition-all duration-200">
+            <div className="flex justify-between items-center mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
               <div className="font-bold text-lg text-gray-900 dark:text-white">
                 Pilih {modal.type === "material" ? "Material" : modal.type === "jasa" ? "Jasa" : "Package"}
               </div>
               <button
-                className="text-gray-500 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white"
+                className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-2xl px-2 transition"
                 onClick={handleCloseModal}
+                aria-label="Tutup"
               >
                 &times;
               </button>
             </div>
             <input
               type="text"
-              className="w-full mb-2 px-2 py-1 border rounded dark:bg-gray-700 dark:text-white"
+              className="w-full mb-3 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500 transition"
               placeholder="Cari..."
               value={modal.search}
               onChange={e => setModal({ ...modal, search: e.target.value })}
               autoFocus
             />
-            <div className="overflow-x-auto max-h-80">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto max-h-80 rounded">
+              <table className="w-full text-sm border-separate border-spacing-0">
                 <thead>
-                  <tr>
+                  <tr className="bg-gray-100 dark:bg-gray-800">
                     {modalColumns.map(col => (
-                      <th key={col.key} className="px-2 py-1 border-b dark:border-gray-600 text-gray-900 dark:text-white">{col.label}</th>
+                      <th key={col.key} className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold sticky top-0 z-10 bg-inherit">
+                        {col.label}
+                      </th>
                     ))}
-                    <th className="px-2 py-1 border-b dark:border-gray-600"></th>
+                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700"></th>
                   </tr>
                 </thead>
                 <tbody>
                   {modalData.length === 0 && (
                     <tr>
-                      <td colSpan={modalColumns.length + 1} className="text-center text-gray-400 py-4">
+                      <td colSpan={modalColumns.length + 1} className="text-center text-gray-400 dark:text-gray-500 py-6">
                         Tidak ada data.
                       </td>
                     </tr>
                   )}
                   {modalData.map((row, idx) => (
-                    <tr key={row.id || idx}>
+                    <tr
+                      key={row.id || idx}
+                      className="hover:bg-primary-50 dark:hover:bg-gray-800 transition"
+                    >
                       {modalColumns.map(col => (
-                        <td key={col.key} className="px-2 py-1 border-b dark:border-gray-700">
+                        <td key={col.key} className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100">
                           {row[col.key]}
                         </td>
                       ))}
-                      <td className="px-2 py-1 border-b dark:border-gray-700">
+                      <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800">
                         <button
                           type="button"
-                          className="bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
+                          className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1 rounded text-xs font-semibold shadow-sm transition"
                           onClick={() => handleSelectFromModal(row)}
                         >
                           Pilih
