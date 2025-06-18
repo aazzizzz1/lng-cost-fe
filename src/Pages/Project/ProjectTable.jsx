@@ -390,12 +390,20 @@ const ProjectTable = () => {
                     </div>
                   </div>
                 )}
+                <div className="flex flex-row gap-2 justify-center">
                 <button
                   className="mt-4 bg-primary-700 hover:bg-primary-800 text-white font-semibold py-2 px-4 rounded"
                   onClick={() => handleDetailClick(summary)}
                 >
                   Lihat Detail Harga Konstruksi
                 </button>
+                <button
+                  className="mt-4 bg-primary-700 hover:bg-primary-800 text-white font-semibold py-2 px-4 rounded"
+                  onClick={() => alert("Detail Design Engineering belum tersedia")}
+                >
+                  Detail Design Engineering
+                </button>
+                </div>
               </div>
             ) : (
               <div className="text-gray-400 dark:text-gray-300 text-center">
