@@ -1,9 +1,32 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Mapping satuan berdasarkan jenis project
+const satuanByJenis = {
+  "Onshore LNG Plant": "MTPA",
+  "Offshore LNG Plant": "MTPA",
+  "LNG Carrier": "m³",
+  "LNG Trucking": "CBM",
+  "FSRU": "m³ / MMSCFD",
+  "ORF": "MMSCFD",
+  "OTS": "MMSCFD",
+  "ORU": "m³ / MMSCFD",
+};
+
+const jenisOptions = [
+  { value: "Onshore LNG Plant", label: "Onshore LNG Plant" },
+  { value: "Offshore LNG Plant", label: "Offshore LNG Plant" },
+  { value: "LNG Carrier", label: "LNG Carrier" },
+  { value: "LNG Trucking", label: "LNG Trucking" },
+  { value: "FSRU", label: "FSRU" },
+  { value: "ORF", label: "ORF" },
+  { value: "OTS", label: "OTS" },
+  { value: "ORU", label: "ORU" },
+];
+
 const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
   const [name, setName] = useState("");
-  const [jenis, setJenis] = useState("LNG Plant");
+  const [jenis, setJenis] = useState("Onshore LNG Plant");
   const [kategori, setKategori] = useState("");
   const [lokasi, setLokasi] = useState("");
   const [tahun, setTahun] = useState(new Date().getFullYear());
@@ -29,7 +52,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
     onClose();
     // reset form
     setName("");
-    setJenis("LNG Plant");
+    setJenis("Onshore LNG Plant");
     setKategori("");
     setLokasi("");
     setTahun(new Date().getFullYear());
@@ -48,7 +71,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
             Add a new Project
           </h2>
           <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 grid-cols-3 sm:grid-cols-2 sm:gap-6 w-full">
+            <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 sm:gap-6 w-full">
               <div className="sm:col-span-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Nama Project
@@ -71,21 +94,17 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                   onChange={e => setJenis(e.target.value)}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 >
-                  <option value="LNG Plant">Onshore LNG Plant</option>
-                  <option value="LNG Plant">Offshore LNG Plant</option>
-                  <option value="Transportation">LNG Carier</option>
-                  <option value="Transportation">Barge LNG</option>
-                  <option value="Transportation">LNG Trucking</option>
-                  <option value="Terminal">FSRU</option> 
-                  <option value="Terminal">ORF</option>
-                  <option value="Terminal">OTS</option>
-                  <option value="Terminal">ORU</option>
+                  {jenisOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
                 </select>
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Kategori
                 </label>
+                <div className="flex flex-row gap-2">  
+                  {/* dropdown berdasarkan database yang ada dan isi sendiri */}
                 <input
                   type="text"
                   value={kategori}
@@ -93,11 +112,20 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                   placeholder="Kategori"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 />
+                {/* Satuan di kunci sesuai jenis nya */}
+                <div className="text-sm text-light bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {satuanByJenis[jenis] || "-"}
+                  </span>
+                </div>
+                </div>
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Lokasi
                 </label>
+                {/* Indeks Kemahalan Konstruksi Provinsi Badan Pusat Statistik */}
+                {/* Setting paratemer buat administrator */}
                 <select
                   value={lokasi}
                   onChange={e => setLokasi(e.target.value)}
@@ -128,21 +156,17 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Level AACE
+                  Asumsi Inflasi (%)
                 </label>
-                <select
-                  value={levelAACE}
-                  onChange={e => setLevelAACE(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                >
-                  <option value="Level 1">Level 1</option>
-                  <option value="Level 2">Level 2</option>
-                  <option value="Level 3">Level 3</option>
-                  <option value="Level 4">Level 4</option>
-                  <option value="Level 5">Level 5</option>
-                </select>
+                <input
+                  type="number"
+                  // value={inflasi}
+                  // onChange={e => setTahun(e.target.value)}
+                  placeholder="5%"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
               </div>
-              {/* Tambahan dropdown perhitungan Galileo */}
+              {/* //Tambahan dropdown perhitungan Galileo
               <div className="sm:col-span-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Perhitungan Galileo
@@ -156,20 +180,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                   <option value="ya">Ya</option>
                   <option value="tidak">Tidak</option>
                 </select>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Harga
-                </label>
-                <input
-                  type="number"
-                  value={harga}
-                  onChange={e => setHarga(e.target.value)}
-                  placeholder="Harga"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required
-                />
-              </div>
+              </div> */}
             </div>
             <div className="gap-2 flex flex-row mt-4">
               <button

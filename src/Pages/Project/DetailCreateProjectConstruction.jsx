@@ -95,15 +95,15 @@ const DetailCreateProjectConstruction = () => {
     setItems(items.map((item, i) =>
       i === idx
         ? {
-            ...item,
-            [field]: field === "qty" || field === "hargaSatuan" ? Number(value) : value,
-            totalHarga:
-              field === "qty"
-                ? Number(value) * item.hargaSatuan
-                : field === "hargaSatuan"
-                ? item.qty * Number(value)
+          ...item,
+          [field]: field === "qty" || field === "hargaSatuan" ? parseFloat(value) : value,
+          totalHarga:
+            field === "qty"
+              ? parseFloat(value) * item.hargaSatuan
+              : field === "hargaSatuan"
+                ? item.qty * parseFloat(value)
                 : item.qty * item.hargaSatuan,
-          }
+        }
         : item
     ));
   };
@@ -195,13 +195,13 @@ const DetailCreateProjectConstruction = () => {
     setItems(items.map((item, i) =>
       i === modal.itemIdx
         ? {
-            ...item,
-            uraian: row.uraian || row.nama || "",
-            satuan: row.satuan || row.satuan || "",
-            hargaSatuan: row.hargaSatuan || row.harga || 0,
-            // qty tetap, totalHarga update
-            totalHarga: item.qty * (row.hargaSatuan || row.harga || 0),
-          }
+          ...item,
+          uraian: row.uraian || row.nama || "",
+          satuan: row.satuan || row.satuan || "",
+          hargaSatuan: row.hargaSatuan || row.harga || 0,
+          // qty tetap, totalHarga update
+          totalHarga: item.qty * (row.hargaSatuan || row.harga || 0),
+        }
         : item
     ));
     handleCloseModal();
@@ -318,6 +318,7 @@ const DetailCreateProjectConstruction = () => {
                             <input
                               type="number"
                               min={1}
+                              step="any"
                               value={item.qty}
                               onChange={e => handleItemChange(absIdx, "qty", e.target.value)}
                               className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
@@ -331,6 +332,7 @@ const DetailCreateProjectConstruction = () => {
                             <input
                               type="number"
                               min={0}
+                              step="any"
                               value={item.hargaSatuan}
                               onChange={e => handleItemChange(absIdx, "hargaSatuan", e.target.value)}
                               className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"

@@ -281,85 +281,98 @@ const ProjectTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {projects.map((project, index) => (
-                  <tr
-                    key={project.id}
-                    className={`border-b dark:border-gray-700 cursor-pointer ${
-                      selectedProject && selectedProject.id === project.id
-                        ? "bg-blue-50 dark:bg-blue-900"
-                        : ""
-                    }`}
-                    onClick={() => handleRowClick(project)}
-                  >
-                    <td className="px-4 py-3">{index + 1}</td>
-                    <th
-                      scope="row"
-                      className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                {projects.map((project, index) => {
+                  // Ambil summary untuk tipe project
+                  const summary = getProjectSummary(project);
+                  // Ambil semua cost yang sesuai tipe project
+                  const filteredCosts = costs.filter(item => item.tipe === summary.tipe);
+                  const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (item.totalHarga || 0), 0);
+                  const ppn = totalHargaPekerjaan * 0.11;
+                  const asuransi = totalHargaPekerjaan * 0.0025;
+                  const totalPerkiraan = totalHargaPekerjaan + ppn + asuransi;
+                  return (
+                    <tr
+                      key={project.id}
+                      className={`border-b dark:border-gray-700 cursor-pointer ${
+                        selectedProject && selectedProject.id === project.id
+                          ? "bg-blue-50 dark:bg-blue-900"
+                          : ""
+                      }`}
+                      onClick={() => handleRowClick(project)}
                     >
-                      {project.name}
-                    </th>
-                    <td className="px-4 py-3">{project.jenis}</td>
-                    <td className="px-4 py-3">{project.kategori}</td>
-                    <td className="px-4 py-3">{project.lokasi}</td>
-                    <td className="px-4 py-3">{project.tahun}</td>
-                    <td className="px-4 py-3">{project.levelAACE}</td>
-                    <td className="px-4 py-3">
-                      Rp<span className="text-green-500 font-semibold">{project.harga.toLocaleString()}</span>
-                    </td>
-                    <td className="flex items-center justify-center">
-                      <button
-                        id="apple-imac-27-dropdown-button"
-                        data-dropdown-toggle="apple-imac-27-dropdown"
-                        className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
-                        type="button"
+                      <td className="px-4 py-3">{index + 1}</td>
+                      <th
+                        scope="row"
+                        className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                       >
-                        <svg
-                          className="w-5 h-5"
-                          aria-hidden="true"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
+                        {project.name}
+                      </th>
+                      <td className="px-4 py-3">{project.jenis}</td>
+                      <td className="px-4 py-3">{project.kategori}</td>
+                      <td className="px-4 py-3">{project.lokasi}</td>
+                      <td className="px-4 py-3">{project.tahun}</td>
+                      <td className="px-4 py-3">{project.levelAACE}</td>
+                      <td className="px-4 py-3">
+                        Rp
+                        <span className="text-green-500 font-semibold">
+                          {Number(totalPerkiraan).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                      <td className="flex items-center justify-center">
+                        <button
+                          id="apple-imac-27-dropdown-button"
+                          data-dropdown-toggle="apple-imac-27-dropdown"
+                          className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+                          type="button"
                         >
-                          <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                        </svg>
-                      </button>
-                      <div
-                        id="apple-imac-27-dropdown"
-                        className="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
-                      >
-                        <ul
-                          className="py-1 text-sm text-gray-700 dark:text-gray-200"
-                          aria-labelledby="apple-imac-27-dropdown-button"
-                        >
-                          <li>
-                            <a
-                              href="#d"
-                              className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                            >
-                              Show
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              href="#d"
-                              className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                            >
-                              Edit
-                            </a>
-                          </li>
-                        </ul>
-                        <div className="py-1">
-                          <a
-                            href="#s"
-                            className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                          <svg
+                            className="w-5 h-5"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            Delete
-                          </a>
+                            <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                          </svg>
+                        </button>
+                        <div
+                          id="apple-imac-27-dropdown"
+                          className="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600"
+                        >
+                          <ul
+                            className="py-1 text-sm text-gray-700 dark:text-gray-200"
+                            aria-labelledby="apple-imac-27-dropdown-button"
+                          >
+                            <li>
+                              <a
+                                href="#d"
+                                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                              >
+                                Show
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                href="#d"
+                                className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                              >
+                                Edit
+                              </a>
+                            </li>
+                          </ul>
+                          <div className="py-1">
+                            <a
+                              href="#s"
+                              className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                            >
+                              Delete
+                            </a>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
