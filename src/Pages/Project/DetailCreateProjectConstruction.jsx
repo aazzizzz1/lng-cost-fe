@@ -62,7 +62,8 @@ const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe, isCate
   proyek,
   lokasi,
   tipe,
-  isCategory
+  isCategory,
+  aaceClass: 5, // Default AACE class is 5
 });
 
 const DetailCreateProjectConstruction = () => {
@@ -95,15 +96,20 @@ const DetailCreateProjectConstruction = () => {
     setItems(items.map((item, i) =>
       i === idx
         ? {
-          ...item,
-          [field]: field === "qty" || field === "hargaSatuan" ? parseFloat(value) : value,
-          totalHarga:
-            field === "qty"
-              ? parseFloat(value) * item.hargaSatuan
-              : field === "hargaSatuan"
+            ...item,
+            [field]:
+              field === "qty" || field === "hargaSatuan"
+                ? parseFloat(value)
+                : field === "aaceClass"
+                ? parseInt(value)
+                : value,
+            totalHarga:
+              field === "qty"
+                ? parseFloat(value) * item.hargaSatuan
+                : field === "hargaSatuan"
                 ? item.qty * parseFloat(value)
                 : item.qty * item.hargaSatuan,
-        }
+          }
         : item
     ));
   };
@@ -144,7 +150,6 @@ const DetailCreateProjectConstruction = () => {
       .map((item, idx) => ({
         ...item,
         id: Date.now() + idx,
-        aaceClass: project?.levelAACE || 4,
         accuracyLow: -15,
         accuracyHigh: 20,
         infrastruktur: project?.kategori || "",
@@ -270,6 +275,7 @@ const DetailCreateProjectConstruction = () => {
                     <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Total Harga</th>
                     <th className="px-2 py-2 border dark:border-gray-700 w-16"></th>
                     <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Ambil Harga</th>
+                    <th className="px-2 py-2 border dark:border-gray-700 w-20 text-gray-900 dark:text-white">AACE Class</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -278,12 +284,7 @@ const DetailCreateProjectConstruction = () => {
                       (it) => it === item
                     );
                     return (
-                      <tr
-                        key={absIdx}
-                        className={item.isCategory
-                          ? "bg-gray-50 dark:bg-gray-800 font-semibold"
-                          : "bg-white dark:bg-gray-900"}
-                      >
+                      <tr key={absIdx} className={item.isCategory ? "bg-gray-50 dark:bg-gray-800 font-semibold" : "bg-white dark:bg-gray-900"}>
                         <td className="border dark:border-gray-700 px-2 py-1 align-top text-gray-900 dark:text-white">{item.kode}</td>
                         <td className="border dark:border-gray-700 px-2 py-1 align-top text-gray-900 dark:text-white">
                           {item.isCategory ? (
@@ -381,6 +382,20 @@ const DetailCreateProjectConstruction = () => {
                                 Ambil dari Package
                               </button>
                             </div>
+                          )}
+                        </td>
+                        <td className="border dark:border-gray-700 px-2 py-1 align-top">
+                          {item.isCategory ? (
+                            ""
+                          ) : (
+                            <input
+                              type="number"
+                              min={1}
+                              max={5}
+                              value={item.aaceClass}
+                              onChange={e => handleItemChange(absIdx, "aaceClass", e.target.value)}
+                              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
+                            />
                           )}
                         </td>
                       </tr>

@@ -286,6 +286,12 @@ const ProjectTable = () => {
                   const summary = getProjectSummary(project);
                   // Ambil semua cost yang sesuai tipe project
                   const filteredCosts = costs.filter(item => item.tipe === summary.tipe);
+                  // Hitung rata-rata aaceClass dari contraction cost (bulat, hanya angka)
+                  let avgAACE = "";
+                  if (filteredCosts.length > 0) {
+                    const sumAACE = filteredCosts.reduce((sum, item) => sum + (parseInt(item.aaceClass) || 0), 0);
+                    avgAACE = Math.round(sumAACE / filteredCosts.length);
+                  }
                   const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (item.totalHarga || 0), 0);
                   const ppn = totalHargaPekerjaan * 0.11;
                   const asuransi = totalHargaPekerjaan * 0.0025;
@@ -311,7 +317,7 @@ const ProjectTable = () => {
                       <td className="px-4 py-3">{project.kategori}</td>
                       <td className="px-4 py-3">{project.lokasi}</td>
                       <td className="px-4 py-3">{project.tahun}</td>
-                      <td className="px-4 py-3">{project.levelAACE}</td>
+                      <td className="px-4 py-3">{avgAACE}</td>
                       <td className="px-4 py-3">
                         Rp
                         <span className="text-green-500 font-semibold">
