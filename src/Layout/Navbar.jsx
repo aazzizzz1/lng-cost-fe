@@ -10,6 +10,7 @@ import {
 import { toggleSidebar } from "../Provider/GlobalSlice";
 import PLILogo from "../Assets/Images/plilogo.png";
 import { Link } from "react-router-dom";
+import ModalCapacityFactor from '../Pages/CapacityFactor/ModalCapacityFactor';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -27,6 +28,9 @@ const Navbar = () => {
   const notificationRef = useRef(null);
   const appsRef = useRef(null);
   const profileRef = useRef(null);
+
+  // State for Capacity Factor modal
+  const [isCFModalOpen, setCFModalOpen] = useState(false);
 
   // Sync dark mode to body and localStorage
   useEffect(() => {
@@ -121,15 +125,16 @@ const Navbar = () => {
             </svg>
             <span className="sr-only">Toggle sidebar</span>
           </button>
-          <a
-            href="https://pgnlng.co.id/"
+          <Link
+            // href="https://pgnlng.co.id/"
+            to="/dashboard"
             className="flex items-center justify-between mr-4"
           >
             <img src={PLILogo} className="mr-3 h-8" alt="Flowbite Logo" />
             {/* <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
               COSTX
             </span> */}
-          </a>
+          </Link>
         </div>
         <div className="flex-1 flex justify-center">
           <form
@@ -517,6 +522,30 @@ const Navbar = () => {
                     Rekap
                   </div>
                 </Link>
+                <Link
+                  to="#"
+                  onClick={e => { e.preventDefault(); setCFModalOpen(true); }}
+                  className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
+                >
+                  <svg
+                    className="mx-auto mb-1 w-7 h-7 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-400"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M9 15a6 6 0 1 1 12 0 6 6 0 0 1-12 0Zm3.845-1.855a2.4 2.4 0 0 1 1.2-1.226 1 1 0 0 1 1.992-.026c.426.15.809.408 1.111.749a1 1 0 1 1-1.496 1.327.682.682 0 0 0-.36-.213.997.997 0 0 1-.113-.032.4.4 0 0 0-.394.074.93.93 0 0 0 .455.254 2.914 2.914 0 0 1 1.504.9c.373.433.669 1.092.464 1.823a.996.996 0 0 1-.046.129c-.226.519-.627.94-1.132 1.192a1 1 0 0 1-1.956.093 2.68 2.68 0 0 1-1.227-.798 1 1 0 1 1 1.506-1.315.682.682 0 0 0 .363.216c.038.009.075.02.111.032a.4.4 0 0 0 .395-.074.93.93 0 0 0-.455-.254 2.91 2.91 0 0 1-1.503-.9c-.375-.433-.666-1.089-.466-1.817a.994.994 0 0 1 .047-.134Zm1.884.573.003.008c-.003-.005-.003-.008-.003-.008Zm.55 2.613s-.002-.002-.003-.007a.032.032 0 0 1 .003.007ZM4 14a1 1 0 0 1 1 1v4a1 1 0 1 1-2 0v-4a1 1 0 0 1 1-1Zm3-2a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1Zm6.5-8a1 1 0 0 1 1-1H18a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-.796l-2.341 2.049a1 1 0 0 1-1.24.06l-2.894-2.066L6.614 9.29a1 1 0 1 1-1.228-1.578l4.5-3.5a1 1 0 0 1 1.195-.025l2.856 2.04L15.34 5h-.84a1 1 0 0 1-1-1Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    Calculation
+                  </div>
+                </Link>
                 <a
                   href="sajdj"
                   className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
@@ -704,6 +733,7 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      <ModalCapacityFactor isOpen={isCFModalOpen} onClose={() => setCFModalOpen(false)} />
     </nav>
   );
 };
