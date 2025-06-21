@@ -102,7 +102,11 @@ const CapacityFactorSlice = createSlice({
         state.result = null;
         return;
       }
-      if (method === 'Linear Regression' && data.length >= 2) {
+      // Jika kapasitas persis ada di database, ambil harga langsung
+      const found = data.find(d => d.capacity === x);
+      if (found) {
+        result = found.cost;
+      } else if (method === 'Linear Regression' && data.length >= 2) {
         result = linearRegression(data, x);
       } else if (method === 'Log-log Regression' && data.length >= 2) {
         result = logLogRegression(data, x);
