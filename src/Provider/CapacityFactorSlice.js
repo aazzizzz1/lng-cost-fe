@@ -82,7 +82,17 @@ function capacityFactorMethod(data, x) {
   // y2 = y1 * (x2/x1)^n, n biasanya 0.6-0.7, gunakan 0.65
   if (data.length < 1) return null;
   const n = 0.65;
-  const { capacity: x1, cost: y1 } = data[0];
+  // Cari data dengan kapasitas terdekat
+  let closest = data[0];
+  let minDiff = Math.abs(x - data[0].capacity);
+  for (let i = 1; i < data.length; i++) {
+    const diff = Math.abs(x - data[i].capacity);
+    if (diff < minDiff) {
+      closest = data[i];
+      minDiff = diff;
+    }
+  }
+  const { capacity: x1, cost: y1 } = closest;
   return y1 * Math.pow(x / x1, n);
 }
 
