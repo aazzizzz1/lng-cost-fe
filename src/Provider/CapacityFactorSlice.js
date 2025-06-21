@@ -2,7 +2,17 @@ import { createSlice } from '@reduxjs/toolkit';
 
 // Contoh data referensi untuk FSRU (bisa dikembangkan untuk tipe lain)
 const initialReferenceData = {
-  FSRU: [
+    'Onshore LNG Plant': [
+        { capacity: 1000000, cost: 5000000000 },
+        { capacity: 2000000, cost: 8000000000 },
+        { capacity: 3000000, cost: 12000000000 },
+    ],
+  'Offshore LNG Plant': [
+    { capacity: 500000, cost: 3000000000 },
+    { capacity: 1000000, cost: 6000000000 },
+    { capacity: 1500000, cost: 9000000000 },
+    ],
+  'FSRU': [
     { capacity: 20000, cost: 50000000 },
     { capacity: 50000, cost: 600000000 },
     { capacity: 60000, cost: 700000000 },
