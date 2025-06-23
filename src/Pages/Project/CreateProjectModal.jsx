@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux'; // Tambahkan ini
 
 // Mapping satuan berdasarkan jenis project
 const satuanByJenis = {
@@ -30,10 +31,11 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
   const [kategori, setKategori] = useState("");
   const [lokasi, setLokasi] = useState("");
   const [tahun, setTahun] = useState(new Date().getFullYear());
-  const [levelAACE, setLevelAACE] = useState("Level 4");
+  const [levelAACE, setLevelAACE] = useState(4);
   const [harga, setHarga] = useState("");
   const [useGalileo, setUseGalileo] = useState(""); // Ubah nama state
   const navigate = useNavigate();
+  const provinces = useSelector(state => state.administrator.provinces); // Ambil dari redux
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -124,8 +126,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Lokasi
                 </label>
-                {/* Indeks Kemahalan Konstruksi Provinsi Badan Pusat Statistik */}
-                {/* Setting paratemer buat administrator */}
+                {/* Dropdown lokasi dari administrator slice */}
                 <select
                   value={lokasi}
                   onChange={e => setLokasi(e.target.value)}
@@ -133,13 +134,9 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                   required
                 >
                   <option value="">Pilih Lokasi</option>
-                  <option value="Lampung">Lampung</option>
-                  <option value="Papua">Papua</option>
-                  <option value="Biak">Biak</option>
-                  <option value="Jawa Timur">Jawa Timur</option>
-                  <option value="Sulawesi">Sulawesi</option>
-                  <option value="Kepulauan Riau">Kepulauan Riau</option>
-                  {/* Tambahkan lokasi lain jika perlu */}
+                  {provinces.map(prov => (
+                    <option key={prov.code} value={prov.name}>{prov.name}</option>
+                  ))}
                 </select>
               </div>
               <div>

@@ -201,13 +201,14 @@ const DetailCreateProjectConstruction = () => {
     setItems(items.map((item, i) =>
       i === modal.itemIdx
         ? {
-          ...item,
-          uraian: row.uraian || row.nama || "",
-          satuan: row.satuan || row.satuan || "",
-          hargaSatuan: row.hargaSatuan || row.harga || 0,
-          // qty tetap, totalHarga update
-          totalHarga: item.qty * (row.hargaSatuan || row.harga || 0),
-        }
+            ...item,
+            uraian: row.uraian || row.nama || "",
+            satuan: row.satuan || "",
+            hargaSatuan: row.hargaSatuan || row.harga || 0,
+            // qty tetap, totalHarga update
+            totalHarga: item.qty * (row.hargaSatuan || row.harga || 0),
+            aaceClass: Math.max(1, Math.min(5, parseInt(row.aaceClass) || 5)), // Set aaceClass dari sumber, bulat 1-5
+          }
         : item
     ));
     handleCloseModal();
@@ -218,7 +219,7 @@ const DetailCreateProjectConstruction = () => {
   let modalColumns = [];
   if (modal.type === "material") {
     modalData = materialList.filter(m =>
-      m.uraian.toLowerCase().includes(modal.search.toLowerCase())
+      (m.uraian || "").toLowerCase().includes((modal.search || "").toLowerCase())
     );
     modalColumns = [
       { key: "uraian", label: "Uraian" },
@@ -229,7 +230,7 @@ const DetailCreateProjectConstruction = () => {
     ];
   } else if (modal.type === "jasa") {
     modalData = jasaList.filter(j =>
-      j.nama.toLowerCase().includes(modal.search.toLowerCase())
+      (j.nama || "").toLowerCase().includes((modal.search || "").toLowerCase())
     );
     modalColumns = [
       { key: "nama", label: "Nama Jasa" },
@@ -239,7 +240,7 @@ const DetailCreateProjectConstruction = () => {
     ];
   } else if (modal.type === "package") {
     modalData = packageList.filter(p =>
-      p.uraian.toLowerCase().includes(modal.search.toLowerCase())
+      (p.uraian || "").toLowerCase().includes((modal.search || "").toLowerCase())
     );
     modalColumns = [
       { key: "uraian", label: "Uraian" },
@@ -250,7 +251,7 @@ const DetailCreateProjectConstruction = () => {
     ];
   } else if (modal.type === "transport") {
     modalData = transportList.filter(t =>
-      t.uraian.toLowerCase().includes(modal.search.toLowerCase())
+      (t.uraian || "").toLowerCase().includes((modal.search || "").toLowerCase())
     );
     modalColumns = [
       { key: "uraian", label: "Uraian" },
