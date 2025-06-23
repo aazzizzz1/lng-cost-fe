@@ -10,7 +10,7 @@ import {
 import { toggleSidebar } from "../Provider/GlobalSlice";
 import PLILogo from "../Assets/Images/plilogo.png";
 import { Link } from "react-router-dom";
-import ModalCapacityFactor from '../Pages/CapacityFactor/ModalCapacityFactor';
+import ModalCapacityFactor from "../Pages/CapacityFactor/ModalCapacityFactor";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -524,7 +524,10 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="#"
-                  onClick={e => { e.preventDefault(); setCFModalOpen(true); }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setCFModalOpen(true);
+                  }}
                   className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
                 >
                   <svg
@@ -546,27 +549,31 @@ const Navbar = () => {
                     Calculation
                   </div>
                 </Link>
-                <a
-                  href="sajdj"
+                <Link
+                  to="/administrator"
                   className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
                 >
                   <svg
-                    aria-hidden="true"
                     className="mx-auto mb-1 w-7 h-7 text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+                    aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v7h-2l-1 2H8l-1-2H5V5z"
-                      clipRule="evenodd"
+                      stroke="currentColor"
+                      stroke-linecap="square"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
                     />
                   </svg>
                   <div className="text-sm text-gray-900 dark:text-white">
-                    Inbox
+                    Administrator 
                   </div>
-                </a>
+                </Link>
                 <a
                   href="sajdj"
                   className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
@@ -733,7 +740,10 @@ const Navbar = () => {
           )}
         </div>
       </div>
-      <ModalCapacityFactor isOpen={isCFModalOpen} onClose={() => setCFModalOpen(false)} />
+      <ModalCapacityFactor
+        isOpen={isCFModalOpen}
+        onClose={() => setCFModalOpen(false)}
+      />
     </nav>
   );
 };

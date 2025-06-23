@@ -308,27 +308,51 @@ const Sidebar = () => {
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/transport?tab=lngc&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/transport?tab=lngc&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/transport?tab=lngc&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/transport?tab=lngc&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/transport?tab=lngc&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
                       <li>
                         <DropdownMenu
-                          title="Barge LNG"
+                          title="LNG Barge"
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/transport?tab=lngbarge&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/transport?tab=lngbarge&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/transport?tab=lngbarge&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/transport?tab=lngbarge&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/transport?tab=lngbarge&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
@@ -338,12 +362,24 @@ const Sidebar = () => {
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/transport?tab=lngtrucking&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/transport?tab=lngtrucking&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/transport?tab=lngtrucking&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/transport?tab=lngtrucking&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/transport?tab=lngtrucking&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
@@ -670,7 +706,7 @@ const Sidebar = () => {
           <li>
             <a
               href="#askjd"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+              className="flex items-center p-2 textBase font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
             >
               <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"
@@ -695,7 +731,7 @@ const Sidebar = () => {
           <li>
             <a
               href="#askjd"
-              className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
+              className="flex items-center p-2 textBase font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
             >
               <svg
                 class="w-6 h-6 text-gray-800 dark:text-white"

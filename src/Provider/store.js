@@ -5,9 +5,11 @@ import jasaReducer from './jasaSlice'; // Import jasa reducer
 import layoutReducer from './layoutSlice'; // Import layout reducer
 import materialReducer from './materialSlice'; // Import material reducer
 import constractionCostReducer from './ConstractionCostSlice'; // Import constraction cost reducer
-import materialAndPackageReducer from './MaterialAndPackageSlice'; // Import materialAndPackage reducer
+import materialAndPackageReducer from './HargaSatuan/MaterialAndPackageSlice'; // Import materialAndPackage reducer
 import globalReducer from './GlobalSlice'; // Tambahkan ini
 import capacityFactorReducer from './CapacityFactorSlice'; // Tambahkan import
+import administratorReducer from './administratorSlice'; // Tambahkan import
+import transportReducer from './HargaSatuan/transportSlice'; // Tambahkan ini
 
 export default configureStore({
   reducer: {
@@ -20,5 +22,7 @@ export default configureStore({
     materialAndPackage: materialAndPackageReducer, // Add materialAndPackage reducer
     global: globalReducer, // Tambahkan ini
     capacityFactor: capacityFactorReducer, // Tambahkan ini
+    administrator: administratorReducer, // Tambahkan ini
+    transport: transportReducer, // Tambahkan ini
   },
 });

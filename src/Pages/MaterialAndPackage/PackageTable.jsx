@@ -9,7 +9,7 @@ import {
   clearExportData,
   downloadExportData,
   clearDownloadUrl
-} from '../../Provider/MaterialAndPackageSlice'
+} from '../../Provider/HargaSatuan/MaterialAndPackageSlice'
 
 const PackageTable = () => {
   const sortedPackages = useSelector(state => state.materialAndPackage.sortedPackages);

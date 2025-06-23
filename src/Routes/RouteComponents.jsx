@@ -16,6 +16,8 @@ import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjec
 import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
 import MaterialAndPackagePages from "../Pages/MaterialAndPackage/MaterialAndPackagePages";
+import AdministratorPages from "../Pages/Admin/AdministratorPages";
+import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
 
 const RouteComponents = () => {
   return (
@@ -107,6 +109,22 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <MaterialAndPackagePages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/transport"
+            element={
+              <LayoutPages>
+                <TransportPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/administrator"
+            element={
+              <LayoutPages>
+                <AdministratorPages />
               </LayoutPages>
             }
           />

@@ -173,10 +173,11 @@ const DetailCreateProjectConstruction = () => {
     return acc;
   }, {});
 
-  // Ambil data material, jasa, dan package dari redux
+  // Ambil data material, jasa, package, dan transport dari redux
   const materialList = useSelector(state => state.material.dataMaterial || []);
   const jasaList = useSelector(state => state.jasa.jasa || []);
   const packageList = useSelector(state => state.materialAndPackage.packages || []);
+  const transportList = useSelector(state => state.transport.data || []);
 
   // State untuk modal ambil harga satuan
   const [modal, setModal] = useState({
@@ -246,6 +247,19 @@ const DetailCreateProjectConstruction = () => {
       { key: "satuan", label: "Satuan" },
       { key: "hargaSatuan", label: "Harga Satuan" },
       { key: "tahun", label: "Tahun" },
+    ];
+  } else if (modal.type === "transport") {
+    modalData = transportList.filter(t =>
+      t.uraian.toLowerCase().includes(modal.search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "uraian", label: "Uraian" },
+      { key: "kategori", label: "Kategori" },
+      { key: "satuan", label: "Satuan" },
+      { key: "hargaSatuan", label: "Harga Satuan" },
+      { key: "tipe", label: "Tipe" },
+      { key: "tahun", label: "Tahun" },
+      { key: "proyek", label: "Proyek" },
     ];
   }
 
@@ -376,10 +390,17 @@ const DetailCreateProjectConstruction = () => {
                               </button>
                               <button
                                 type="button"
-                                className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs"
+                                className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs mb-1"
                                 onClick={() => handleOpenModal("package", absIdx)}
                               >
                                 Ambil dari Package
+                              </button>
+                              <button
+                                type="button"
+                                className="bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded text-xs"
+                                onClick={() => handleOpenModal("transport", absIdx)}
+                              >
+                                Ambil dari Transportasi
                               </button>
                             </div>
                           )}
@@ -428,7 +449,7 @@ const DetailCreateProjectConstruction = () => {
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-2xl w-full p-4 transition-all duration-200">
             <div className="flex justify-between items-center mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
               <div className="font-bold text-lg text-gray-900 dark:text-white">
-                Pilih {modal.type === "material" ? "Material" : modal.type === "jasa" ? "Jasa" : "Package"}
+                Pilih {modal.type === "material" ? "Material" : modal.type === "jasa" ? "Jasa" : modal.type === "package" ? "Package" : "Transportasi"}
               </div>
               <button
                 className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-2xl px-2 transition"
