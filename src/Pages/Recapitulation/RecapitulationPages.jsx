@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
-import RecapProject from './RecapProject';
+import React, { Component } from "react";
+import RecapProject from "./RecapProject";
 
-class ErrorBoundary extends Component{
+class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
@@ -36,7 +36,7 @@ const RecapitulationPages = () => {
         <RecapProject />
       </div>
     </ErrorBoundary>
-  )
-}
+  );
+};
 
-export default RecapitulationPages
+export default RecapitulationPages;

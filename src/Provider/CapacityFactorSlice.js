@@ -1,55 +1,55 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 // Contoh data referensi untuk FSRU (bisa dikembangkan untuk tipe lain)
 const initialReferenceData = {
-    'Onshore LNG Plant': [
-        { capacity: 1000000, cost: 5000000000 },
-        { capacity: 2000000, cost: 8000000000 },
-        { capacity: 3000000, cost: 12000000000 },
-    ],
-  'Offshore LNG Plant': [
-    { capacity: 500000, cost: 3000000000 },
-    { capacity: 1000000, cost: 6000000000 },
-    { capacity: 1500000, cost: 9000000000 },
-    ],
-  'FSRU': [
-    { capacity: 20000, cost: 50000000 },
-    { capacity: 50000, cost: 600000000 },
-    { capacity: 60000, cost: 700000000 },
+  "Onshore LNG Plant": [
+    { capacity: 100000, cost: 50000000 },
+    { capacity: 2000000, cost: 80000000 },
+    { capacity: 3000000, cost: 120000000 },
   ],
-    'LNG Carrier': [
-        { capacity: 100000, cost: 2000000000 },
-        { capacity: 150000, cost: 3000000000 },
-        { capacity: 200000, cost: 4000000000 },
-    ],
-    'LNG Trucking': [
-        { capacity: 1000, cost: 50000 },
-        { capacity: 2000, cost: 100000 },
-        { capacity: 3000, cost: 150000 },
-    ],
-    'ORF': [
-        { capacity: 10000, cost: 3000000 },
-        { capacity: 20000, cost: 6000000 },
-        { capacity: 30000, cost: 9000000 },
-    ],
-    'OTS': [
-        { capacity: 5000, cost: 2000000 },
-        { capacity: 10000, cost: 4000000 },
-        { capacity: 15000, cost: 6000000 },
-    ],
-    'ORU': [
-        { capacity: 15000, cost: 4000000 },
-        { capacity: 30000, cost: 8000000 },
-        { capacity: 45000, cost: 12000000 },
-    ],
+  "Offshore LNG Plant": [
+    { capacity: 50000, cost: 30000000 },
+    { capacity: 100000, cost: 60000000 },
+    { capacity: 150000, cost: 90000000 },
+  ],
+  FSRU: [
+    { capacity: 20000, cost: 5000000 },
+    { capacity: 50000, cost: 60000000 },
+    { capacity: 60000, cost: 70000000 },
+  ],
+  "LNG Carrier": [
+    { capacity: 100000, cost: 20000000 },
+    { capacity: 150000, cost: 30000000 },
+    { capacity: 200000, cost: 40000000 },
+  ],
+  "LNG Trucking": [
+    { capacity: 1000, cost: 50000 },
+    { capacity: 2000, cost: 100000 },
+    { capacity: 3000, cost: 150000 },
+  ],
+  ORF: [
+    { capacity: 10000, cost: 3000000 },
+    { capacity: 20000, cost: 6000000 },
+    { capacity: 30000, cost: 9000000 },
+  ],
+  OTS: [
+    { capacity: 5000, cost: 2000000 },
+    { capacity: 10000, cost: 4000000 },
+    { capacity: 15000, cost: 6000000 },
+  ],
+  ORU: [
+    { capacity: 15000, cost: 4000000 },
+    { capacity: 30000, cost: 8000000 },
+    { capacity: 45000, cost: 12000000 },
+  ],
 };
 
 const initialState = {
   referenceData: initialReferenceData,
   input: {
-    type: 'FSRU',
-    method: 'Linear Regression',
-    capacity: '',
+    type: "FSRU",
+    method: "Linear Regression",
+    capacity: "",
   },
   result: null,
 };
@@ -71,7 +71,10 @@ function logLogRegression(data, x) {
   const n = data.length;
   const sumLnX = data.reduce((acc, d) => acc + Math.log(d.capacity), 0);
   const sumLnY = data.reduce((acc, d) => acc + Math.log(d.cost), 0);
-  const sumLnXLnY = data.reduce((acc, d) => acc + Math.log(d.capacity) * Math.log(d.cost), 0);
+  const sumLnXLnY = data.reduce(
+    (acc, d) => acc + Math.log(d.capacity) * Math.log(d.cost),
+    0
+  );
   const sumLnX2 = data.reduce((acc, d) => acc + Math.log(d.capacity) ** 2, 0);
   const b = (n * sumLnXLnY - sumLnX * sumLnY) / (n * sumLnX2 - sumLnX ** 2);
   const a = (sumLnY - b * sumLnX) / n;
@@ -97,7 +100,7 @@ function capacityFactorMethod(data, x) {
 }
 
 const CapacityFactorSlice = createSlice({
-  name: 'capacityFactor',
+  name: "capacityFactor",
   initialState,
   reducers: {
     setInput(state, action) {
@@ -113,14 +116,14 @@ const CapacityFactorSlice = createSlice({
         return;
       }
       // Jika kapasitas persis ada di database, ambil harga langsung
-      const found = data.find(d => d.capacity === x);
+      const found = data.find((d) => d.capacity === x);
       if (found) {
         result = found.cost;
-      } else if (method === 'Linear Regression' && data.length >= 2) {
+      } else if (method === "Linear Regression" && data.length >= 2) {
         result = linearRegression(data, x);
-      } else if (method === 'Log-log Regression' && data.length >= 2) {
+      } else if (method === "Log-log Regression" && data.length >= 2) {
         result = logLogRegression(data, x);
-      } else if (method === 'Capacity Factor Method' && data.length >= 1) {
+      } else if (method === "Capacity Factor Method" && data.length >= 1) {
         result = capacityFactorMethod(data, x);
       }
       state.result = result;

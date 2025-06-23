@@ -4,7 +4,6 @@ import { GlobalProvider } from "../Provider/GlobalContext";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
 import SignUp from "../Pages/Auth/SignUp";
-import SelfTestDisplay from "../Pages/SelfTest/SelfTestDisplay";
 import LayoutPages from "../Layout/LayoutPages";
 import DashboardPages from "../Pages/Home/DashboardPages";
 import ProjectPages from "../Pages/Project/ProjectPages";
@@ -87,7 +86,6 @@ const RouteComponents = () => {
               </LayoutPages>
             }
           />
-          <Route path="/selftest/display" element={<SelfTestDisplay />} />
           <Route
             path="/construction-cost"
             element={
