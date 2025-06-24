@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   updateItem,
@@ -16,16 +16,31 @@ const DetailCreateProjectConstructionModal = ({
   transportList,
   provinces,
   inflasiList,
+  liquifectionPlantList = [],
+  transportasiList = [],
+  receivingTerminalList = [],
+  materialAndPackageList = [],
 }) => {
   const dispatch = useDispatch();
   const modal = useSelector(selectModal);
   const items = useSelector(selectItems);
   const search = modal.search || "";
 
+  // Sumber data yang bisa dipilih
+  const dataSources = [
+    { key: "liquifectionPlant", label: "Liquifection Plant" },
+    { key: "transportasi", label: "Transportasi" },
+    { key: "receivingTerminal", label: "Receiving Terminal" },
+    { key: "materialAndPackage", label: "Material & Package" },
+  ];
+
+  // State untuk sumber data aktif
+  const [activeSource, setActiveSource] = useState(modal.type || "material");
+
   // Logic untuk filter data dan columns
   let modalData = [];
   let modalColumns = [];
-  if (modal.type === "material") {
+  if (activeSource === "material") {
     modalData = materialList.filter(m =>
       (m.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
@@ -36,7 +51,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "tahun", label: "Tahun" },
       { key: "proyek", label: "Proyek" },
     ];
-  } else if (modal.type === "jasa") {
+  } else if (activeSource === "jasa") {
     modalData = jasaList.filter(j =>
       (j.nama || "").toLowerCase().includes(search.toLowerCase())
     );
@@ -46,7 +61,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "harga", label: "Harga Satuan" },
       { key: "kategori", label: "Kategori" },
     ];
-  } else if (modal.type === "package") {
+  } else if (activeSource === "package") {
     modalData = packageList.filter(p =>
       (p.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
@@ -57,7 +72,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "hargaSatuan", label: "Harga Satuan" },
       { key: "tahun", label: "Tahun" },
     ];
-  } else if (modal.type === "transport") {
+  } else if (activeSource === "transport") {
     modalData = transportList.filter(t =>
       (t.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
@@ -69,6 +84,58 @@ const DetailCreateProjectConstructionModal = ({
       { key: "tipe", label: "Tipe" },
       { key: "tahun", label: "Tahun" },
       { key: "proyek", label: "Proyek" },
+    ];
+  } else if (activeSource === "liquifectionPlant") {
+    modalData = liquifectionPlantList.filter(m =>
+      (m.uraian || "").toLowerCase().includes(search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "uraian", label: "Uraian" },
+      { key: "satuan", label: "Satuan" },
+      { key: "hargaSatuan", label: "Harga Satuan" },
+      { key: "tahun", label: "Tahun" },
+      { key: "proyek", label: "Proyek" },
+      { key: "tipe", label: "Tipe" },
+      { key: "kategori", label: "Kategori" },
+    ];
+  } else if (activeSource === "transportasi") {
+    modalData = transportasiList.filter(m =>
+      (m.uraian || "").toLowerCase().includes(search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "uraian", label: "Uraian" },
+      { key: "satuan", label: "Satuan" },
+      { key: "hargaSatuan", label: "Harga Satuan" },
+      { key: "tahun", label: "Tahun" },
+      { key: "proyek", label: "Proyek" },
+      { key: "tipe", label: "Tipe" },
+      { key: "kategori", label: "Kategori" },
+    ];
+  } else if (activeSource === "receivingTerminal") {
+    modalData = receivingTerminalList.filter(m =>
+      (m.uraian || "").toLowerCase().includes(search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "uraian", label: "Uraian" },
+      { key: "satuan", label: "Satuan" },
+      { key: "hargaSatuan", label: "Harga Satuan" },
+      { key: "tahun", label: "Tahun" },
+      { key: "proyek", label: "Proyek" },
+      { key: "tipe", label: "Tipe" },
+      { key: "kategori", label: "Kategori" },
+    ];
+  } else if (activeSource === "materialAndPackage") {
+    modalData = materialAndPackageList.filter(m =>
+      (m.uraian || "").toLowerCase().includes(search.toLowerCase())
+    );
+    modalColumns = [
+      { key: "uraian", label: "Uraian" },
+      { key: "spesifikasi", label: "Spesifikasi" },
+      { key: "satuan", label: "Satuan" },
+      { key: "hargaSatuan", label: "Harga Satuan" },
+      { key: "tahun", label: "Tahun" },
+      { key: "proyek", label: "Proyek" },
+      { key: "jenis", label: "Jenis" },
     ];
   }
 
@@ -140,7 +207,7 @@ const DetailCreateProjectConstructionModal = ({
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-2xl w-full p-4 transition-all duration-200">
         <div className="flex justify-between items-center mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
           <div className="font-bold text-lg text-gray-900 dark:text-white">
-            Pilih {modal.type === "material" ? "Material" : modal.type === "jasa" ? "Jasa" : modal.type === "package" ? "Package" : "Transportasi"}
+            Pilih Harga Satuan
           </div>
           <button
             className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-2xl px-2 transition"
@@ -149,6 +216,23 @@ const DetailCreateProjectConstructionModal = ({
           >
             &times;
           </button>
+        </div>
+        {/* Pilihan sumber data */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {dataSources.map(ds => (
+            <button
+              key={ds.key}
+              type="button"
+              className={`px-3 py-1 rounded text-xs font-semibold border transition ${
+                activeSource === ds.key
+                  ? "bg-primary-700 text-white border-primary-700"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600"
+              }`}
+              onClick={() => setActiveSource(ds.key)}
+            >
+              {ds.label}
+            </button>
+          ))}
         </div>
         <input
           type="text"

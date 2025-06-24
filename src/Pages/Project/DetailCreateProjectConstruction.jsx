@@ -117,6 +117,12 @@ const DetailCreateProjectConstruction = () => {
   const provinces = useSelector(state => state.administrator.provinces || []);
   const inflasiList = useSelector(state => state.administrator.inflasi || []);
 
+  // Tambahan: data sumber lain
+  const liquifectionPlantList = useSelector(state => state.liquifectionPlant.data || []);
+  const transportasiList = useSelector(state => state.transport.data || []);
+  const receivingTerminalList = useSelector(state => state.receivingTerminal.data || []);
+  const materialAndPackageList = useSelector(state => state.materialAndPackage.packages || []);
+
   // Handler untuk buka modal, dipanggil dari tombol di tabel
   const handleOpenModal = (type, idx) => {
     dispatch(openModal({ type, itemIdx: idx, search: "" }));
@@ -149,9 +155,9 @@ const DetailCreateProjectConstruction = () => {
                     <th className="px-2 py-2 border dark:border-gray-700 w-16 text-gray-900 dark:text-white">Qty</th>
                     <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Harga Satuan</th>
                     <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Total Harga</th>
-                    <th className="px-2 py-2 border dark:border-gray-700 w-16"></th>
-                    <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Ambil Harga</th>
                     <th className="px-2 py-2 border dark:border-gray-700 w-20 text-gray-900 dark:text-white">AACE Class</th>
+                    <th className="px-2 py-2 border dark:border-gray-700 w-32 text-gray-900 dark:text-white">Ambil Harga</th>
+                    <th className="px-2 py-2 border dark:border-gray-700 w-16">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -222,52 +228,6 @@ const DetailCreateProjectConstruction = () => {
                             : `Rp${Number(item.totalHarga || 0).toLocaleString()}`}
                         </td>
                         <td className="border dark:border-gray-700 px-2 py-1 align-top">
-                          {!item.isCategory && (
-                            <button
-                              type="button"
-                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs ml-1"
-                              onClick={() => handleDeleteItem(absIdx)}
-                              title="Hapus Item"
-                            >
-                              Hapus
-                            </button>
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-2 py-1 align-top">
-                          {!item.isCategory && (
-                            <div className="flex flex-col gap-1">
-                              <button
-                                type="button"
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs mb-1"
-                                onClick={() => handleOpenModal("material", absIdx)}
-                              >
-                                Ambil dari Material
-                              </button>
-                              <button
-                                type="button"
-                                className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs mb-1"
-                                onClick={() => handleOpenModal("jasa", absIdx)}
-                              >
-                                Ambil dari Jasa
-                              </button>
-                              <button
-                                type="button"
-                                className="bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded text-xs mb-1"
-                                onClick={() => handleOpenModal("package", absIdx)}
-                              >
-                                Ambil dari Package
-                              </button>
-                              <button
-                                type="button"
-                                className="bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded text-xs"
-                                onClick={() => handleOpenModal("transport", absIdx)}
-                              >
-                                Ambil dari Transportasi
-                              </button>
-                            </div>
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-2 py-1 align-top">
                           {item.isCategory ? (
                             ""
                           ) : (
@@ -279,6 +239,36 @@ const DetailCreateProjectConstruction = () => {
                               onChange={e => handleItemChange(absIdx, "aaceClass", e.target.value)}
                               className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
                             />
+                          )}
+                        </td>
+                        <td className="border dark:border-gray-700 px-2 py-1 align-top">
+                          {!item.isCategory && (
+                            <button
+                              type="button"
+                              className="flex items-center gap-1 bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
+                              onClick={() => handleOpenModal("material", absIdx)}
+                              title="Ambil dari Harga Satuan"
+                            >
+                              {/* Icon database */}
+                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <ellipse cx="12" cy="6" rx="8" ry="3" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                <path d="M4 6v6c0 1.657 3.582 3 8 3s8-1.343 8-3V6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                                <path d="M4 12v6c0 1.657 3.582 3 8 3s8-1.343 8-3v-6" stroke="currentColor" strokeWidth="2" fill="none"/>
+                              </svg>
+                              Ambil dari Harga Satuan
+                            </button>
+                          )}
+                        </td>
+                        <td className="border dark:border-gray-700 px-2 py-1 align-top">
+                          {!item.isCategory && (
+                            <button
+                              type="button"
+                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs ml-1"
+                              onClick={() => handleDeleteItem(absIdx)}
+                              title="Hapus Item"
+                            >
+                              Hapus
+                            </button>
                           )}
                         </td>
                       </tr>
@@ -316,6 +306,10 @@ const DetailCreateProjectConstruction = () => {
         transportList={transportList}
         provinces={provinces}
         inflasiList={inflasiList}
+        liquifectionPlantList={liquifectionPlantList}
+        transportasiList={transportasiList}
+        receivingTerminalList={receivingTerminalList}
+        materialAndPackageList={materialAndPackageList}
         onClose={handleCloseModal}
         dispatch={dispatch}
       />
