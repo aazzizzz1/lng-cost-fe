@@ -436,18 +436,30 @@ const Sidebar = () => {
                   </button>
                   {isReceivingTerminalOpen && (
                     <ul className="py-2 space-y-2 ml-2">
-                      <li className="">
+                      <li>
                         <DropdownMenu
                           title="FSRU"
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/receiving-terminal?tab=fsru&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/receiving-terminal?tab=fsru&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/receiving-terminal?tab=fsru&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/receiving-terminal?tab=fsru&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/receiving-terminal?tab=fsru&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
@@ -457,12 +469,24 @@ const Sidebar = () => {
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/receiving-terminal?tab=orf&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/receiving-terminal?tab=orf&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/receiving-terminal?tab=orf&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/receiving-terminal?tab=orf&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/receiving-terminal?tab=orf&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
@@ -472,12 +496,24 @@ const Sidebar = () => {
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/receiving-terminal?tab=ots&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/receiving-terminal?tab=ots&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/receiving-terminal?tab=ots&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/receiving-terminal?tab=ots&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/receiving-terminal?tab=ots&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
@@ -487,12 +523,24 @@ const Sidebar = () => {
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/receiving-terminal?tab=oru&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/receiving-terminal?tab=oru&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/receiving-terminal?tab=oru&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/receiving-terminal?tab=oru&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/receiving-terminal?tab=oru&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>

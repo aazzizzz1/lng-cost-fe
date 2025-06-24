@@ -11,6 +11,7 @@ import capacityFactorReducer from './CapacityFactorSlice'; // Tambahkan import
 import administratorReducer from './administratorSlice'; // Tambahkan import
 import transportReducer from './HargaSatuan/transportSlice'; // Tambahkan ini
 import liquifectionPlantReducer from './HargaSatuan/liquifectionPlantSlice'; // Pastikan penamaan dan path sudah benar
+import receivingTerminalReducer from './HargaSatuan/receivingTerminalSlice'; // Tambahkan ini
 import detailCreateProjectConstructionReducer from './detailCreateProjectConstructionSlice'; // Import detailCreateProjectConstruction reducer
 
 export default configureStore({
@@ -27,6 +28,7 @@ export default configureStore({
     administrator: administratorReducer, // Tambahkan ini
     transport: transportReducer, // Tambahkan ini
     liquifectionPlant: liquifectionPlantReducer, // Tambahkan ini
+    receivingTerminal: receivingTerminalReducer, // Tambahkan ini
     detailCreateProjectConstruction: detailCreateProjectConstructionReducer, // Tambahkan ini
   },
 });

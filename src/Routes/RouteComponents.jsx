@@ -19,6 +19,7 @@ import MaterialAndPackagePages from "../Pages/MaterialAndPackage/MaterialAndPack
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
 import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
+import ReceivingTerimnalPages from "../Pages/UnitPrice/ReceivingTerminal/ReceivingTerimnalPages";
 
 const RouteComponents = () => {
   return (
@@ -126,6 +127,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <LiquifactionPlantPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/receiving-terminal"
+            element={
+              <LayoutPages>
+                <ReceivingTerimnalPages />
               </LayoutPages>
             }
           />
