@@ -18,6 +18,7 @@ import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
 import MaterialAndPackagePages from "../Pages/MaterialAndPackage/MaterialAndPackagePages";
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
+import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
 
 const RouteComponents = () => {
   return (
@@ -117,6 +118,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <TransportPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/liquifaction-plant"
+            element={
+              <LayoutPages>
+                <LiquifactionPlantPages />
               </LayoutPages>
             }
           />

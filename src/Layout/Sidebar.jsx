@@ -243,18 +243,30 @@ const Sidebar = () => {
                   </button>
                   {isLNGPlantOpen && (
                     <ul className="py-2 space-y-2 ml-2">
-                      <li className="">
+                      <li>
                         <DropdownMenu
                           title="Onshore LNG Plant"
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/liquifaction-plant?tab=onshore&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/liquifaction-plant?tab=onshore&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/liquifaction-plant?tab=onshore&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/liquifaction-plant?tab=onshore&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/liquifaction-plant?tab=onshore&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
@@ -264,12 +276,24 @@ const Sidebar = () => {
                           items={[
                             {
                               label: "Material Konstruksi",
-                              link: "/material-konstruksi",
+                              link: "/liquifaction-plant?tab=offshore&kategori=Material Konstruksi",
                             },
-                            { label: "Peralatan" },
-                            { label: "Upah" },
-                            { label: "Jasa", link: "/jasa" },
-                            { label: "Testing" },
+                            {
+                              label: "Peralatan",
+                              link: "/liquifaction-plant?tab=offshore&kategori=Peralatan",
+                            },
+                            {
+                              label: "Upah",
+                              link: "/liquifaction-plant?tab=offshore&kategori=Upah",
+                            },
+                            {
+                              label: "Jasa",
+                              link: "/liquifaction-plant?tab=offshore&kategori=Jasa",
+                            },
+                            {
+                              label: "Testing",
+                              link: "/liquifaction-plant?tab=offshore&kategori=Testing",
+                            },
                           ]}
                         />
                       </li>
