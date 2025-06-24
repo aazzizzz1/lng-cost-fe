@@ -15,7 +15,7 @@ import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPag
 import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
 import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
-import MaterialAndPackagePages from "../Pages/MaterialAndPackage/MaterialAndPackagePages";
+import MaterialAndPackagePages from "../Pages/UnitPrice/MaterialAndPackage/MaterialAndPackagePages";
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
 import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
