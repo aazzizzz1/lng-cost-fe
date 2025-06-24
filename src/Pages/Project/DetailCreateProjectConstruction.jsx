@@ -1,70 +1,21 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { setFilterJenis } from '../../Provider/ConstractionCostSlice'
-
-const kelompokList = [
-  "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN",
-  "SUPPORTING WORK",
-  "PENYEDIAAN MATERIAL",
-  "PEKERJAAN PEMASANGAN DAN PENGUJIAN",
-  "PEKERJAAN KHUSUS/FINISHING",
-  "PEKERJAAN DOKUMENTASI",
-  "PEKERJAAN COMMISSIONING & TRIAL OPERATION"
-];
-
-// Template kode dan uraian per kelompok
-const kelompokTemplates = {
-  "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN": [
-    { kode: "A", uraian: "PREPARATION", isCategory: true },
-    { kode: "A.1", uraian: "PROJECT MANAGEMENT EPCC" },
-    { kode: "A.2", uraian: "PROJECT FACILITY" },
-    { kode: "A.3", uraian: "WORK PERMIT" }
-  ],
-  "SUPPORTING WORK": [
-    { kode: "B", uraian: "SUPPORTING WORK", isCategory: true },
-    { kode: "B.1", uraian: "ENGINEERING WORK" },
-    { kode: "B.2", uraian: "PROCUREMENT & CONSTRUCTION" }
-  ],
-  "PENYEDIAAN MATERIAL": [
-    { kode: "C", uraian: "PENYEDIAAN MATERIAL", isCategory: true },
-    { kode: "C.1", uraian: "MATERIAL UTAMA" },
-    { kode: "C.2", uraian: "MATERIAL PENDUKUNG" }
-  ],
-  "PEKERJAAN PEMASANGAN DAN PENGUJIAN": [
-    { kode: "D", uraian: "PEMASANGAN DAN PENGUJIAN", isCategory: true },
-    { kode: "D.1", uraian: "INSTALASI" },
-    { kode: "D.2", uraian: "PENGUJIAN" }
-  ],
-  "PEKERJAAN KHUSUS/FINISHING": [
-    { kode: "E", uraian: "KHUSUS/FINISHING", isCategory: true },
-    { kode: "E.1", uraian: "FINISHING" }
-  ],
-  "PEKERJAAN DOKUMENTASI": [
-    { kode: "F", uraian: "DOKUMENTASI", isCategory: true },
-    { kode: "F.1", uraian: "LAPORAN" }
-  ],
-  "PEKERJAAN COMMISSIONING & TRIAL OPERATION": [
-    { kode: "G", uraian: "COMMISSIONING & TRIAL OPERATION", isCategory: true },
-    { kode: "G.1", uraian: "COMMISSIONING" }
-  ]
-};
-
-const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe, isCategory = false) => ({
-  kode,
-  uraian,
-  satuan: "",
-  qty: 1,
-  hargaSatuan: 0,
-  totalHarga: 0,
-  kelompok,
-  tahun,
-  proyek,
-  lokasi,
-  tipe,
-  isCategory,
-  aaceClass: 5, // Default AACE class is 5
-});
+import {
+  kelompokList,
+  kelompokTemplates,
+  defaultItem,
+  setItems,
+  updateItem,
+  addItem,
+  deleteItem,
+  selectItems,
+  openModal,
+  closeModal,
+  selectModal
+} from '../../Provider/detailCreateProjectConstructionSlice'
+import DetailCreateProjectConstructionModal from './DetailCreateProjectConstructionModal'
 
 const DetailCreateProjectConstruction = () => {
   const { id } = useParams();
@@ -72,51 +23,37 @@ const DetailCreateProjectConstruction = () => {
   const dispatch = useDispatch();
   const projects = useSelector(state => state.projects.projects);
   const project = projects.find(p => String(p.id) === String(id));
+  const items = useSelector(selectItems);
+  const modal = useSelector(selectModal);
 
-  // Generate initial items per kelompok
-  const initialItems = kelompokList.flatMap(kelompok =>
-    (kelompokTemplates[kelompok] || []).map(t =>
-      defaultItem(
-        t.kode,
-        t.uraian,
-        kelompok,
-        project?.tahun,
-        project?.name,
-        project?.lokasi,
-        project?.jenis,
-        t.isCategory || false
-      )
-    )
-  );
-
-  const [items, setItems] = useState(initialItems);
+  // Generate initial items per kelompok (hanya saat mount)
+  useEffect(() => {
+    if ((!items || items.length === 0) && project) {
+      const initialItems = kelompokList.flatMap(kelompok =>
+        (kelompokTemplates[kelompok] || []).map(t =>
+          defaultItem(
+            t.kode,
+            t.uraian,
+            kelompok,
+            project?.tahun,
+            project?.name,
+            project?.lokasi,
+            project?.jenis,
+            t.isCategory || false
+          )
+        )
+      );
+      dispatch(setItems(initialItems));
+    }
+  }, [dispatch, items, project]);
 
   // Handler untuk field
   const handleItemChange = (idx, field, value) => {
-    setItems(items.map((item, i) =>
-      i === idx
-        ? {
-            ...item,
-            [field]:
-              field === "qty" || field === "hargaSatuan"
-                ? parseFloat(value)
-                : field === "aaceClass"
-                ? parseInt(value)
-                : value,
-            totalHarga:
-              field === "qty"
-                ? parseFloat(value) * item.hargaSatuan
-                : field === "hargaSatuan"
-                ? item.qty * parseFloat(value)
-                : item.qty * item.hargaSatuan,
-          }
-        : item
-    ));
+    dispatch(updateItem({ idx, field, value }));
   };
 
   // Tambah item pada kelompok tertentu
   const handleAddItem = (kelompok) => {
-    // Cari kode terakhir pada kelompok, buat kode baru
     const kelompokItems = items.filter(item => item.kelompok === kelompok && !item.isCategory);
     let lastKode = kelompokItems.length > 0
       ? kelompokItems[kelompokItems.length - 1].kode
@@ -124,8 +61,7 @@ const DetailCreateProjectConstruction = () => {
     let base = lastKode.split('.')[0];
     let nextNum = kelompokItems.length + 1;
     let newKode = `${base}.${nextNum}`;
-    setItems([
-      ...items,
+    dispatch(addItem(
       defaultItem(
         newKode,
         "",
@@ -135,12 +71,12 @@ const DetailCreateProjectConstruction = () => {
         project?.lokasi,
         project?.jenis
       )
-    ]);
+    ));
   };
 
   // Hapus item (tidak boleh hapus kategori utama)
   const handleDeleteItem = (idx) => {
-    setItems(items.filter((_, i) => i !== idx));
+    dispatch(deleteItem(idx));
   };
 
   // Simpan ke dummy construction cost slice
@@ -178,159 +114,16 @@ const DetailCreateProjectConstruction = () => {
   const jasaList = useSelector(state => state.jasa.jasa || []);
   const packageList = useSelector(state => state.materialAndPackage.packages || []);
   const transportList = useSelector(state => state.transport.data || []);
-  // Ambil provinces dan inflasi dari administrator
   const provinces = useSelector(state => state.administrator.provinces || []);
   const inflasiList = useSelector(state => state.administrator.inflasi || []);
 
-  // Fungsi utilitas: dapatkan CCI dari nama lokasi
-  const getCCI = (nama) => {
-    const prov = provinces.find(p => p.name === nama);
-    return prov ? prov.cci : 100;
-  };
-  // Dapatkan CCI Banjarmasin (benchmark 100%)
-  const cciBanjarmasin = (() => {
-    const prov = provinces.find(p => p.name.toLowerCase().includes("banjar") && p.cci === 100.70);
-    return prov ? prov.cci : 100;
-  })();
-
-  // Fungsi utilitas: dapatkan inflasi dari tahun
-  const getInflasi = (tahun) => {
-    const inf = inflasiList.find(i => Number(i.year) === Number(tahun));
-    return inf ? inf.value : 5.0;
-  };
-
-  // Fungsi perhitungan harga satuan sesuai rumus
-  function calculateHargaSatuan({
-    hargaSatuanItem,
-    tahunItem,
-    lokasiItem,
-    tahunProject,
-    lokasiProject,
-    inflasiProject
-  }) {
-    // Step 1: Update harga ke tahun project
-    const n = Number(tahunProject) - Number(tahunItem);
-    const r = Number(inflasiProject) / 100;
-    let hargaTahunProject = hargaSatuanItem;
-    if (n > 0) {
-      hargaTahunProject = hargaSatuanItem * Math.pow(1 + r, n);
-    }
-    // Step 2: Konversi ke harga benchmark (Banjarmasin)
-    const cciItem = getCCI(lokasiItem);
-    let hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem);
-    // Step 3: Konversi ke lokasi project
-    const cciProject = getCCI(lokasiProject);
-    let hargaLokasiProject = hargaBanjarmasin * (cciProject / 100);
-    return hargaLokasiProject;
-  }
-
-  // State untuk modal ambil harga satuan
-  const [modal, setModal] = useState({
-    open: false,
-    type: null, // 'material' | 'jasa' | 'package'
-    itemIdx: null,
-    search: "",
-  });
-
-  // Handler buka modal
+  // Handler untuk buka modal, dipanggil dari tombol di tabel
   const handleOpenModal = (type, idx) => {
-    setModal({ open: true, type, itemIdx: idx, search: "" });
+    dispatch(openModal({ type, itemIdx: idx, search: "" }));
   };
-  // Handler tutup modal
   const handleCloseModal = () => {
-    setModal({ open: false, type: null, itemIdx: null, search: "" });
+    dispatch(closeModal());
   };
-
-  // Handler pilih data dari modal
-  const handleSelectFromModal = (row) => {
-    // Ambil variabel penting
-    const tahunProject = project?.tahun;
-    const lokasiProject = project?.lokasi;
-    // Ambil inflasi dari input user (atau default 5%)
-    // Untuk sekarang, ambil inflasi dari redux administrator (tahun project), jika tidak ada pakai 5%
-    const inflasiProject = getInflasi(tahunProject);
-
-    // Ambil tahun dan lokasi dari item
-    const tahunItem = row.tahun || tahunProject;
-    const lokasiItem = row.lokasi || lokasiProject;
-    // Ambil harga satuan dari item
-    const hargaSatuanItem = row.hargaSatuan || row.harga || 0;
-
-    // Hitung harga satuan baru
-    const hargaSatuanFinal = calculateHargaSatuan({
-      hargaSatuanItem,
-      tahunItem,
-      lokasiItem,
-      tahunProject,
-      lokasiProject,
-      inflasiProject
-    });
-
-    setItems(items.map((item, i) =>
-      i === modal.itemIdx
-        ? {
-            ...item,
-            uraian: row.uraian || row.nama || "",
-            satuan: row.satuan || "",
-            hargaSatuan: Math.round(hargaSatuanFinal),
-            // qty tetap, totalHarga update
-            totalHarga: item.qty * Math.round(hargaSatuanFinal),
-            aaceClass: Math.max(1, Math.min(5, parseInt(row.aaceClass) || 5)), // Set aaceClass dari sumber, bulat 1-5
-          }
-        : item
-    ));
-    handleCloseModal();
-  };
-
-  // Data dan kolom untuk modal
-  let modalData = [];
-  let modalColumns = [];
-  if (modal.type === "material") {
-    modalData = materialList.filter(m =>
-      (m.uraian || "").toLowerCase().includes((modal.search || "").toLowerCase())
-    );
-    modalColumns = [
-      { key: "uraian", label: "Uraian" },
-      { key: "satuan", label: "Satuan" },
-      { key: "hargaSatuan", label: "Harga Satuan" },
-      { key: "tahun", label: "Tahun" },
-      { key: "proyek", label: "Proyek" },
-    ];
-  } else if (modal.type === "jasa") {
-    modalData = jasaList.filter(j =>
-      (j.nama || "").toLowerCase().includes((modal.search || "").toLowerCase())
-    );
-    modalColumns = [
-      { key: "nama", label: "Nama Jasa" },
-      { key: "satuan", label: "Satuan" },
-      { key: "harga", label: "Harga Satuan" },
-      { key: "kategori", label: "Kategori" },
-    ];
-  } else if (modal.type === "package") {
-    modalData = packageList.filter(p =>
-      (p.uraian || "").toLowerCase().includes((modal.search || "").toLowerCase())
-    );
-    modalColumns = [
-      { key: "uraian", label: "Uraian" },
-      { key: "spesifikasi", label: "Spesifikasi" },
-      { key: "satuan", label: "Satuan" },
-      { key: "hargaSatuan", label: "Harga Satuan" },
-      { key: "tahun", label: "Tahun" },
-    ];
-  } else if (modal.type === "transport") {
-    modalData = transportList.filter(t =>
-      (t.uraian || "").toLowerCase().includes((modal.search || "").toLowerCase())
-    );
-    modalColumns = [
-      { key: "uraian", label: "Uraian" },
-      { key: "kategori", label: "Kategori" },
-      { key: "satuan", label: "Satuan" },
-      { key: "hargaSatuan", label: "Harga Satuan" },
-      { key: "tipe", label: "Tipe" },
-      { key: "tahun", label: "Tahun" },
-      { key: "proyek", label: "Proyek" },
-    ];
-  }
 
   return (
     <div className="p-4">
@@ -513,76 +306,19 @@ const DetailCreateProjectConstruction = () => {
         </div>
       </form>
       {/* Modal Pilih Harga Satuan */}
-      {modal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 transition-colors">
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-2xl w-full p-4 transition-all duration-200">
-            <div className="flex justify-between items-center mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-              <div className="font-bold text-lg text-gray-900 dark:text-white">
-                Pilih {modal.type === "material" ? "Material" : modal.type === "jasa" ? "Jasa" : modal.type === "package" ? "Package" : "Transportasi"}
-              </div>
-              <button
-                className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-2xl px-2 transition"
-                onClick={handleCloseModal}
-                aria-label="Tutup"
-              >
-                &times;
-              </button>
-            </div>
-            <input
-              type="text"
-              className="w-full mb-3 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500 transition"
-              placeholder="Cari..."
-              value={modal.search}
-              onChange={e => setModal({ ...modal, search: e.target.value })}
-              autoFocus
-            />
-            <div className="overflow-x-auto max-h-80 rounded">
-              <table className="w-full text-sm border-separate border-spacing-0">
-                <thead>
-                  <tr className="bg-gray-100 dark:bg-gray-800">
-                    {modalColumns.map(col => (
-                      <th key={col.key} className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold sticky top-0 z-10 bg-inherit">
-                        {col.label}
-                      </th>
-                    ))}
-                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {modalData.length === 0 && (
-                    <tr>
-                      <td colSpan={modalColumns.length + 1} className="text-center text-gray-400 dark:text-gray-500 py-6">
-                        Tidak ada data.
-                      </td>
-                    </tr>
-                  )}
-                  {modalData.map((row, idx) => (
-                    <tr
-                      key={row.id || idx}
-                      className="hover:bg-primary-50 dark:hover:bg-gray-800 transition"
-                    >
-                      {modalColumns.map(col => (
-                        <td key={col.key} className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100">
-                          {row[col.key]}
-                        </td>
-                      ))}
-                      <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800">
-                        <button
-                          type="button"
-                          className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1 rounded text-xs font-semibold shadow-sm transition"
-                          onClick={() => handleSelectFromModal(row)}
-                        >
-                          Pilih
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+      <DetailCreateProjectConstructionModal
+        modal={modal}
+        items={items}
+        project={project}
+        materialList={materialList}
+        jasaList={jasaList}
+        packageList={packageList}
+        transportList={transportList}
+        provinces={provinces}
+        inflasiList={inflasiList}
+        onClose={handleCloseModal}
+        dispatch={dispatch}
+      />
     </div>
   );
 };
