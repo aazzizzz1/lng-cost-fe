@@ -178,6 +178,51 @@ const DetailCreateProjectConstruction = () => {
   const jasaList = useSelector(state => state.jasa.jasa || []);
   const packageList = useSelector(state => state.materialAndPackage.packages || []);
   const transportList = useSelector(state => state.transport.data || []);
+  // Ambil provinces dan inflasi dari administrator
+  const provinces = useSelector(state => state.administrator.provinces || []);
+  const inflasiList = useSelector(state => state.administrator.inflasi || []);
+
+  // Fungsi utilitas: dapatkan CCI dari nama lokasi
+  const getCCI = (nama) => {
+    const prov = provinces.find(p => p.name === nama);
+    return prov ? prov.cci : 100;
+  };
+  // Dapatkan CCI Banjarmasin (benchmark 100%)
+  const cciBanjarmasin = (() => {
+    const prov = provinces.find(p => p.name.toLowerCase().includes("banjar") && p.cci === 100.70);
+    return prov ? prov.cci : 100;
+  })();
+
+  // Fungsi utilitas: dapatkan inflasi dari tahun
+  const getInflasi = (tahun) => {
+    const inf = inflasiList.find(i => Number(i.year) === Number(tahun));
+    return inf ? inf.value : 5.0;
+  };
+
+  // Fungsi perhitungan harga satuan sesuai rumus
+  function calculateHargaSatuan({
+    hargaSatuanItem,
+    tahunItem,
+    lokasiItem,
+    tahunProject,
+    lokasiProject,
+    inflasiProject
+  }) {
+    // Step 1: Update harga ke tahun project
+    const n = Number(tahunProject) - Number(tahunItem);
+    const r = Number(inflasiProject) / 100;
+    let hargaTahunProject = hargaSatuanItem;
+    if (n > 0) {
+      hargaTahunProject = hargaSatuanItem * Math.pow(1 + r, n);
+    }
+    // Step 2: Konversi ke harga benchmark (Banjarmasin)
+    const cciItem = getCCI(lokasiItem);
+    let hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem);
+    // Step 3: Konversi ke lokasi project
+    const cciProject = getCCI(lokasiProject);
+    let hargaLokasiProject = hargaBanjarmasin * (cciProject / 100);
+    return hargaLokasiProject;
+  }
 
   // State untuk modal ambil harga satuan
   const [modal, setModal] = useState({
@@ -198,15 +243,38 @@ const DetailCreateProjectConstruction = () => {
 
   // Handler pilih data dari modal
   const handleSelectFromModal = (row) => {
+    // Ambil variabel penting
+    const tahunProject = project?.tahun;
+    const lokasiProject = project?.lokasi;
+    // Ambil inflasi dari input user (atau default 5%)
+    // Untuk sekarang, ambil inflasi dari redux administrator (tahun project), jika tidak ada pakai 5%
+    const inflasiProject = getInflasi(tahunProject);
+
+    // Ambil tahun dan lokasi dari item
+    const tahunItem = row.tahun || tahunProject;
+    const lokasiItem = row.lokasi || lokasiProject;
+    // Ambil harga satuan dari item
+    const hargaSatuanItem = row.hargaSatuan || row.harga || 0;
+
+    // Hitung harga satuan baru
+    const hargaSatuanFinal = calculateHargaSatuan({
+      hargaSatuanItem,
+      tahunItem,
+      lokasiItem,
+      tahunProject,
+      lokasiProject,
+      inflasiProject
+    });
+
     setItems(items.map((item, i) =>
       i === modal.itemIdx
         ? {
             ...item,
             uraian: row.uraian || row.nama || "",
             satuan: row.satuan || "",
-            hargaSatuan: row.hargaSatuan || row.harga || 0,
+            hargaSatuan: Math.round(hargaSatuanFinal),
             // qty tetap, totalHarga update
-            totalHarga: item.qty * (row.hargaSatuan || row.harga || 0),
+            totalHarga: item.qty * Math.round(hargaSatuanFinal),
             aaceClass: Math.max(1, Math.min(5, parseInt(row.aaceClass) || 5)), // Set aaceClass dari sumber, bulat 1-5
           }
         : item

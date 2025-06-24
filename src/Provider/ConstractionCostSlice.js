@@ -565,6 +565,7 @@ const constractionCostSlice = createSlice({
     },
     addProjectCosts: (state, action) => {
       // action.payload: array of items
+      // Harga satuan sudah dihitung di halaman detail, tidak perlu proses ulang di sini
       state.costs = [...state.costs, ...action.payload];
     },
     // reducer lain jika diperlukan
