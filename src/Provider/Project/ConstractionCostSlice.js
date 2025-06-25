@@ -565,8 +565,14 @@ const constractionCostSlice = createSlice({
     },
     addProjectCosts: (state, action) => {
       // action.payload: array of items
-      // Harga satuan sudah dihitung di halaman detail, tidak perlu proses ulang di sini
-      state.costs = [...state.costs, ...action.payload];
+      // Cari id terakhir yang ada
+      let maxId = state.costs.length > 0 ? Math.max(...state.costs.map(item => item.id || 0)) : 0;
+      // Tambahkan data baru dengan id unik (incremental)
+      const itemsWithUniqueId = action.payload.map((item, idx) => ({
+        ...item,
+        id: maxId + idx + 1,
+      }));
+      state.costs = [...state.costs, ...itemsWithUniqueId];
     },
     // reducer lain jika diperlukan
   },

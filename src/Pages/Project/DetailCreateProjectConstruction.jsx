@@ -83,9 +83,9 @@ const DetailCreateProjectConstruction = () => {
   const handleSave = () => {
     const itemsWithId = items
       .filter(item => !item.isCategory || item.hargaSatuan > 0 || item.uraian)
-      .map((item, idx) => ({
+      .map((item) => ({
         ...item,
-        id: Date.now() + idx,
+        // id akan diisi oleh reducer agar unik
         accuracyLow: -15,
         accuracyHigh: 20,
         infrastruktur: project?.kategori || "",
@@ -94,6 +94,9 @@ const DetailCreateProjectConstruction = () => {
         kapasitasRegasifikasi: "",
         satuanKapasitas: "",
         tipe: project?.jenis || "",
+        proyek: project?.name || "",
+        tahun: project?.tahun,
+        lokasi: project?.lokasi,
       }));
     dispatch({
       type: 'constractionCost/addProjectCosts',

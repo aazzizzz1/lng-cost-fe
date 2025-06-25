@@ -122,11 +122,16 @@ const ProjectTable = () => {
 
   const summary = getProjectSummary(selectedProject);
 
-  // Ambil summary biaya dari constractionCost sesuai tipe project
+  // Ambil summary biaya dari constractionCost sesuai tipe project DAN nama project
   let biayaSummary = null;
   if (selectedProject) {
     const summary = getProjectSummary(selectedProject);
-    const filteredCosts = costs.filter(item => item.tipe === summary.tipe);
+    // Filter juga berdasarkan nama project
+    const filteredCosts = costs.filter(
+      item =>
+        item.tipe === summary.tipe &&
+        item.proyek === selectedProject.name // pastikan nama project sama
+    );
     const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (item.totalHarga || 0), 0);
     const ppn = totalHargaPekerjaan * 0.11;
     const asuransi = totalHargaPekerjaan * 0.0025;
@@ -284,8 +289,12 @@ const ProjectTable = () => {
                 {projects.map((project, index) => {
                   // Ambil summary untuk tipe project
                   const summary = getProjectSummary(project);
-                  // Ambil semua cost yang sesuai tipe project
-                  const filteredCosts = costs.filter(item => item.tipe === summary.tipe);
+                  // Filter juga berdasarkan nama project
+                  const filteredCosts = costs.filter(
+                    item =>
+                      item.tipe === summary.tipe &&
+                      item.proyek === project.name // pastikan nama project sama
+                  );
                   // Hitung rata-rata aaceClass dari contraction cost (bulat, hanya angka)
                   let avgAACE = "";
                   if (filteredCosts.length > 0) {

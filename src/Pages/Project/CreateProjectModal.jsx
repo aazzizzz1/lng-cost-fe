@@ -39,16 +39,25 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Gabungkan satuan ke kategori jika kategori berupa angka saja
+    let kategoriFinal = kategori;
+    const satuan = satuanByJenis[jenis] || "";
+    if (kategori && satuan && !kategori.toLowerCase().includes(satuan.toLowerCase())) {
+      // Jika kategori hanya angka, tambahkan satuan
+      if (/^\d+(\.\d+)?$/.test(kategori.trim())) {
+        kategoriFinal = `${kategori.trim()} ${satuan}`;
+      }
+    }
     const newProject = {
       id: Date.now(),
       name,
       jenis,
-      kategori,
+      kategori: kategoriFinal,
       lokasi,
       tahun: Number(tahun),
       levelAACE,
       harga: Number(harga),
-      useGalileo, // Properti baru dengan nama benar
+      useGalileo,
     };
     onCreate(newProject);
     onClose();
@@ -60,7 +69,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
     setTahun(new Date().getFullYear());
     setLevelAACE("Level 4");
     setHarga("");
-    setUseGalileo(""); // Reset juga
+    setUseGalileo("");
     // redirect ke detail construction cost
     navigate(`/project/${newProject.id}/detail-construction`);
   };
