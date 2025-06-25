@@ -150,7 +150,12 @@ const DetailCreateProjectConstructionModal = ({
     const tahunItem = row.tahun || tahunProject;
     const lokasiItem = row.lokasi || lokasiProject;
     const hargaSatuanItem = row.hargaSatuan || row.harga || 0;
-    // Rumus harga satuan
+    // Rumus harga satuan:
+    // 1. Update harga ke tahun project: hargaTahunProject = hargaSatuanItem * (1 + r)^n
+    //    n = selisih tahun project dan tahun item, r = inflasi (%)
+    // 2. Konversi ke harga benchmark (Banjarmasin): hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem)
+    // 3. Konversi ke lokasi project: hargaLokasiProject = hargaBanjarmasin * (cciProject / 100)
+    // Semua penyesuaian harga dan lokasi mengikuti rumus di atas.
     const getCCI = (nama) => {
       const prov = provinces.find(p => p.name === nama);
       return prov ? prov.cci : 100;
