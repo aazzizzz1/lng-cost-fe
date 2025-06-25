@@ -6,7 +6,7 @@ import {
   selectModal,
   selectItems,
   setModalSearch
-} from '../../Provider/detailCreateProjectConstructionSlice'
+} from '../../Provider/Project/detailCreateProjectConstructionSlice'
 
 const DetailCreateProjectConstructionModal = ({
   project,

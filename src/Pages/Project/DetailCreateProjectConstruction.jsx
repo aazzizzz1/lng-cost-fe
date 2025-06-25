@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { setFilterJenis } from '../../Provider/ConstractionCostSlice'
+import { setFilterJenis } from '../../Provider/Project/ConstractionCostSlice';
 import {
   kelompokList,
   kelompokTemplates,
@@ -14,7 +14,7 @@ import {
   openModal,
   closeModal,
   selectModal
-} from '../../Provider/detailCreateProjectConstructionSlice'
+} from '../../Provider/Project/detailCreateProjectConstructionSlice'
 import DetailCreateProjectConstructionModal from './DetailCreateProjectConstructionModal'
 
 const DetailCreateProjectConstruction = () => {

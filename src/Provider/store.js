@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './AuthSlice'; // Import auth reducer
-import projectReducer from './ProjectSlice'; // Import project reducer
+import projectReducer from './Project/ProjectSlice'; // Corrected path
 import jasaReducer from './jasaSlice'; // Import jasa reducer
 import layoutReducer from './layoutSlice'; // Import layout reducer
 import materialReducer from './materialSlice'; // Import material reducer
-import constractionCostReducer from './ConstractionCostSlice'; // Import constraction cost reducer
+import constractionCostReducer from './Project/ConstractionCostSlice'; // Corrected path
 import materialAndPackageReducer from './HargaSatuan/MaterialAndPackageSlice'; // Import materialAndPackage reducer
 import globalReducer from './GlobalSlice'; // Tambahkan ini
 import capacityFactorReducer from './CapacityFactorSlice'; // Tambahkan import
@@ -12,7 +12,7 @@ import administratorReducer from './administratorSlice'; // Tambahkan import
 import transportReducer from './HargaSatuan/transportSlice'; // Tambahkan ini
 import liquifectionPlantReducer from './HargaSatuan/liquifectionPlantSlice'; // Pastikan penamaan dan path sudah benar
 import receivingTerminalReducer from './HargaSatuan/receivingTerminalSlice'; // Tambahkan ini
-import detailCreateProjectConstructionReducer from './detailCreateProjectConstructionSlice'; // Import detailCreateProjectConstruction reducer
+import detailCreateProjectConstructionReducer from './Project/detailCreateProjectConstructionSlice'; // Corrected path
 
 export default configureStore({
   reducer: {

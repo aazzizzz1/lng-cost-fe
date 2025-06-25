@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CreateProjectModal from "./CreateProjectModal";
-import { createProject } from "../../Provider/ProjectSlice";
-import { setFilterJenis } from "../../Provider/ConstractionCostSlice";
+import { createProject } from "../../Provider/Project/ProjectSlice";
+import { setFilterJenis } from "../../Provider/Project/ConstractionCostSlice";
 import { useNavigate } from "react-router-dom";
 
 // Helper untuk mapping jenis dan kategori ke summary
