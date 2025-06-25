@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './AuthSlice'; // Import auth reducer
 import projectReducer from './Project/ProjectSlice'; // Corrected path
-import jasaReducer from './jasaSlice'; // Import jasa reducer
+import jasaReducer from './HargaSatuan/jasaSlice'; // Import jasa reducer
 import layoutReducer from './layoutSlice'; // Import layout reducer
-import materialReducer from './materialSlice'; // Import material reducer
+import materialReducer from './HargaSatuan/materialSlice'; // Import material reducer
 import constractionCostReducer from './Project/ConstractionCostSlice'; // Corrected path
 import materialAndPackageReducer from './HargaSatuan/MaterialAndPackageSlice'; // Import materialAndPackage reducer
 import globalReducer from './GlobalSlice'; // Tambahkan ini

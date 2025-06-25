@@ -9,7 +9,7 @@ import {
   sortByField,
   downloadExportData,
   clearDownloadUrl,
-} from "../../Provider/jasaSlice";
+} from "../../../Provider/HargaSatuan/jasaSlice";
 import JasaExportModal from "./JasaExportModal";
 
 const JasaTable = () => {

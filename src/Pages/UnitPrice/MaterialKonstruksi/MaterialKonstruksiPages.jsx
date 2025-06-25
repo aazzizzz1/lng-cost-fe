@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { filterByJenis } from "../../Provider/materialSlice";
-import PLILogo from "../../Assets/Images/PLI.jpeg";
+import { filterByJenis } from "../../../Provider/HargaSatuan/materialSlice";
+import PLILogo from "../../../Assets/Images/PLI.jpeg";
 import { useNavigate } from "react-router-dom";
 
 class ErrorBoundary extends Component {
