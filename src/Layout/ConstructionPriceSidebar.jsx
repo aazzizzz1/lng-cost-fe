@@ -64,10 +64,12 @@ const ConstructionPriceSidebar = () => {
           <li>
             <button
               type="button"
-              className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               onClick={() => setOpenLiquifaction((v) => !v)}
             >
-              Liquifection Plant
+              <span className="flex-1 text-left whitespace-nowrap ml-3">
+                Liquifection Plant
+              </span>
               <svg
                 className={`w-4 h-4 ml-auto transition-transform ${
                   openLiquifaction ? "rotate-180" : ""
@@ -85,7 +87,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("Onshore LNG Plant")}
                   >
                     Onshore LNG Plant
@@ -94,7 +96,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("Offshore LNG Plant")}
                   >
                     Offshore LNG Plant
@@ -107,10 +109,12 @@ const ConstructionPriceSidebar = () => {
           <li>
             <button
               type="button"
-              className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               onClick={() => setOpenTransportasi((v) => !v)}
             >
-              Transportasi
+              <span className="flex-1 text-left whitespace-nowrap ml-3">
+                Transportasi
+              </span>
               <svg
                 className={`w-4 h-4 ml-auto transition-transform ${
                   openTransportasi ? "rotate-180" : ""
@@ -128,7 +132,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("LNGC")}
                   >
                     LNG Carier (LNGC)
@@ -137,7 +141,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("LNG Barge")}
                   >
                     LNG Barge
@@ -146,7 +150,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("LNG Trucking")}
                   >
                     LNG Trucking
@@ -159,10 +163,12 @@ const ConstructionPriceSidebar = () => {
           <li>
             <button
               type="button"
-              className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               onClick={() => setOpenReceiving((v) => !v)}
             >
-              Receiving Terminal
+              <span className="flex-1 text-left whitespace-nowrap ml-3">
+                Receiving Terminal
+              </span>
               <svg
                 className={`w-4 h-4 ml-auto transition-transform ${
                   openReceiving ? "rotate-180" : ""
@@ -180,7 +186,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("FSRU")}
                   >
                     FSRU
@@ -189,7 +195,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("ORF")}
                   >
                     ORF
@@ -198,7 +204,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("OTS")}
                   >
                     OTS
@@ -207,7 +213,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("ORU")}
                   >
                     ORU
@@ -220,10 +226,12 @@ const ConstructionPriceSidebar = () => {
           <li>
             <button
               type="button"
-              className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
               onClick={() => setOpenMaterial((v) => !v)}
             >
-              Material & Package
+              <span className="flex-1 text-left whitespace-nowrap ml-3">
+                Material & Package
+              </span>
               <svg
                 className={`w-4 h-4 ml-auto transition-transform ${
                   openMaterial ? "rotate-180" : ""
@@ -241,7 +249,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("Material")}
                   >
                     Material
@@ -250,7 +258,7 @@ const ConstructionPriceSidebar = () => {
                 <li>
                   <button
                     type="button"
-                    className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
                     onClick={() => handleClick("Package")}
                   >
                     Package
