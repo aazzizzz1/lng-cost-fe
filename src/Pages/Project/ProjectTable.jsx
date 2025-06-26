@@ -116,7 +116,7 @@ const ProjectTable = () => {
   };
 
   const handleDetailClick = (summary) => {
-    dispatch(setFilterJenis(summary.tipe));
+    dispatch(setFilterJenis({ tipe: summary.tipe, proyek: selectedProject.name }));
     navigate("/construction-cost");
   };
 

@@ -102,7 +102,7 @@ const DetailCreateProjectConstruction = () => {
       type: 'constractionCost/addProjectCosts',
       payload: itemsWithId,
     });
-    dispatch(setFilterJenis(project?.jenis));
+    dispatch(setFilterJenis({ tipe: project?.jenis, proyek: project?.name }));
     navigate('/construction-cost');
   };
 

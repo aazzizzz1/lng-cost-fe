@@ -29,10 +29,19 @@ const columns = [
 const ConstractionCostTable = () => {
   const { costs, filterJenis } = useSelector((state) => state.constractionCost);
 
-  // Filter data sesuai jenis project
-  const filteredCosts = useMemo(() => (
-    filterJenis ? costs.filter((item) => item.tipe === filterJenis) : costs
-  ), [costs, filterJenis]);
+  // Filter data sesuai jenis project DAN nama proyek jika filterJenis berupa object
+  const filteredCosts = useMemo(() => {
+    if (!filterJenis) return costs;
+    if (typeof filterJenis === "object" && filterJenis !== null) {
+      return costs.filter(
+        (item) =>
+          item.tipe === filterJenis.tipe &&
+          item.proyek === filterJenis.proyek
+      );
+    }
+    // fallback lama: filter hanya tipe
+    return costs.filter((item) => item.tipe === filterJenis);
+  }, [costs, filterJenis]);
 
   // Kelompokkan data berdasarkan 'kelompok'
   const grouped = useMemo(() => {

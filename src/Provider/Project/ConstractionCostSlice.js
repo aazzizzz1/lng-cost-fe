@@ -1329,7 +1329,7 @@ const initialState = {
       tipe: "LNGC"
     },
   ],
-  filterJenis: null,
+  filterJenis: null, // bisa berupa { tipe, proyek }
 };
 
 const constractionCostSlice = createSlice({
@@ -1337,7 +1337,15 @@ const constractionCostSlice = createSlice({
   initialState,
   reducers: {
     setFilterJenis: (state, action) => {
-      state.filterJenis = action.payload;
+      // action.payload bisa string (lama) atau object { tipe, proyek }
+      if (typeof action.payload === "object" && action.payload !== null) {
+        state.filterJenis = {
+          tipe: action.payload.tipe,
+          proyek: action.payload.proyek,
+        };
+      } else {
+        state.filterJenis = action.payload;
+      }
     },
     addProjectCosts: (state, action) => {
       // action.payload: array of items
