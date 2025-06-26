@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux'; // Tambahkan ini
+import { useSelector, useDispatch } from 'react-redux'; // Tambahkan useDispatch
+import { setItems } from '../../Provider/Project/detailCreateProjectConstructionSlice'; // Import setItems
 
 // Mapping satuan berdasarkan jenis project
 const satuanByJenis = {
@@ -29,13 +30,45 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
   const [name, setName] = useState("");
   const [jenis, setJenis] = useState("Onshore LNG Plant");
   const [kategori, setKategori] = useState("");
+  const [volume, setVolume] = useState("");
   const [lokasi, setLokasi] = useState("");
   const [tahun, setTahun] = useState(new Date().getFullYear());
   const [levelAACE, setLevelAACE] = useState(4);
   const [harga, setHarga] = useState("");
   const [useGalileo, setUseGalileo] = useState(""); // Ubah nama state
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const provinces = useSelector(state => state.administrator.provinces); // Ambil dari redux
+  const costs = useSelector(state => state.constractionCost.costs);
+  const inflasiList = useSelector(state => state.administrator.inflasi);
+
+  // Auto set kategori FSRU & LNGC berdasarkan volume
+  React.useEffect(() => {
+    if (jenis === "FSRU" && volume) {
+      const v = Number(volume);
+      if (v > 150000) {
+        setKategori("BIG SCALE LNG FSRU [> 150.000 m³]");
+      } else if (v >= 50000) {
+        setKategori("MID SCALE LNG FSRU [50.000 - 150.000 m³]");
+      } else if (v > 0) {
+        setKategori("SMALL SCALE LNG FSRU [< 30.000 m³]");
+      } else {
+        setKategori("");
+      }
+    } else if ((jenis === "LNG Carrier" || jenis === "LNGC") && volume) {
+      const v = Number(volume);
+      if (v > 100000) {
+        setKategori("BIG SCALE LNG CARRIER (LNGC) [> 100.000 m³]");
+      } else if (v >= 30000) {
+        setKategori("MID SCALE LNG CARRIER (LNGC) [30.000 - 100.000 m³]");
+      } else if (v > 0) {
+        setKategori("SMALL SCALE LNG CARRIER (LNGC) [< 30.000 m³]");
+      } else {
+        setKategori("");
+      }
+    }
+    // Jika bukan FSRU/LNGC, jangan auto set kategori
+  }, [jenis, volume]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -58,8 +91,65 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       levelAACE,
       harga: Number(harga),
       useGalileo,
+      volume: Number(volume), // Simpan volume
     };
     onCreate(newProject);
+
+    // --- AUTO FILL DETAIL CONSTRUCTION JIKA ADA DI COST DB ---
+    // Cari data yang cocok di constractionCost (jenis & volume)
+    const summaryJenis = (() => {
+      if (jenis.toLowerCase().includes("fsru")) return "FSRU";
+      if (jenis.toLowerCase().includes("plant")) return "LNG Plant";
+      if (jenis.toLowerCase().includes("carrier")) return "LNGC";
+      return jenis;
+    })();
+    // Cari cost yang cocok (jenis & volume)
+    const matchedCosts = costs.filter(item =>
+      String(item.tipe).toLowerCase() === String(summaryJenis).toLowerCase() &&
+      Number(item.volume) === Number(volume)
+    );
+    if (matchedCosts.length > 0) {
+      // Penyesuaian harga satuan (tahun, lokasi, inflasi)
+      const inflasiProject = (() => {
+        const inf = inflasiList?.find(i => Number(i.year) === Number(tahun));
+        return inf ? inf.value : 5.0;
+      })();
+      const getCCI = (nama) => {
+        const prov = provinces.find(p => p.name === nama);
+        return prov ? prov.cci : 100;
+      };
+      const cciBanjarmasin = (() => {
+        const prov = provinces.find(p => p.name.toLowerCase().includes("banjar") && p.cci === 100.70);
+        return prov ? prov.cci : 100;
+      })();
+      const items = matchedCosts.map(row => {
+        const tahunItem = row.tahun || tahun;
+        const lokasiItem = row.lokasi || lokasi;
+        const hargaSatuanItem = row.hargaSatuan || row.harga || 0;
+        const n = Number(tahun) - Number(tahunItem);
+        const r = Number(inflasiProject) / 100;
+        let hargaTahunProject = hargaSatuanItem;
+        if (n > 0) {
+          hargaTahunProject = hargaSatuanItem * Math.pow(1 + r, n);
+        }
+        const cciItem = getCCI(lokasiItem);
+        let hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem);
+        const cciProject = getCCI(lokasi);
+        let hargaLokasiProject = hargaBanjarmasin * (cciProject / 100);
+        return {
+          ...row,
+          hargaSatuan: Math.round(hargaLokasiProject),
+          totalHarga: (row.qty || 1) * Math.round(hargaLokasiProject),
+          tahun: Number(tahun),
+          lokasi,
+          proyek: name,
+        };
+      });
+      dispatch(setItems(items));
+    } else {
+      dispatch(setItems([])); // Kosongkan jika tidak ada
+    }
+
     onClose();
     // reset form
     setName("");
@@ -70,6 +160,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
     setLevelAACE("Level 4");
     setHarga("");
     setUseGalileo("");
+    setVolume("");
     // redirect ke detail construction cost
     navigate(`/project/${newProject.id}/detail-construction`);
   };
@@ -112,24 +203,34 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Volume
+                </label>
+                <div className="flex flex-row gap-2">
+                  <input
+                    type="number"
+                    value={volume}
+                    onChange={e => setVolume(e.target.value)}
+                    placeholder="Volume"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    required
+                  />
+                  <div className="text-sm flex items-center px-2 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+                    {satuanByJenis[jenis] || "-"}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Kategori
                 </label>
-                <div className="flex flex-row gap-2">  
-                  {/* dropdown berdasarkan database yang ada dan isi sendiri */}
                 <input
                   type="text"
                   value={kategori}
                   onChange={e => setKategori(e.target.value)}
                   placeholder="Kategori"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  readOnly={jenis === "FSRU" && volume}
                 />
-                {/* Satuan di kunci sesuai jenis nya */}
-                <div className="text-sm text-light bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {satuanByJenis[jenis] || "-"}
-                  </span>
-                </div>
-                </div>
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
