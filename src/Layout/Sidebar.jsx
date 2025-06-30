@@ -131,7 +131,7 @@ const Sidebar = () => {
               </a>
             </li>
           </Link>
-          <Link to="/manage-data">
+          {/* <Link to="/manage-data">
             <li
               className={
                 isActive("/manage-data")
@@ -161,7 +161,7 @@ const Sidebar = () => {
                 <span className="ml-3">Manage Data</span>
               </a>
             </li>
-          </Link>
+          </Link> */}
           {/* Ganti blok <li> Harga Satuan beserta dropdown-nya dengan komponen UnitPriceSidebar */}
           <UnitPriceSidebar />
           {/* Ganti blok <li> Harga Konstruksi dengan komponen ConstructionPriceSidebar */}
