@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux'; // Tambahkan useDispatch
-import { setItems } from '../../Provider/Project/detailCreateProjectConstructionSlice'; // Import setItems
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux"; // Tambahkan useDispatch
+import { setItems } from "../../Provider/Project/detailCreateProjectConstructionSlice"; // Import setItems
 
 // Mapping satuan berdasarkan jenis project
 const satuanByJenis = {
@@ -9,10 +9,10 @@ const satuanByJenis = {
   "Offshore LNG Plant": "MTPA",
   "LNG Carrier": "m³",
   "LNG Trucking": "CBM",
-  "FSRU": "m³ / MMSCFD",
-  "ORF": "MMSCFD",
-  "OTS": "MMSCFD",
-  "ORU": "m³ / MMSCFD",
+  FSRU: "m³ / MMSCFD",
+  ORF: "MMSCFD",
+  OTS: "MMSCFD",
+  ORU: "m³ / MMSCFD",
 };
 
 const jenisOptions = [
@@ -38,9 +38,9 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
   const [useGalileo, setUseGalileo] = useState(""); // Ubah nama state
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const provinces = useSelector(state => state.administrator.provinces); // Ambil dari redux
-  const costs = useSelector(state => state.constractionCost.costs);
-  const inflasiList = useSelector(state => state.administrator.inflasi);
+  const provinces = useSelector((state) => state.administrator.provinces); // Ambil dari redux
+  const costs = useSelector((state) => state.constractionCost.costs);
+  const inflasiList = useSelector((state) => state.administrator.inflasi);
 
   // Auto set kategori FSRU & LNGC berdasarkan volume
   React.useEffect(() => {
@@ -75,7 +75,11 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
     // Gabungkan satuan ke kategori jika kategori berupa angka saja
     let kategoriFinal = kategori;
     const satuan = satuanByJenis[jenis] || "";
-    if (kategori && satuan && !kategori.toLowerCase().includes(satuan.toLowerCase())) {
+    if (
+      kategori &&
+      satuan &&
+      !kategori.toLowerCase().includes(satuan.toLowerCase())
+    ) {
       // Jika kategori hanya angka, tambahkan satuan
       if (/^\d+(\.\d+)?$/.test(kategori.trim())) {
         kategoriFinal = `${kategori.trim()} ${satuan}`;
@@ -104,25 +108,29 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       return jenis;
     })();
     // Cari cost yang cocok (jenis & volume)
-    const matchedCosts = costs.filter(item =>
-      String(item.tipe).toLowerCase() === String(summaryJenis).toLowerCase() &&
-      Number(item.volume) === Number(volume)
+    const matchedCosts = costs.filter(
+      (item) =>
+        String(item.tipe).toLowerCase() ===
+          String(summaryJenis).toLowerCase() &&
+        Number(item.volume) === Number(volume)
     );
     if (matchedCosts.length > 0) {
       // Penyesuaian harga satuan (tahun, lokasi, inflasi)
       const inflasiProject = (() => {
-        const inf = inflasiList?.find(i => Number(i.year) === Number(tahun));
+        const inf = inflasiList?.find((i) => Number(i.year) === Number(tahun));
         return inf ? inf.value : 5.0;
       })();
       const getCCI = (nama) => {
-        const prov = provinces.find(p => p.name === nama);
+        const prov = provinces.find((p) => p.name === nama);
         return prov ? prov.cci : 100;
       };
       const cciBanjarmasin = (() => {
-        const prov = provinces.find(p => p.name.toLowerCase().includes("banjar") && p.cci === 100.70);
+        const prov = provinces.find(
+          (p) => p.name.toLowerCase().includes("banjar") && p.cci === 100.7
+        );
         return prov ? prov.cci : 100;
       })();
-      const items = matchedCosts.map(row => {
+      const items = matchedCosts.map((row) => {
         const tahunItem = row.tahun || tahun;
         const lokasiItem = row.lokasi || lokasi;
         const hargaSatuanItem = row.hargaSatuan || row.harga || 0;
@@ -181,7 +189,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="text"
                   value={name}
-                  onChange={e => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Nama Project"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   required
@@ -193,11 +201,13 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 </label>
                 <select
                   value={jenis}
-                  onChange={e => setJenis(e.target.value)}
+                  onChange={(e) => setJenis(e.target.value)}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 >
-                  {jenisOptions.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  {jenisOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -209,7 +219,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                   <input
                     type="number"
                     value={volume}
-                    onChange={e => setVolume(e.target.value)}
+                    onChange={(e) => setVolume(e.target.value)}
                     placeholder="Volume"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required
@@ -226,7 +236,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="text"
                   value={kategori}
-                  onChange={e => setKategori(e.target.value)}
+                  onChange={(e) => setKategori(e.target.value)}
                   placeholder="Kategori"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   readOnly={jenis === "FSRU" && volume}
@@ -239,13 +249,15 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 {/* Dropdown lokasi dari administrator slice */}
                 <select
                   value={lokasi}
-                  onChange={e => setLokasi(e.target.value)}
+                  onChange={(e) => setLokasi(e.target.value)}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   required
                 >
                   <option value="">Pilih Lokasi</option>
-                  {provinces.map(prov => (
-                    <option key={prov.code} value={prov.name}>{prov.name}</option>
+                  {provinces.map((prov) => (
+                    <option key={prov.code} value={prov.name}>
+                      {prov.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -256,7 +268,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 <input
                   type="number"
                   value={tahun}
-                  onChange={e => setTahun(e.target.value)}
+                  onChange={(e) => setTahun(e.target.value)}
                   placeholder="Tahun"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 />

@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   updateItem,
   closeModal,
   selectModal,
   selectItems,
-  setModalSearch
-} from '../../Provider/Project/detailCreateProjectConstructionSlice'
+  setModalSearch,
+} from "../../Provider/Project/detailCreateProjectConstructionSlice";
 
 const DetailCreateProjectConstructionModal = ({
   project,
@@ -41,7 +41,7 @@ const DetailCreateProjectConstructionModal = ({
   let modalData = [];
   let modalColumns = [];
   if (activeSource === "material") {
-    modalData = materialList.filter(m =>
+    modalData = materialList.filter((m) =>
       (m.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -52,7 +52,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "proyek", label: "Proyek" },
     ];
   } else if (activeSource === "jasa") {
-    modalData = jasaList.filter(j =>
+    modalData = jasaList.filter((j) =>
       (j.nama || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -62,7 +62,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "kategori", label: "Kategori" },
     ];
   } else if (activeSource === "package") {
-    modalData = packageList.filter(p =>
+    modalData = packageList.filter((p) =>
       (p.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -73,7 +73,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "tahun", label: "Tahun" },
     ];
   } else if (activeSource === "transport") {
-    modalData = transportList.filter(t =>
+    modalData = transportList.filter((t) =>
       (t.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -86,7 +86,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "proyek", label: "Proyek" },
     ];
   } else if (activeSource === "liquifectionPlant") {
-    modalData = liquifectionPlantList.filter(m =>
+    modalData = liquifectionPlantList.filter((m) =>
       (m.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -99,7 +99,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "kategori", label: "Kategori" },
     ];
   } else if (activeSource === "transportasi") {
-    modalData = transportasiList.filter(m =>
+    modalData = transportasiList.filter((m) =>
       (m.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -112,7 +112,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "kategori", label: "Kategori" },
     ];
   } else if (activeSource === "receivingTerminal") {
-    modalData = receivingTerminalList.filter(m =>
+    modalData = receivingTerminalList.filter((m) =>
       (m.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -125,7 +125,7 @@ const DetailCreateProjectConstructionModal = ({
       { key: "kategori", label: "Kategori" },
     ];
   } else if (activeSource === "materialAndPackage") {
-    modalData = materialAndPackageList.filter(m =>
+    modalData = materialAndPackageList.filter((m) =>
       (m.uraian || "").toLowerCase().includes(search.toLowerCase())
     );
     modalColumns = [
@@ -144,7 +144,9 @@ const DetailCreateProjectConstructionModal = ({
     const tahunProject = project?.tahun;
     const lokasiProject = project?.lokasi;
     const inflasiProject = (() => {
-      const inf = inflasiList.find(i => Number(i.year) === Number(tahunProject));
+      const inf = inflasiList.find(
+        (i) => Number(i.year) === Number(tahunProject)
+      );
       return inf ? inf.value : 5.0;
     })();
     const tahunItem = row.tahun || tahunProject;
@@ -152,11 +154,13 @@ const DetailCreateProjectConstructionModal = ({
     const hargaSatuanItem = row.hargaSatuan || row.harga || 0;
     // Rumus harga satuan:
     const getCCI = (nama) => {
-      const prov = provinces.find(p => p.name === nama);
+      const prov = provinces.find((p) => p.name === nama);
       return prov ? prov.cci : 100;
     };
     const cciBanjarmasin = (() => {
-      const prov = provinces.find(p => p.name.toLowerCase().includes("banjar") && p.cci === 100.70);
+      const prov = provinces.find(
+        (p) => p.name.toLowerCase().includes("banjar") && p.cci === 100.7
+      );
       return prov ? prov.cci : 100;
     })();
     // Step 1: Update harga ke tahun project
@@ -169,7 +173,7 @@ const DetailCreateProjectConstructionModal = ({
       hargaTahunProject = hargaSatuanItem * Math.pow(1 + r, n);
     }
     // Step 2: Konversi ke harga benchmark (Banjarmasin)
-        // 2. Konversi ke harga benchmark (Banjarmasin): hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem)
+    // 2. Konversi ke harga benchmark (Banjarmasin): hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem)
     const cciItem = getCCI(lokasiItem);
     let hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem);
     // Step 3: Konversi ke lokasi project
@@ -177,31 +181,41 @@ const DetailCreateProjectConstructionModal = ({
     const cciProject = getCCI(lokasiProject);
     let hargaLokasiProject = hargaBanjarmasin * (cciProject / 100);
 
-    dispatch(updateItem({
-      idx: modal.itemIdx,
-      field: "uraian",
-      value: row.uraian || row.nama || ""
-    }));
-    dispatch(updateItem({
-      idx: modal.itemIdx,
-      field: "satuan",
-      value: row.satuan || ""
-    }));
-    dispatch(updateItem({
-      idx: modal.itemIdx,
-      field: "hargaSatuan",
-      value: Math.round(hargaLokasiProject)
-    }));
-    dispatch(updateItem({
-      idx: modal.itemIdx,
-      field: "totalHarga",
-      value: items[modal.itemIdx].qty * Math.round(hargaLokasiProject)
-    }));
-    dispatch(updateItem({
-      idx: modal.itemIdx,
-      field: "aaceClass",
-      value: Math.max(1, Math.min(5, parseInt(row.aaceClass) || 5))
-    }));
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "uraian",
+        value: row.uraian || row.nama || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "satuan",
+        value: row.satuan || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "hargaSatuan",
+        value: Math.round(hargaLokasiProject),
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "totalHarga",
+        value: items[modal.itemIdx].qty * Math.round(hargaLokasiProject),
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "aaceClass",
+        value: Math.max(1, Math.min(5, parseInt(row.aaceClass) || 5)),
+      })
+    );
     dispatch(closeModal());
   };
 
@@ -223,7 +237,7 @@ const DetailCreateProjectConstructionModal = ({
         </div>
         {/* Pilihan sumber data */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {dataSources.map(ds => (
+          {dataSources.map((ds) => (
             <button
               key={ds.key}
               type="button"
@@ -243,15 +257,18 @@ const DetailCreateProjectConstructionModal = ({
           className="w-full mb-3 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-primary-500 focus:border-primary-500 transition"
           placeholder="Cari..."
           value={search}
-          onChange={e => dispatch(setModalSearch(e.target.value))}
+          onChange={(e) => dispatch(setModalSearch(e.target.value))}
           autoFocus
         />
         <div className="overflow-x-auto max-h-80 rounded">
           <table className="w-full text-sm border-separate border-spacing-0">
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-800">
-                {modalColumns.map(col => (
-                  <th key={col.key} className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold sticky top-0 z-10 bg-inherit">
+                {modalColumns.map((col) => (
+                  <th
+                    key={col.key}
+                    className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold sticky top-0 z-10 bg-inherit"
+                  >
                     {col.label}
                   </th>
                 ))}
@@ -261,7 +278,10 @@ const DetailCreateProjectConstructionModal = ({
             <tbody>
               {modalData.length === 0 && (
                 <tr>
-                  <td colSpan={modalColumns.length + 1} className="text-center text-gray-400 dark:text-gray-500 py-6">
+                  <td
+                    colSpan={modalColumns.length + 1}
+                    className="text-center text-gray-400 dark:text-gray-500 py-6"
+                  >
                     Tidak ada data.
                   </td>
                 </tr>
@@ -271,8 +291,11 @@ const DetailCreateProjectConstructionModal = ({
                   key={row.id || idx}
                   className="hover:bg-primary-50 dark:hover:bg-gray-800 transition"
                 >
-                  {modalColumns.map(col => (
-                    <td key={col.key} className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100">
+                  {modalColumns.map((col) => (
+                    <td
+                      key={col.key}
+                      className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100"
+                    >
                       {row[col.key]}
                     </td>
                   ))}
@@ -295,4 +318,4 @@ const DetailCreateProjectConstructionModal = ({
   );
 };
 
-export default DetailCreateProjectConstructionModal
+export default DetailCreateProjectConstructionModal;

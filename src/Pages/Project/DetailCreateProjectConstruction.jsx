@@ -17,6 +17,18 @@ import {
 } from '../../Provider/Project/detailCreateProjectConstructionSlice'
 import DetailCreateProjectConstructionModal from './DetailCreateProjectConstructionModal'
 
+const satuanByJenis = {
+  "Onshore LNG Plant": "MTPA",
+  "Offshore LNG Plant": "MTPA",
+  "LNG Carrier": "m³",
+  "LNGC": "m³",
+  "LNG Trucking": "CBM",
+  FSRU: "m³ / MMSCFD",
+  ORF: "MMSCFD",
+  OTS: "MMSCFD",
+  ORU: "m³ / MMSCFD",
+};
+
 const DetailCreateProjectConstruction = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -134,11 +146,55 @@ const DetailCreateProjectConstruction = () => {
     dispatch(closeModal());
   };
 
+  // Ambil inflasi dari inflasiList
+  const inflasi = (() => {
+    if (!project?.tahun) return "";
+    const inf = inflasiList.find(i => Number(i.year) === Number(project.tahun));
+    return inf ? inf.value : "";
+  })();
+
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-        Input Detail Construction Cost untuk Project: {project?.name}
-      </h2>
+      {/* text gambaran umum judul */}
+      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        Gambaran Umum Project
+      </h1>
+      {/* Gambaran Umum Project */}
+      <div className="mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Nama Project</div>
+            <div className="font-semibold text-gray-900 dark:text-white">{project?.name || "-"}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Jenis</div>
+            <div className="font-semibold text-gray-900 dark:text-white">{project?.jenis || "-"}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Volume</div>
+            <div className="font-semibold text-gray-900 dark:text-white">
+              {project?.volume ? project.volume : "-"} <span className="text-xs">{satuanByJenis[project?.jenis] || "-"}</span>
+            </div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Kategori</div>
+            <div className="font-semibold text-gray-900 dark:text-white">{project?.kategori || "-"}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Lokasi</div>
+            <div className="font-semibold text-gray-900 dark:text-white">{project?.lokasi || "-"}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Tahun</div>
+            <div className="font-semibold text-gray-900 dark:text-white">{project?.tahun || "-"}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Asumsi Inflasi (%)</div>
+            <div className="font-semibold text-gray-900 dark:text-white">{inflasi !== "" ? inflasi : "-"}</div>
+          </div>
+        </div>
+      </div>
+      {/* END Gambaran Umum Project */}
       <form
         onSubmit={e => {
           e.preventDefault();
