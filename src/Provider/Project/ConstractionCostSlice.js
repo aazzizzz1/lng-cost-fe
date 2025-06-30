@@ -22,7 +22,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100, // Tambahkan projectId
     },
     {
       id: 2,
@@ -43,7 +44,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     {
       id: 3,
@@ -64,7 +66,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     {
       id: 4,
@@ -85,7 +88,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     // === SUPPORTING WORK ===
     {
@@ -107,7 +111,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     {
       id: 6,
@@ -128,7 +133,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     // ...tambahkan data lain sesuai kelompok...
     // === PENYEDIAAN MATERIAL ===
@@ -151,7 +157,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     // ...tambahkan data lain sesuai kelompok...
     // === PEKERJAAN PEMASANGAN DAN PENGUJIAN ===
@@ -174,7 +181,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     // ...tambahkan data lain sesuai kelompok...
     // === PEKERJAAN KHUSUS/FINISHING ===
@@ -197,7 +205,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     // ...tambahkan data lain sesuai kelompok...
     // === PEKERJAAN DOKUMENTASI ===
@@ -220,7 +229,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     // ...tambahkan data lain sesuai kelompok...
     // === PEKERJAAN COMMISSIONING & TRIAL OPERATION ===
@@ -243,7 +253,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 100,
     },
     
     // === MID SCALE LNG FSRU ===
@@ -266,7 +277,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     {
       id: 11002,
@@ -287,7 +299,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     {
       id: 11003,
@@ -308,7 +321,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     {
       id: 11004,
@@ -329,7 +343,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     // === SUPPORTING WORK MID ===
     {
@@ -351,7 +366,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     {
       id: 11006,
@@ -372,7 +388,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     // === PENYEDIAAN MATERIAL MID ===
     {
@@ -394,7 +411,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     // === PEKERJAAN PEMASANGAN DAN PENGUJIAN MID ===
     {
@@ -416,7 +434,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     // === PEKERJAAN KHUSUS/FINISHING MID ===
     {
@@ -438,7 +457,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     // === PEKERJAAN DOKUMENTASI MID ===
     {
@@ -460,7 +480,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
     // === PEKERJAAN COMMISSIONING & TRIAL OPERATION MID ===
     {
@@ -482,7 +503,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Mid Example",
       lokasi: "Jawa Tengah",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 101,
     },
 
     // === SMALL SCALE LNG FSRU ===
@@ -505,7 +527,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     {
       id: 12002,
@@ -526,7 +549,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     {
       id: 12003,
@@ -547,7 +571,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     {
       id: 12004,
@@ -568,7 +593,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     // === SUPPORTING WORK SMALL ===
     {
@@ -590,7 +616,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     {
       id: 12006,
@@ -611,7 +638,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     // === PENYEDIAAN MATERIAL SMALL ===
     {
@@ -633,7 +661,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     // === PEKERJAAN PEMASANGAN DAN PENGUJIAN SMALL ===
     {
@@ -655,7 +684,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     // === PEKERJAAN KHUSUS/FINISHING SMALL ===
     {
@@ -677,7 +707,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     // === PEKERJAAN DOKUMENTASI SMALL ===
     {
@@ -699,7 +730,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
     // === PEKERJAAN COMMISSIONING & TRIAL OPERATION SMALL ===
     {
@@ -721,7 +753,8 @@ const initialState = {
       satuanKapasitas: "MMSCFD",
       proyek: "FSRU Small Example",
       lokasi: "Sumatera Selatan",
-      tipe: "FSRU"
+      tipe: "FSRU",
+      projectId: 102,
     },
 
     // === DUMMY DATA: LNG PLANT ===
@@ -744,7 +777,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "Small LNG Plant Bau Bau",
       lokasi: "Sulawesi",
-      tipe: "LNG Plant"
+      tipe: "LNG Plant",
+      projectId: 101,
     },
     {
       id: 1002,
@@ -765,7 +799,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "Small LNG Plant Bau Bau",
       lokasi: "Sulawesi",
-      tipe: "LNG Plant"
+      tipe: "LNG Plant",
+      projectId: 101,
     },
     // === SUPPORTING WORK LNG PLANT ===
     {
@@ -787,7 +822,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "Small LNG Plant Bau Bau",
       lokasi: "Sulawesi",
-      tipe: "LNG Plant"
+      tipe: "LNG Plant",
+      projectId: 101,
     },
     // === PENYEDIAAN MATERIAL LNG PLANT ===
     {
@@ -809,7 +845,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "Small LNG Plant Bau Bau",
       lokasi: "Sulawesi",
-      tipe: "LNG Plant"
+      tipe: "LNG Plant",
+      projectId: 101,
     },
     // === PEKERJAAN PEMASANGAN DAN PENGUJIAN LNG PLANT ===
     {
@@ -831,7 +868,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "Small LNG Plant Bau Bau",
       lokasi: "Sulawesi",
-      tipe: "LNG Plant"
+      tipe: "LNG Plant",
+      projectId: 101,
     },
     // === PEKERJAAN DOKUMENTASI LNG PLANT ===
     {
@@ -853,7 +891,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "Small LNG Plant Bau Bau",
       lokasi: "Sulawesi",
-      tipe: "LNG Plant"
+      tipe: "LNG Plant",
+      projectId: 101,
     },
     // === PEKERJAAN COMMISSIONING & TRIAL OPERATION LNG PLANT ===
     {
@@ -875,7 +914,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "Small LNG Plant Bau Bau",
       lokasi: "Sulawesi",
-      tipe: "LNG Plant"
+      tipe: "LNG Plant",
+      projectId: 101,
     },
     
     // === DUMMY DATA: LNGC ===
@@ -898,7 +938,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Papua",
       lokasi: "Kepulauan Riau",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 102,
     },
     {
       id: 2002,
@@ -919,7 +960,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Papua",
       lokasi: "Kepulauan Riau",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 102,
     },
     // === SUPPORTING WORK LNGC ===
     {
@@ -941,7 +983,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Papua",
       lokasi: "Kepulauan Riau",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 102,
     },
     // === PENYEDIAAN MATERIAL LNGC ===
     {
@@ -963,7 +1006,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Papua",
       lokasi: "Kepulauan Riau",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 102,
     },
     // === PEKERJAAN PEMASANGAN DAN PENGUJIAN LNGC ===
     {
@@ -985,7 +1029,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Papua",
       lokasi: "Kepulauan Riau",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 102,
     },
     // === PEKERJAAN DOKUMENTASI LNGC ===
     {
@@ -1007,7 +1052,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Papua",
       lokasi: "Kepulauan Riau",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 102,
     },
     // === PEKERJAAN COMMISSIONING & TRIAL OPERATION LNGC ===
     {
@@ -1029,7 +1075,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Papua",
       lokasi: "Kepulauan Riau",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 102,
     },
     // === MID SCALE LNGC ===
     {
@@ -1051,7 +1098,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Mid Example",
       lokasi: "Jawa Barat",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 103,
     },
     {
       id: 21002,
@@ -1072,7 +1120,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Mid Example",
       lokasi: "Jawa Barat",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 103,
     },
     {
       id: 21003,
@@ -1093,7 +1142,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Mid Example",
       lokasi: "Jawa Barat",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 103,
     },
     {
       id: 21100,
@@ -1114,7 +1164,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Mid Example",
       lokasi: "Jawa Barat",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 103,
     },
     {
       id: 21200,
@@ -1135,7 +1186,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Mid Example",
       lokasi: "Jawa Barat",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 103,
     },
     {
       id: 21300,
@@ -1156,7 +1208,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Mid Example",
       lokasi: "Jawa Barat",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 103,
     },
     {
       id: 21400,
@@ -1177,7 +1230,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Mid Example",
       lokasi: "Jawa Barat",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 103,
     },
 
     // === SMALL SCALE LNGC ===
@@ -1200,7 +1254,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Small Example",
       lokasi: "Kalimantan Timur",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 104,
     },
     {
       id: 22002,
@@ -1221,7 +1276,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Small Example",
       lokasi: "Kalimantan Timur",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 104,
     },
     {
       id: 22003,
@@ -1242,7 +1298,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Small Example",
       lokasi: "Kalimantan Timur",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 104,
     },
     {
       id: 22100,
@@ -1263,7 +1320,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Small Example",
       lokasi: "Kalimantan Timur",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 104,
     },
     {
       id: 22200,
@@ -1284,7 +1342,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Small Example",
       lokasi: "Kalimantan Timur",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 104,
     },
     {
       id: 22300,
@@ -1305,7 +1364,8 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Small Example",
       lokasi: "Kalimantan Timur",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 104,
     },
     {
       id: 22400,
@@ -1326,8 +1386,348 @@ const initialState = {
       satuanKapasitas: "",
       proyek: "LNGC Small Example",
       lokasi: "Kalimantan Timur",
-      tipe: "LNGC"
+      tipe: "LNGC",
+      projectId: 104,
     },
+    // === SMALL SCALE LNGC 5000 m³ (Engineering Estimate LNG Bunkering Barge) ===
+    // HULL CONSTRUCTION & CONSUMABLE
+    {
+      id: 30001,
+      uraian: "Plate & Profile (Mild steel grade A marine use)",
+      satuan: "ton",
+      qty: 2696,
+      hargaSatuan: 18745000,
+      totalHarga: 50533145900,
+      kelompok: "Material & Equipment",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    {
+      id: 30002,
+      uraian: "Allowance plate & profile (10% of installed)",
+      satuan: "ton",
+      qty: 270,
+      hargaSatuan: 18745000,
+      totalHarga: 5053314590,
+      kelompok: "Material & Equipment",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    {
+      id: 30003,
+      uraian: "Electrode",
+      satuan: "ton",
+      qty: 135,
+      hargaSatuan: 23146000,
+      totalHarga: 3119872486,
+      kelompok: "Material & Equipment",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    {
+      id: 30004,
+      uraian: "Oxygen",
+      satuan: "Bottle",
+      qty: 4529,
+      hargaSatuan: 114100,
+      totalHarga: 516758900,
+      kelompok: "Material & Equipment",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    {
+      id: 30005,
+      uraian: "Acetylene",
+      satuan: "Lot",
+      qty: 2264.5,
+      hargaSatuan: 1141000,
+      totalHarga: 2583794500,
+      kelompok: "Material & Equipment",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SURFACE PROTECTION & PAINTING (contoh, tambahkan data lain sesuai kebutuhan)
+    {
+      id: 30006,
+      uraian: "Sandblasting",
+      satuan: "m2",
+      qty: 21777,
+      hargaSatuan: 130400,
+      totalHarga: 2839707710.95,
+      kelompok: "Material & Equipment",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // ...tambahkan data lain dari tabel sesuai kebutuhan, gunakan id increment...
+    // SHIPYARD SERVICES - Overhead Cost
+    {
+      id: 30100,
+      uraian: "Overhead Cost",
+      satuan: "lot",
+      qty: 1,
+      hargaSatuan: 49347920564.45,
+      totalHarga: 49347920564.45,
+      kelompok: "General & Finalization",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SHIPYARD SERVICES - Test & Inspection
+    {
+      id: 30101,
+      uraian: "Test & Inspection",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 863900000,
+      totalHarga: 863900000,
+      kelompok: "Testing & Commissioning",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SHIPYARD SERVICES - Commisioning
+    {
+      id: 30102,
+      uraian: "Commisioning",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 937250000,
+      totalHarga: 937250000,
+      kelompok: "Testing & Commissioning",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SHIPYARD SERVICES - Dock & Sea Trial
+    {
+      id: 30103,
+      uraian: "Dock & Sea Trial",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 652000000,
+      totalHarga: 652000000,
+      kelompok: "Testing & Commissioning",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SHIPYARD SERVICES - Inclining Test
+    {
+      id: 30104,
+      uraian: "Inclining Test",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 81500000,
+      totalHarga: 81500000,
+      kelompok: "Testing & Commissioning",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SHIPYARD SERVICES - Launching
+    {
+      id: 30105,
+      uraian: "Launching",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 163000000,
+      totalHarga: 163000000,
+      kelompok: "General & Finalization",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SHIPYARD SERVICES - Training dan familirization of Crews
+    {
+      id: 30106,
+      uraian: "Training dan familirization of Crews",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 314590000,
+      totalHarga: 314590000,
+      kelompok: "General & Finalization",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // SHIPYARD SERVICES - Delivery
+    {
+      id: 30107,
+      uraian: "Delivery",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 187450000,
+      totalHarga: 187450000,
+      kelompok: "General & Finalization",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // THIRD PARTY SERVICES - Class Supervision & Certificates
+    {
+      id: 30108,
+      uraian: "Class Supervision & Certificates",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 3080700000,
+      totalHarga: 3080700000,
+      kelompok: "General & Finalization",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // THIRD PARTY SERVICES - Flag State & Certificate
+    {
+      id: 30109,
+      uraian: "Flag State & Certificate",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 277100000,
+      totalHarga: 277100000,
+      kelompok: "General & Finalization",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // THIRD PARTY SERVICES - Insurance
+    {
+      id: 30110,
+      uraian: "Insurance",
+      satuan: "Lot",
+      qty: 1,
+      hargaSatuan: 4871593719.35,
+      totalHarga: 4871593719.35,
+      kelompok: "General & Finalization",
+      tahun: 2022,
+      infrastruktur: "Small Scale LNGC",
+      volume: 5000,
+      satuanVolume: "m³",
+      proyek: "Engineering Estimate LNG Bunkering Barge",
+      lokasi: "Jawa Timur",
+      tipe: "LNGC",
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+    },
+    // ...tambahkan data lain dari tabel sesuai kebutuhan...
   ],
   filterJenis: null, // bisa berupa { tipe, proyek }
 };

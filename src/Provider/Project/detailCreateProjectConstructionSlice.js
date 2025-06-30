@@ -98,10 +98,12 @@ const detailCreateProjectConstructionSlice = createSlice({
                   : value,
               totalHarga:
                 field === "qty"
-                  ? parseFloat(value) * item.hargaSatuan
+                  ? parseFloat(value) * (item.hargaSatuan || 0)
                   : field === "hargaSatuan"
-                  ? item.qty * parseFloat(value)
-                  : item.qty * item.hargaSatuan,
+                  ? (item.qty || 1) * parseFloat(value)
+                  : item.totalHarga !== undefined
+                  ? item.totalHarga
+                  : (item.qty || 1) * (item.hargaSatuan || 0),
             }
           : item
       );

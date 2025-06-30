@@ -202,11 +202,13 @@ const DetailCreateProjectConstructionModal = ({
         value: Math.round(hargaLokasiProject),
       })
     );
+    // PATCH: update totalHarga after hargaSatuan and qty
+    const qty = items[modal.itemIdx]?.qty || 1;
     dispatch(
       updateItem({
         idx: modal.itemIdx,
         field: "totalHarga",
-        value: items[modal.itemIdx].qty * Math.round(hargaLokasiProject),
+        value: qty * Math.round(hargaLokasiProject),
       })
     );
     dispatch(

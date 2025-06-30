@@ -120,17 +120,16 @@ const ProjectTable = () => {
     navigate("/construction-cost");
   };
 
-  const summary = getProjectSummary(selectedProject);
+  // const summary = getProjectSummary(selectedProject); // HAPUS/COMMENT agar tidak unused
 
-  // Ambil summary biaya dari constractionCost sesuai tipe project DAN nama project
+  // Ambil summary biaya dari constractionCost sesuai projectId
   let biayaSummary = null;
+  let summary = null;
   if (selectedProject) {
-    const summary = getProjectSummary(selectedProject);
-    // Filter juga berdasarkan nama project
+    summary = getProjectSummary(selectedProject);
+    // Filter hanya berdasarkan projectId
     const filteredCosts = costs.filter(
-      item =>
-        item.tipe === summary.tipe &&
-        item.proyek === selectedProject.name // pastikan nama project sama
+      item => item.projectId === selectedProject.id
     );
     const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (item.totalHarga || 0), 0);
     const ppn = totalHargaPekerjaan * 0.11;
@@ -288,23 +287,26 @@ const ProjectTable = () => {
               <tbody>
                 {projects.map((project, index) => {
                   // Ambil summary untuk tipe project
-                  const summary = getProjectSummary(project);
-                  // Filter juga berdasarkan nama project
+                  // Filter hanya berdasarkan projectId
                   const filteredCosts = costs.filter(
-                    item =>
-                      item.tipe === summary.tipe &&
-                      item.proyek === project.name // pastikan nama project sama
+                    item => item.projectId === project.id
                   );
                   // Hitung rata-rata aaceClass dari contraction cost (bulat, hanya angka)
                   let avgAACE = "";
                   if (filteredCosts.length > 0) {
                     const sumAACE = filteredCosts.reduce((sum, item) => sum + (parseInt(item.aaceClass) || 0), 0);
                     avgAACE = Math.round(sumAACE / filteredCosts.length);
+                  } else if (project.levelAACE) {
+                    avgAACE = project.levelAACE;
                   }
                   const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (item.totalHarga || 0), 0);
                   const ppn = totalHargaPekerjaan * 0.11;
                   const asuransi = totalHargaPekerjaan * 0.0025;
                   const totalPerkiraan = totalHargaPekerjaan + ppn + asuransi;
+                  // PATCH: fallback harga jika tidak ada detail cost
+                  const hargaTampil = filteredCosts.length > 0
+                    ? totalPerkiraan
+                    : project.harga || 0;
                   return (
                     <tr
                       key={project.id}
@@ -330,7 +332,7 @@ const ProjectTable = () => {
                       <td className="px-4 py-3">
                         Rp
                         <span className="text-green-500 font-semibold">
-                          {Number(totalPerkiraan).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                          {Number(hargaTampil).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                         </span>
                       </td>
                       <td className="flex items-center justify-center">

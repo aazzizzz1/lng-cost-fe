@@ -29,6 +29,44 @@ const satuanByJenis = {
   ORU: "m³ / MMSCFD",
 };
 
+// Tambahkan mapping khusus untuk LNGC
+const kelompokListLNGC = [
+  "Material & Equipment",
+  "Construction and Installation",
+  "Engineering & Management",
+  "Testing & Commissioning",
+  "General & Finalization"
+];
+
+const kelompokTemplatesLNGC = {
+  "Material & Equipment": [
+    { kode: "A", uraian: "HULL CONSTRUCTION & CONSUMABLE", isCategory: true },
+    { kode: "A.1", uraian: "Plate & Profile" },
+    { kode: "A.2", uraian: "Allowance plate & profile" },
+    { kode: "A.3", uraian: "Electrode" },
+    // ...tambahkan sub-item lain sesuai kebutuhan...
+    { kode: "B", uraian: "SURFACE PROTECTION & PAINTING", isCategory: true },
+    { kode: "B.1", uraian: "Sandblasting" },
+    // ...dst...
+  ],
+  "Construction and Installation": [
+    { kode: "C", uraian: "ROOM ACCOMODATION EQUIPMENT", isCategory: true },
+    // ...tambahkan sub-item lain sesuai kebutuhan...
+  ],
+  "Engineering & Management": [
+    { kode: "D", uraian: "SHIPYARD SERVICES", isCategory: true },
+    // ...tambahkan sub-item lain sesuai kebutuhan...
+  ],
+  "Testing & Commissioning": [
+    { kode: "E", uraian: "TESTING & COMMISSIONING", isCategory: true },
+    // ...tambahkan sub-item lain sesuai kebutuhan...
+  ],
+  "General & Finalization": [
+    { kode: "F", uraian: "THIRD PARTY SERVICES", isCategory: true },
+    // ...tambahkan sub-item lain sesuai kebutuhan...
+  ]
+};
+
 const DetailCreateProjectConstruction = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,11 +76,16 @@ const DetailCreateProjectConstruction = () => {
   const items = useSelector(selectItems);
   const modal = useSelector(selectModal);
 
+  // Gunakan kelompokList dan kelompokTemplates sesuai jenis project
+  const isLNGC = project?.jenis === "LNGC" || project?.jenis === "LNG Carrier";
+  const kelompokListUsed = isLNGC ? kelompokListLNGC : kelompokList;
+  const kelompokTemplatesUsed = isLNGC ? kelompokTemplatesLNGC : kelompokTemplates;
+
   // Generate initial items per kelompok (hanya saat mount)
   useEffect(() => {
     if ((!items || items.length === 0) && project) {
-      const initialItems = kelompokList.flatMap(kelompok =>
-        (kelompokTemplates[kelompok] || []).map(t =>
+      const initialItems = kelompokListUsed.flatMap(kelompok =>
+        (kelompokTemplatesUsed[kelompok] || []).map(t =>
           defaultItem(
             t.kode,
             t.uraian,
@@ -57,22 +100,33 @@ const DetailCreateProjectConstruction = () => {
       );
       dispatch(setItems(initialItems));
     }
-  }, [dispatch, items, project]);
+  }, [dispatch, items, project, kelompokListUsed, kelompokTemplatesUsed]);
 
   // Handler untuk field
   const handleItemChange = (idx, field, value) => {
-    dispatch(updateItem({ idx, field, value }));
+    // If qty or hargaSatuan, update totalHarga as well
+    if (field === "qty" || field === "hargaSatuan") {
+      const item = items[idx];
+      const qty = field === "qty" ? parseFloat(value) : parseFloat(item.qty || 1);
+      const hargaSatuan = field === "hargaSatuan" ? parseFloat(value) : parseFloat(item.hargaSatuan || 0);
+      dispatch(updateItem({ idx, field, value }));
+      dispatch(updateItem({ idx, field: "totalHarga", value: qty * hargaSatuan }));
+    } else {
+      dispatch(updateItem({ idx, field, value }));
+    }
   };
 
   // Tambah item pada kelompok tertentu
   const handleAddItem = (kelompok) => {
     const kelompokItems = items.filter(item => item.kelompok === kelompok && !item.isCategory);
+    // Gunakan kelompokTemplatesUsed, bukan kelompokTemplates
+    const templates = kelompokTemplatesUsed[kelompok] || [];
     let lastKode = kelompokItems.length > 0
       ? kelompokItems[kelompokItems.length - 1].kode
-      : kelompokTemplates[kelompok].find(t => t.isCategory)?.kode || "";
-    let base = lastKode.split('.')[0];
+      : (templates.find(t => t.isCategory)?.kode || "");
+    let base = typeof lastKode === "string" && lastKode.includes('.') ? lastKode.split('.')[0] : lastKode;
     let nextNum = kelompokItems.length + 1;
-    let newKode = `${base}.${nextNum}`;
+    let newKode = base ? `${base}.${nextNum}` : `${kelompok}.${nextNum}`;
     dispatch(addItem(
       defaultItem(
         newKode,
@@ -109,6 +163,7 @@ const DetailCreateProjectConstruction = () => {
         proyek: project?.name || "",
         tahun: project?.tahun,
         lokasi: project?.lokasi,
+        projectId: project?.id, // Pastikan projectId ikut
       }));
     dispatch({
       type: 'constractionCost/addProjectCosts',
@@ -119,7 +174,7 @@ const DetailCreateProjectConstruction = () => {
   };
 
   // Group items by kelompok
-  const grouped = kelompokList.reduce((acc, kelompok) => {
+  const grouped = kelompokListUsed.reduce((acc, kelompok) => {
     acc[kelompok] = items.filter(item => item.kelompok === kelompok);
     return acc;
   }, {});
@@ -201,7 +256,7 @@ const DetailCreateProjectConstruction = () => {
           handleSave();
         }}
       >
-        {kelompokList.map((kelompok, kidx) => (
+        {kelompokListUsed.map((kelompok, kidx) => (
           <div key={kelompok} className="mb-8">
             <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
             <div className="overflow-x-auto">

@@ -86,7 +86,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       }
     }
     const newProject = {
-      id: Date.now(),
+      id: Date.now(), // Auto generate project id
       name,
       jenis,
       kategori: kategoriFinal,
@@ -95,7 +95,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       levelAACE,
       harga: Number(harga),
       useGalileo,
-      volume: Number(volume), // Simpan volume
+      volume: Number(volume),
     };
     onCreate(newProject);
 
@@ -151,6 +151,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
           tahun: Number(tahun),
           lokasi,
           proyek: name,
+          projectId: newProject.id, // Pastikan projectId ikut
         };
       });
       dispatch(setItems(items));
