@@ -13,6 +13,7 @@ import transportReducer from './HargaSatuan/transportSlice'; // Tambahkan ini
 import liquifectionPlantReducer from './HargaSatuan/liquifectionPlantSlice'; // Pastikan penamaan dan path sudah benar
 import receivingTerminalReducer from './HargaSatuan/receivingTerminalSlice'; // Tambahkan ini
 import detailCreateProjectConstructionReducer from './Project/detailCreateProjectConstructionSlice'; // Corrected path
+import rabReducer from './RabSlice'; // Tambahkan import RabSlice
 
 export default configureStore({
   reducer: {
@@ -30,5 +31,6 @@ export default configureStore({
     liquifectionPlant: liquifectionPlantReducer, // Tambahkan ini
     receivingTerminal: receivingTerminalReducer, // Tambahkan ini
     detailCreateProjectConstruction: detailCreateProjectConstructionReducer, // Tambahkan ini
+    rab: rabReducer, // Tambahkan reducer rab di sini
   },
 });

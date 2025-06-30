@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux';
+import { addRabItem } from 'path-to-your-redux-slice'; // ganti dengan path yang sesuai
 
-const ModalUnitPriceRab = ({ onClose, onSubmit }) => {
+const ModalUnitPriceRab = ({ onClose }) => {
+  const dispatch = useDispatch();
   const [uraian, setUraian] = useState('');
   const [satuan, setSatuan] = useState('');
   const [qty, setQty] = useState(1);
@@ -8,17 +11,18 @@ const ModalUnitPriceRab = ({ onClose, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({
+    dispatch(addRabItem({
       uraian,
       satuan,
       qty: Number(qty),
       hargaSatuan: Number(hargaSatuan),
-    });
+    }));
     // reset form
     setUraian('');
     setSatuan('');
     setQty(1);
     setHargaSatuan(0);
+    onClose(); // tutup modal setelah submit
   };
 
   return (
@@ -90,3 +94,5 @@ const ModalUnitPriceRab = ({ onClose, onSubmit }) => {
 }
 
 export default ModalUnitPriceRab
+
+// Untuk penggunaan, dispatch(addRabItem(...)) di parent jika ingin dipakai
