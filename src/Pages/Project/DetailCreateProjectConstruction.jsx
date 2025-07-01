@@ -75,6 +75,7 @@ const DetailCreateProjectConstruction = () => {
   const project = projects.find(p => String(p.id) === String(id));
   const items = useSelector(selectItems);
   const modal = useSelector(selectModal);
+  const costs = useSelector(state => state.constractionCost.costs);
 
   // Gunakan kelompokList dan kelompokTemplates sesuai jenis project
   const isLNGC = project?.jenis === "LNGC" || project?.jenis === "LNG Carrier";
@@ -208,6 +209,39 @@ const DetailCreateProjectConstruction = () => {
     return inf ? inf.value : "";
   })();
 
+  // --- REKOMENDASI VOLUME TERDEKAT (lebih kecil) ---
+  // Cek jika items kosong dan project ada volume
+  let rekomendasiVolume = null;
+  if (items.length === 0 && project?.volume) {
+    const summaryJenis = (() => {
+      if (project.jenis.toLowerCase().includes("fsru")) return "FSRU";
+      if (project.jenis.toLowerCase().includes("plant")) return "LNG Plant";
+      if (project.jenis.toLowerCase().includes("carrier")) return "LNGC";
+      return project.jenis;
+    })();
+    // Cari cost dengan volume persis
+    let matchedCosts = costs.filter(
+      (item) =>
+        String(item.tipe).toLowerCase() === String(summaryJenis).toLowerCase() &&
+        Number(item.volume) === Number(project.volume)
+    );
+    // Jika tidak ada, cari volume terbesar yang lebih kecil
+    if (matchedCosts.length === 0) {
+      const candidates = costs.filter(
+        (item) =>
+          String(item.tipe).toLowerCase() === String(summaryJenis).toLowerCase() &&
+          Number(item.volume) < Number(project.volume)
+      );
+      if (candidates.length > 0) {
+        const maxVolume = Math.max(...candidates.map((item) => Number(item.volume)));
+        matchedCosts = candidates.filter((item) => Number(item.volume) === maxVolume);
+        if (matchedCosts.length > 0) {
+          rekomendasiVolume = maxVolume;
+        }
+      }
+    }
+  }
+
   return (
     <div className="p-4">
       {/* text gambaran umum judul */}
@@ -256,6 +290,15 @@ const DetailCreateProjectConstruction = () => {
           handleSave();
         }}
       >
+        {/* Rekomendasi volume terdekat */}
+        {rekomendasiVolume && (
+          <div className="mb-4 p-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded">
+            <div>
+              <b>Rekomendasi:</b> Tidak ditemukan data volume {project.volume} di database. 
+              Menampilkan rekomendasi berdasarkan volume terbesar yang lebih kecil: <b>{rekomendasiVolume}</b>.
+            </div>
+          </div>
+        )}
         {kelompokListUsed.map((kelompok, kidx) => (
           <div key={kelompok} className="mb-8">
             <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>

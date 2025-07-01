@@ -108,12 +108,28 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       return jenis;
     })();
     // Cari cost yang cocok (jenis & volume)
-    const matchedCosts = costs.filter(
+    let matchedCosts = costs.filter(
       (item) =>
         String(item.tipe).toLowerCase() ===
           String(summaryJenis).toLowerCase() &&
         Number(item.volume) === Number(volume)
     );
+    // Jika tidak ada volume yang sama persis, ambil volume terbesar yang lebih kecil
+    if (matchedCosts.length === 0) {
+      // Cari semua cost dengan tipe yang sama dan volume <= volume input
+      const candidates = costs
+        .filter(
+          (item) =>
+            String(item.tipe).toLowerCase() ===
+              String(summaryJenis).toLowerCase() &&
+            Number(item.volume) <= Number(volume)
+        );
+      if (candidates.length > 0) {
+        // Ambil volume terbesar yang lebih kecil
+        const maxVolume = Math.max(...candidates.map((item) => Number(item.volume)));
+        matchedCosts = candidates.filter((item) => Number(item.volume) === maxVolume);
+      }
+    }
     if (matchedCosts.length > 0) {
       // Penyesuaian harga satuan (tahun, lokasi, inflasi)
       const inflasiProject = (() => {
