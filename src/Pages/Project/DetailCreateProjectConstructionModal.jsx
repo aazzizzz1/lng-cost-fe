@@ -223,7 +223,8 @@ const DetailCreateProjectConstructionModal = ({
       // Rumus Capacity Factor:
       // qty_target = qty_base * (volume_target / volume_base)^n
       // n biasanya 0.6-0.7, gunakan 0.65
-      const factor = 0.65;
+      // hitung sendiri dengan koefisiensi 0.73 sudah sesuai
+      const factor = 0.73;
       return baseQty * Math.pow(targetVolume / baseVolume, factor);
     };
     const adjustedQty = calculateQuantityUsingCapacityFactor(
