@@ -6,13 +6,11 @@ const formatCurrency = (value) =>
   value ? `Rp${Number(value).toLocaleString()}` : "";
 
 const kelompokList = [
-  "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN",
-  "SUPPORTING WORK",
-  "PENYEDIAAN MATERIAL",
-  "PEKERJAAN PEMASANGAN DAN PENGUJIAN",
-  "PEKERJAAN KHUSUS/FINISHING",
-  "PEKERJAAN DOKUMENTASI",
-  "PEKERJAAN COMMISSIONING & TRIAL OPERATION",
+  "Material & Equipment",
+  "Construction and Installation",
+  "Engineering & Management",
+  "Testing & Commissioning",
+  "General & Finalization",
 ];
 
 const getUniqueItems = (costs, selectedProjects) => {

@@ -1,53 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// List kelompok pekerjaan konstruksi
-export const kelompokList = [
-  "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN",
-  "SUPPORTING WORK",
-  "PENYEDIAAN MATERIAL",
-  "PEKERJAAN PEMASANGAN DAN PENGUJIAN",
-  "PEKERJAAN KHUSUS/FINISHING",
-  "PEKERJAAN DOKUMENTASI",
-  "PEKERJAAN COMMISSIONING & TRIAL OPERATION"
-];
-
-// Template kode dan uraian per kelompok
-export const kelompokTemplates = {
-  "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN": [
-    { kode: "A", uraian: "PREPARATION", isCategory: true },
-    { kode: "A.1", uraian: "PROJECT MANAGEMENT EPCC" },
-    { kode: "A.2", uraian: "PROJECT FACILITY" },
-    { kode: "A.3", uraian: "WORK PERMIT" }
-  ],
-  "SUPPORTING WORK": [
-    { kode: "B", uraian: "SUPPORTING WORK", isCategory: true },
-    { kode: "B.1", uraian: "ENGINEERING WORK" },
-    { kode: "B.2", uraian: "PROCUREMENT & CONSTRUCTION" }
-  ],
-  "PENYEDIAAN MATERIAL": [
-    { kode: "C", uraian: "PENYEDIAAN MATERIAL", isCategory: true },
-    { kode: "C.1", uraian: "MATERIAL UTAMA" },
-    { kode: "C.2", uraian: "MATERIAL PENDUKUNG" }
-  ],
-  "PEKERJAAN PEMASANGAN DAN PENGUJIAN": [
-    { kode: "D", uraian: "PEMASANGAN DAN PENGUJIAN", isCategory: true },
-    { kode: "D.1", uraian: "INSTALASI" },
-    { kode: "D.2", uraian: "PENGUJIAN" }
-  ],
-  "PEKERJAAN KHUSUS/FINISHING": [
-    { kode: "E", uraian: "KHUSUS/FINISHING", isCategory: true },
-    { kode: "E.1", uraian: "FINISHING" }
-  ],
-  "PEKERJAAN DOKUMENTASI": [
-    { kode: "F", uraian: "DOKUMENTASI", isCategory: true },
-    { kode: "F.1", uraian: "LAPORAN" }
-  ],
-  "PEKERJAAN COMMISSIONING & TRIAL OPERATION": [
-    { kode: "G", uraian: "COMMISSIONING & TRIAL OPERATION", isCategory: true },
-    { kode: "G.1", uraian: "COMMISSIONING" }
-  ]
-};
-
 // Fungsi default item
 export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe, isCategory = false) => ({
   kode,
