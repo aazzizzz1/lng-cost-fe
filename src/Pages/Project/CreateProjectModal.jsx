@@ -146,6 +146,13 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
         );
         return prov ? prov.cci : 100;
       })();
+      const calculateQuantityUsingCapacityFactor = (baseQty, baseVolume, targetVolume) => {
+        // Rumus Capacity Factor:
+        // qty_target = qty_base * (volume_target / volume_base)^n
+        // n biasanya 0.6-0.7, gunakan 0.65
+        const factor = 0.65;
+        return baseQty * Math.pow(targetVolume / baseVolume, factor);
+      };
       const items = matchedCosts.map((row) => {
         const tahunItem = row.tahun || tahun;
         const lokasiItem = row.lokasi || lokasi;
@@ -160,10 +167,16 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
         let hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem);
         const cciProject = getCCI(lokasi);
         let hargaLokasiProject = hargaBanjarmasin * (cciProject / 100);
+        const adjustedQty = calculateQuantityUsingCapacityFactor(
+          row.qty || 1,
+          row.volume || 1,
+          volume || 1
+        );
         return {
           ...row,
           hargaSatuan: Math.round(hargaLokasiProject),
-          totalHarga: (row.qty || 1) * Math.round(hargaLokasiProject),
+          totalHarga: Math.round(adjustedQty * hargaLokasiProject),
+          qty: Math.round(adjustedQty),
           tahun: Number(tahun),
           lokasi,
           proyek: name,
