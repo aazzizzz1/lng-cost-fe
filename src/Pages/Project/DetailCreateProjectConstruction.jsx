@@ -1,10 +1,8 @@
-import React, { useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { setFilterJenis } from '../../Provider/Project/ConstractionCostSlice';
 import {
-  kelompokList,
-  kelompokTemplates,
   defaultItem,
   setItems,
   updateItem,
@@ -13,9 +11,9 @@ import {
   selectItems,
   openModal,
   closeModal,
-  selectModal
-} from '../../Provider/Project/detailCreateProjectConstructionSlice'
-import DetailCreateProjectConstructionModal from './DetailCreateProjectConstructionModal'
+  selectModal,
+} from '../../Provider/Project/detailCreateProjectConstructionSlice';
+import DetailCreateProjectConstructionModal from './DetailCreateProjectConstructionModal';
 
 const satuanByJenis = {
   "Onshore LNG Plant": "MTPA",
@@ -29,63 +27,37 @@ const satuanByJenis = {
   ORU: "m³ / MMSCFD",
 };
 
-// Tambahkan mapping khusus untuk LNGC
-const kelompokListLNGC = [
-  "Material & Equipment",
-  "Construction and Installation",
-  "Engineering & Management",
-  "Testing & Commissioning",
-  "General & Finalization"
-];
-
-const kelompokTemplatesLNGC = {
-  "Material & Equipment": [
-    { kode: "A", uraian: "HULL CONSTRUCTION & CONSUMABLE", isCategory: true },
-    { kode: "A.1", uraian: "Plate & Profile" },
-    { kode: "A.2", uraian: "Allowance plate & profile" },
-    { kode: "A.3", uraian: "Electrode" },
-    // ...tambahkan sub-item lain sesuai kebutuhan...
-    { kode: "B", uraian: "SURFACE PROTECTION & PAINTING", isCategory: true },
-    { kode: "B.1", uraian: "Sandblasting" },
-    // ...dst...
-  ],
-  "Construction and Installation": [
-    { kode: "C", uraian: "ROOM ACCOMODATION EQUIPMENT", isCategory: true },
-    // ...tambahkan sub-item lain sesuai kebutuhan...
-  ],
-  "Engineering & Management": [
-    { kode: "D", uraian: "SHIPYARD SERVICES", isCategory: true },
-    // ...tambahkan sub-item lain sesuai kebutuhan...
-  ],
-  "Testing & Commissioning": [
-    { kode: "E", uraian: "TESTING & COMMISSIONING", isCategory: true },
-    // ...tambahkan sub-item lain sesuai kebutuhan...
-  ],
-  "General & Finalization": [
-    { kode: "F", uraian: "THIRD PARTY SERVICES", isCategory: true },
-    // ...tambahkan sub-item lain sesuai kebutuhan...
-  ]
-};
-
 const DetailCreateProjectConstruction = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const projects = useSelector(state => state.projects.projects);
-  const project = projects.find(p => String(p.id) === String(id));
+  const projects = useSelector((state) => state.projects.projects);
+  const project = projects.find((p) => String(p.id) === String(id));
   const items = useSelector(selectItems);
   const modal = useSelector(selectModal);
+  const costs = useSelector((state) => state.constractionCost.costs);
 
-  // Gunakan kelompokList dan kelompokTemplates sesuai jenis project
-  const isLNGC = project?.jenis === "LNGC" || project?.jenis === "LNG Carrier";
-  const kelompokListUsed = isLNGC ? kelompokListLNGC : kelompokList;
-  const kelompokTemplatesUsed = isLNGC ? kelompokTemplatesLNGC : kelompokTemplates;
+  // Memoize kelompokListUsed to avoid unnecessary recalculations
+  const kelompokListUsed = useMemo(() => [...new Set(costs.map((cost) => cost.kelompok))], [costs]);
 
-  // Generate initial items per kelompok (hanya saat mount)
+  const kelompokTemplatesUsed = useMemo(() => {
+    return kelompokListUsed.reduce((acc, kelompok) => {
+      acc[kelompok] = costs
+        .filter((cost) => cost.kelompok === kelompok)
+        .map((cost) => ({
+          kode: cost.id,
+          uraian: cost.detailKelompok || cost.uraian,
+          isCategory: false,
+        }));
+      return acc;
+    }, {});
+  }, [kelompokListUsed, costs]);
+
+  // Generate initial items per kelompok (only on mount)
   useEffect(() => {
     if ((!items || items.length === 0) && project) {
-      const initialItems = kelompokListUsed.flatMap(kelompok =>
-        (kelompokTemplatesUsed[kelompok] || []).map(t =>
+      const initialItems = kelompokListUsed.flatMap((kelompok) =>
+        (kelompokTemplatesUsed[kelompok] || []).map((t) =>
           defaultItem(
             t.kode,
             t.uraian,
@@ -102,9 +74,8 @@ const DetailCreateProjectConstruction = () => {
     }
   }, [dispatch, items, project, kelompokListUsed, kelompokTemplatesUsed]);
 
-  // Handler untuk field
+  // Handler for field changes
   const handleItemChange = (idx, field, value) => {
-    // If qty or hargaSatuan, update totalHarga as well
     if (field === "qty" || field === "hargaSatuan") {
       const item = items[idx];
       const qty = field === "qty" ? parseFloat(value) : parseFloat(item.qty || 1);
@@ -116,42 +87,42 @@ const DetailCreateProjectConstruction = () => {
     }
   };
 
-  // Tambah item pada kelompok tertentu
+  // Add item to a specific kelompok
   const handleAddItem = (kelompok) => {
-    const kelompokItems = items.filter(item => item.kelompok === kelompok && !item.isCategory);
-    // Gunakan kelompokTemplatesUsed, bukan kelompokTemplates
+    const kelompokItems = items.filter((item) => item.kelompok === kelompok && !item.isCategory);
     const templates = kelompokTemplatesUsed[kelompok] || [];
     let lastKode = kelompokItems.length > 0
       ? kelompokItems[kelompokItems.length - 1].kode
-      : (templates.find(t => t.isCategory)?.kode || "");
+      : (templates.find((t) => t.isCategory)?.kode || "");
     let base = typeof lastKode === "string" && lastKode.includes('.') ? lastKode.split('.')[0] : lastKode;
     let nextNum = kelompokItems.length + 1;
     let newKode = base ? `${base}.${nextNum}` : `${kelompok}.${nextNum}`;
-    dispatch(addItem(
-      defaultItem(
-        newKode,
-        "",
-        kelompok,
-        project?.tahun,
-        project?.name,
-        project?.lokasi,
-        project?.jenis
+    dispatch(
+      addItem(
+        defaultItem(
+          newKode,
+          "",
+          kelompok,
+          project?.tahun,
+          project?.name,
+          project?.lokasi,
+          project?.jenis
+        )
       )
-    ));
+    );
   };
 
-  // Hapus item (tidak boleh hapus kategori utama)
+  // Delete item (categories cannot be deleted)
   const handleDeleteItem = (idx) => {
     dispatch(deleteItem(idx));
   };
 
-  // Simpan ke dummy construction cost slice
+  // Save to dummy construction cost slice
   const handleSave = () => {
     const itemsWithId = items
-      .filter(item => !item.isCategory || item.hargaSatuan > 0 || item.uraian)
+      .filter((item) => !item.isCategory || item.hargaSatuan > 0 || item.uraian)
       .map((item) => ({
         ...item,
-        // id akan diisi oleh reducer agar unik
         accuracyLow: -15,
         accuracyHigh: 20,
         infrastruktur: project?.kategori || "",
@@ -163,7 +134,7 @@ const DetailCreateProjectConstruction = () => {
         proyek: project?.name || "",
         tahun: project?.tahun,
         lokasi: project?.lokasi,
-        projectId: project?.id, // Pastikan projectId ikut
+        projectId: project?.id,
       }));
     dispatch({
       type: 'constractionCost/addProjectCosts',
@@ -175,25 +146,22 @@ const DetailCreateProjectConstruction = () => {
 
   // Group items by kelompok
   const grouped = kelompokListUsed.reduce((acc, kelompok) => {
-    acc[kelompok] = items.filter(item => item.kelompok === kelompok);
+    acc[kelompok] = items.filter((item) => item.kelompok === kelompok);
     return acc;
   }, {});
 
-  // Ambil data material, jasa, package, dan transport dari redux
-  const materialList = useSelector(state => state.material.dataMaterial || []);
-  const jasaList = useSelector(state => state.jasa.jasa || []);
-  const packageList = useSelector(state => state.materialAndPackage.packages || []);
-  const transportList = useSelector(state => state.transport.data || []);
-  const provinces = useSelector(state => state.administrator.provinces || []);
-  const inflasiList = useSelector(state => state.administrator.inflasi || []);
+  // Fetch additional data for modal
+  const materialList = useSelector((state) => state.material.dataMaterial || []);
+  const jasaList = useSelector((state) => state.jasa.jasa || []);
+  const packageList = useSelector((state) => state.materialAndPackage.packages || []);
+  const transportList = useSelector((state) => state.transport.data || []);
+  const provinces = useSelector((state) => state.administrator.provinces || []);
+  const inflasiList = useSelector((state) => state.administrator.inflasi || []);
+  const liquifectionPlantList = useSelector((state) => state.liquifectionPlant.data || []);
+  const transportasiList = useSelector((state) => state.transport.data || []);
+  const receivingTerminalList = useSelector((state) => state.receivingTerminal.data || []);
+  const materialAndPackageList = useSelector((state) => state.materialAndPackage.packages || []);
 
-  // Tambahan: data sumber lain
-  const liquifectionPlantList = useSelector(state => state.liquifectionPlant.data || []);
-  const transportasiList = useSelector(state => state.transport.data || []);
-  const receivingTerminalList = useSelector(state => state.receivingTerminal.data || []);
-  const materialAndPackageList = useSelector(state => state.materialAndPackage.packages || []);
-
-  // Handler untuk buka modal, dipanggil dari tombol di tabel
   const handleOpenModal = (type, idx) => {
     dispatch(openModal({ type, itemIdx: idx, search: "" }));
   };
@@ -201,14 +169,11 @@ const DetailCreateProjectConstruction = () => {
     dispatch(closeModal());
   };
 
-  // Ambil inflasi dari inflasiList
   const inflasi = (() => {
     if (!project?.tahun) return "";
-    const inf = inflasiList.find(i => Number(i.year) === Number(project.tahun));
+    const inf = inflasiList.find((i) => Number(i.year) === Number(project.tahun));
     return inf ? inf.value : "";
   })();
-
-  
 
   return (
     <div className="p-4">
@@ -253,13 +218,12 @@ const DetailCreateProjectConstruction = () => {
       </div>
       {/* END Gambaran Umum Project */}
       <form
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault();
           handleSave();
         }}
       >
-       
-        {kelompokListUsed.map((kelompok, kidx) => (
+        {kelompokListUsed.map((kelompok) => (
           <div key={kelompok} className="mb-8">
             <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
             <div className="overflow-x-auto">
@@ -434,4 +398,4 @@ const DetailCreateProjectConstruction = () => {
   );
 };
 
-export default DetailCreateProjectConstruction
+export default DetailCreateProjectConstruction;

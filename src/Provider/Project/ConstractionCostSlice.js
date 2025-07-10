@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   costs: [
-    // === PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN ===
     {
       id: 1,
       uraian: "Project Management",
@@ -13,7 +12,8 @@ const initialState = {
       aaceClass: 2,
       accuracyLow: -15,
       accuracyHigh: 20,
-      kelompok: "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN",
+      kelompok: "Engineering & Management",
+      detailKelompok: "Project Management",
       tahun: 2023,
       infrastruktur: "Big Scale FSRU",
       volume: 200000,
@@ -23,11 +23,11 @@ const initialState = {
       proyek: "FSRU Lampung",
       lokasi: "Jawa Timur",
       tipe: "FSRU",
-      projectId: 100, // Tambahkan projectId
+      projectId: 100,
     },
     {
       id: 2,
-      uraian: "Ijin MIGAS -  Certificate of Inspection (COI) PSV",
+      uraian: "Certificate of Inspection (COI) PSV",
       satuan: "Ls",
       qty: 1,
       hargaSatuan: 25000000,
@@ -35,7 +35,8 @@ const initialState = {
       aaceClass: 2,
       accuracyLow: -15,
       accuracyHigh: 20,
-      kelompok: "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN",
+      kelompok: "Testing & Commissioning",
+      detailKelompok: "Inspection",
       tahun: 2023,
       infrastruktur: "Big Scale FSRU",
       volume: 200000,
@@ -49,7 +50,7 @@ const initialState = {
     },
     {
       id: 3,
-      uraian: "Ijin Lingkungan",
+      uraian: "Environmental Permit",
       satuan: "Ls",
       qty: 1,
       hargaSatuan: 100000000,
@@ -57,7 +58,8 @@ const initialState = {
       aaceClass: 2,
       accuracyLow: -15,
       accuracyHigh: 20,
-      kelompok: "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN",
+      kelompok: "General & Finalization",
+      detailKelompok: "Permits",
       tahun: 2023,
       infrastruktur: "Big Scale FSRU",
       volume: 200000,
@@ -71,7 +73,7 @@ const initialState = {
     },
     {
       id: 4,
-      uraian: "Ijin Mendirikan Bangunan (IMB)",
+      uraian: "Building Permit (IMB)",
       satuan: "Ls",
       qty: 1,
       hargaSatuan: 205500801,
@@ -79,7 +81,54 @@ const initialState = {
       aaceClass: 2,
       accuracyLow: -15,
       accuracyHigh: 20,
-      kelompok: "PROJECT MANAGEMENT DAN PEKERJAAN PERSIAPAN",
+      kelompok: "General & Finalization",
+      detailKelompok: "Permits",
+      tahun: 2023,
+      infrastruktur: "Big Scale FSRU",
+      volume: 200000,
+      satuanVolume: "m³",
+      kapasitasRegasifikasi: 250,
+      satuanKapasitas: "MMSCFD",
+      proyek: "FSRU Lampung",
+      lokasi: "Jawa Timur",
+      tipe: "FSRU",
+      projectId: 100,
+    },
+    {
+      id: 5,
+      uraian: "Soil Investigation",
+      satuan: "Titik",
+      qty: 1,
+      hargaSatuan: 104250933.15,
+      totalHarga: 104250933.15,
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+      kelompok: "Material & Equipment",
+      detailKelompok: "Investigation",
+      tahun: 2023,
+      infrastruktur: "Big Scale FSRU",
+      volume: 200000,
+      satuanVolume: "m³",
+      kapasitasRegasifikasi: 250,
+      satuanKapasitas: "MMSCFD",
+      proyek: "FSRU Lampung",
+      lokasi: "Jawa Timur",
+      tipe: "FSRU",
+      projectId: 100,
+    },
+    {
+      id: 6,
+      uraian: "Survey and Drawing",
+      satuan: "Ls",
+      qty: 1,
+      hargaSatuan: 6728996.86,
+      totalHarga: 6728996.86,
+      aaceClass: 2,
+      accuracyLow: -15,
+      accuracyHigh: 20,
+      kelompok: "Material & Equipment",
+      detailKelompok: "Survey",
       tahun: 2023,
       infrastruktur: "Big Scale FSRU",
       volume: 200000,
@@ -93,8 +142,8 @@ const initialState = {
     },
     // === SUPPORTING WORK ===
     {
-      id: 5,
-      uraian: "Pekerjaan Soil Investigation + Laporan + Penentuan Kedalaman Pondasi",
+      id: 7,
+      uraian: "Soil Investigation + Report + Foundation Depth Determination",
       satuan: "Titik",
       qty: 1,
       hargaSatuan: 104250933.15,
@@ -115,8 +164,8 @@ const initialState = {
       projectId: 100,
     },
     {
-      id: 6,
-      uraian: "Pekerjaan Survey Lokasi dan Pembuatan Gambar",
+      id: 8,
+      uraian: "Site Survey and Drawing",
       satuan: "Ls",
       qty: 1,
       hargaSatuan: 6728996.86,
@@ -136,7 +185,6 @@ const initialState = {
       tipe: "FSRU",
       projectId: 100,
     },
-    // ...tambahkan data lain sesuai kelompok...
     // === PENYEDIAAN MATERIAL ===
     {
       id: 100,
@@ -1515,7 +1563,8 @@ const initialState = {
       qty: 1,
       hargaSatuan: 49347920564.45,
       totalHarga: 49347920564.45,
-      kelompok: "General & Finalization",
+      kelompok: "General & Finalization", // Updated kelompok
+      detailKelompok: "Overhead Cost", // Added detailKelompok
       tahun: 2022,
       infrastruktur: "Small Scale LNGC",
       volume: 5000,
@@ -1615,7 +1664,8 @@ const initialState = {
       qty: 1,
       hargaSatuan: 163000000,
       totalHarga: 163000000,
-      kelompok: "General & Finalization",
+      kelompok: "General & Finalization", // Updated kelompok
+      detailKelompok: "Launching", // Added detailKelompok
       tahun: 2022,
       infrastruktur: "Small Scale LNGC",
       volume: 5000,
@@ -1635,7 +1685,8 @@ const initialState = {
       qty: 1,
       hargaSatuan: 314590000,
       totalHarga: 314590000,
-      kelompok: "General & Finalization",
+      kelompok: "General & Finalization", // Updated kelompok
+      detailKelompok: "Training & Familiarization", // Added detailKelompok
       tahun: 2022,
       infrastruktur: "Small Scale LNGC",
       volume: 5000,
@@ -1655,7 +1706,8 @@ const initialState = {
       qty: 1,
       hargaSatuan: 187450000,
       totalHarga: 187450000,
-      kelompok: "General & Finalization",
+      kelompok: "General & Finalization", // Updated kelompok
+      detailKelompok: "Delivery", // Added detailKelompok
       tahun: 2022,
       infrastruktur: "Small Scale LNGC",
       volume: 5000,
@@ -1675,7 +1727,8 @@ const initialState = {
       qty: 1,
       hargaSatuan: 3080700000,
       totalHarga: 3080700000,
-      kelompok: "General & Finalization",
+      kelompok: "General & Finalization", // Updated kelompok
+      detailKelompok: "Class Supervision & Certificates", // Added detailKelompok
       tahun: 2022,
       infrastruktur: "Small Scale LNGC",
       volume: 5000,
@@ -1695,7 +1748,8 @@ const initialState = {
       qty: 1,
       hargaSatuan: 277100000,
       totalHarga: 277100000,
-      kelompok: "General & Finalization",
+      kelompok: "General & Finalization", // Updated kelompok
+      detailKelompok: "Flag State & Certificate", // Added detailKelompok
       tahun: 2022,
       infrastruktur: "Small Scale LNGC",
       volume: 5000,
@@ -1715,7 +1769,8 @@ const initialState = {
       qty: 1,
       hargaSatuan: 4871593719.35,
       totalHarga: 4871593719.35,
-      kelompok: "General & Finalization",
+      kelompok: "General & Finalization", // Updated kelompok
+      detailKelompok: "Insurance", // Added detailKelompok
       tahun: 2022,
       infrastruktur: "Small Scale LNGC",
       volume: 5000,
