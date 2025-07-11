@@ -38,44 +38,44 @@ const TransportPages = () => {
   const navigate = useNavigate();
 
   const [tipeTabs, setTipeTabs] = useState([]);
-  const [kategoriList, setKategoriList] = useState([]);
+  const [kelompokList, setKelompokList] = useState([]);
 
   useEffect(() => {
     dispatch(fetchTransportData());
   }, [dispatch]);
 
   useEffect(() => {
-    // Extract unique `tipe` and `kategori` values from the data
-    const uniqueTipe = [...new Set(data.map((item) => item.tipe))].map((tipe) => ({
-      label: tipe,
-      value: tipe.toLowerCase().replace(/\s+/g, ''),
+    // Extract unique `infrastruktur` and `kelompok` values from the data
+    const uniqueTipe = [...new Set(data.map((item) => item.infrastruktur))].map((infrastruktur) => ({
+      label: infrastruktur,
+      value: infrastruktur.toLowerCase().replace(/\s+/g, ''),
     }));
-    const uniqueKategori = [...new Set(data.map((item) => item.kategori))];
+    const uniqueKelompok = [...new Set(data.map((item) => item.kelompok))];
     setTipeTabs(uniqueTipe);
-    setKategoriList(uniqueKategori);
+    setKelompokList(uniqueKelompok);
   }, [data]);
 
-  // Ambil tab dan kategori dari query string
+  // Ambil tab dan kelompok dari query string
   const tab = query.get('tab') || (tipeTabs[0]?.value || '');
-  const kategori = query.get('kategori') || '';
+  const kelompok = query.get('kelompok') || '';
 
   // Filtering logic
   const filteredData = useMemo(() => {
-    let d = data.filter((item) => item.tipe.toLowerCase().replace(/\s+/g, '') === tab);
-    if (kategori && kategoriList.includes(kategori)) {
-      d = d.filter((item) => item.kategori === kategori);
+    let d = data.filter((item) => item.infrastruktur.toLowerCase().replace(/\s+/g, '') === tab);
+    if (kelompok && kelompokList.includes(kelompok)) {
+      d = d.filter((item) => item.kelompok === kelompok);
     }
     return d;
-  }, [data, tab, kategori, kategoriList]);
+  }, [data, tab, kelompok, kelompokList]);
 
   // Tabs navigation
   const handleTabClick = (tabValue) => {
-    navigate(`/transport?tab=${tabValue}${kategori ? `&kategori=${encodeURIComponent(kategori)}` : ''}`);
+    navigate(`/transport?tab=${tabValue}${kelompok ? `&kelompok=${encodeURIComponent(kelompok)}` : ''}`);
   };
 
-  // Kategori navigation
-  const handleKategoriClick = (kat) => {
-    navigate(`/transport?tab=${tab}${kat ? `&kategori=${encodeURIComponent(kat)}` : ''}`);
+  // Kelompok navigation
+  const handleKelompokClick = (kel) => {
+    navigate(`/transport?tab=${tab}${kel ? `&kelompok=${encodeURIComponent(kel)}` : ''}`);
   };
 
   return (
@@ -100,30 +100,30 @@ const TransportPages = () => {
             </button>
           ))}
         </div>
-        {/* Filter kategori */}
+        {/* Filter kelompok */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {kategoriList.map((kat) => (
+          {kelompokList.map((kel) => (
             <button
-              key={kat}
+              key={kel}
               className={`px-3 py-1 rounded border ${
-                kategori === kat
+                kelompok === kel
                   ? "bg-primary-700 text-white border-primary-700"
                   : "bg-white dark:bg-gray-800 text-gray-700 border-gray-300"
               }`}
-              onClick={() => handleKategoriClick(kat)}
+              onClick={() => handleKelompokClick(kel)}
             >
-              {kat}
+              {kel}
             </button>
           ))}
           <button
             className={`px-3 py-1 rounded border ${
-              !kategori
+              !kelompok
                 ? "bg-primary-700 text-white border-primary-700"
                 : "bg-white dark:bg-gray-800 text-gray-700 border-gray-300"
             }`}
-            onClick={() => handleKategoriClick("")}
+            onClick={() => handleKelompokClick("")}
           >
-            Semua Kategori
+            Semua Kelompok
           </button>
         </div>
         {/* Table */}
