@@ -8,8 +8,10 @@ import ErrorButton from "../../Components/Button/ErrorButton";
 import TooltipAuth from "../../Components/Tooltip/TooltipAuth";
 import EyeOpenIcon from "../../Assets/Svg/Auth/EyeOpenIcon";
 import EyeClosedIcon from "../../Assets/Svg/Auth/EyeClosedIcon";
-import LogoLen from "../../Assets/Images/logonddu.svg";
-import BackGround from "../../Assets/Svg/Auth/BackgorundAuth.png";
+// import LogoLen from "../../Assets/Images/logonddu.svg";
+import LogoLng from "../../Assets/Images/Logolng.png";
+import BackgroundLNG from "../../Assets/Images/PLI.jpeg";
+// import BackGround from "../../Assets/Svg/Auth/BackgorundAuth.png";
 
 const SignUp = () => {
   //Memanggil state dari GlobalContext dan dari destructuring dibawah ini
@@ -46,7 +48,7 @@ const SignUp = () => {
       <div
         className="min-h-screen flex items-center justify-center"
         style={{
-          backgroundImage: `url(${BackGround})`,
+          backgroundImage: `url(${BackgroundLNG})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
@@ -55,7 +57,7 @@ const SignUp = () => {
           <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
             <img
               className="w-40 h-30"
-              src={LogoLen}
+              src={LogoLng}
               alt="Logo-Len"
               border="0"
             />
@@ -82,7 +84,7 @@ const SignUp = () => {
                     name="full_name"
                     id="full_name"
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder="Abdul Aziz"
+                    placeholder="lngjaya"
                     required
                   />
                   {formSubmitted && !inputSignUp.full_name && (
@@ -110,7 +112,7 @@ const SignUp = () => {
                         ? "border-red-600"
                         : ""
                     }`}
-                    placeholder="PT Len Industri"
+                    placeholder="PGN LNG Indonesia"
                     required
                   />
                   {formSubmitted && !inputSignUp.username && (

@@ -1,6 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import 'handsontable/styles/handsontable.css';
+@import 'handsontable/styles/ht-theme-main.css';
 
 .overflow-hidden .bg-gray-900 {
     --tw-bg-opacity: 0;
@@ -32,6 +34,6 @@
   border-radius: 3px; /* Sudut track scroll bar */
 }
 
-/* body {
-  background-color: #f9fafb;
-} */
+::-webkit-scrollbar:horizontal {
+  height: 8px; /* Tinggi scrollbar horizontal */
+}

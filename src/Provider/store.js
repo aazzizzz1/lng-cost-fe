@@ -1,18 +1,36 @@
 import { configureStore } from '@reduxjs/toolkit';
-import positionReducer from './positionSlice';
-import simulatorReducer from './simulatorSlice';
-import selftestReducer from './selftestSlice';
-import matrixReducer from './matrixSlice';
-import objectReducer from './objectSlice';
 import authReducer from './AuthSlice'; // Import auth reducer
+import projectReducer from './Project/ProjectSlice'; // Corrected path
+import jasaReducer from './HargaSatuan/jasaSlice'; // Import jasa reducer
+import layoutReducer from './layoutSlice'; // Import layout reducer
+import materialReducer from './HargaSatuan/materialSlice'; // Import material reducer
+import constractionCostReducer from './Project/ConstractionCostSlice'; // Corrected path
+import materialAndPackageReducer from './HargaSatuan/MaterialAndPackageSlice'; // Import materialAndPackage reducer
+import globalReducer from './GlobalSlice'; // Tambahkan ini
+import capacityFactorReducer from './CapacityFactorSlice'; // Tambahkan import
+import administratorReducer from './administratorSlice'; // Tambahkan import
+import transportReducer from './HargaSatuan/transportSlice'; // Tambahkan ini
+import liquifectionPlantReducer from './HargaSatuan/liquifectionPlantSlice'; // Pastikan penamaan dan path sudah benar
+import receivingTerminalReducer from './HargaSatuan/receivingTerminalSlice'; // Tambahkan ini
+import detailCreateProjectConstructionReducer from './Project/detailCreateProjectConstructionSlice'; // Corrected path
+import rabReducer from './RabSlice'; // Tambahkan import RabSlice
 
 export default configureStore({
   reducer: {
-    position: positionReducer,
-    simulator: simulatorReducer,
-    selftest: selftestReducer,
-    matrix: matrixReducer,
-    objects: objectReducer,
-    auth: authReducer, // Add auth reducer
+    auth: authReducer,
+    projects: projectReducer, // Add project reducer
+    jasa: jasaReducer, // Add jasa reducer
+    layout: layoutReducer, // Add layout reducer
+    material: materialReducer, // Add material reducer
+    constractionCost: constractionCostReducer, // Add constraction cost reducer
+    materialAndPackage: materialAndPackageReducer, // Add materialAndPackage reducer
+    global: globalReducer, // Tambahkan ini
+    capacityFactor: capacityFactorReducer, // Tambahkan ini
+    administrator: administratorReducer, // Tambahkan ini
+    transport: transportReducer, // Tambahkan ini
+    liquifectionPlant: liquifectionPlantReducer, // Tambahkan ini
+    receivingTerminal: receivingTerminalReducer, // Tambahkan ini
+    detailCreateProjectConstruction: detailCreateProjectConstructionReducer, // Tambahkan ini
+    rab: rabReducer, // Tambahkan reducer rab di sini
   },
 });

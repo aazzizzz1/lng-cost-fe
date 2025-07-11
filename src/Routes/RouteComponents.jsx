@@ -4,15 +4,22 @@ import { GlobalProvider } from "../Provider/GlobalContext";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
 import SignUp from "../Pages/Auth/SignUp";
-import Dashboard from "../Pages/Home/Dashboard";
-import HomeLayout from "../Layout/HomeLayout";
-import Simulator from "../Pages/Simulator/Simulator";
-import ObjectPages from "../Pages/Object/ObjectPages";
-import AccountSetting from "../Pages/Account/AccountSetting";
-import SelfTestPages from "../Pages/SelfTest/SelfTestPages";
-import SelfTestDisplay from "../Pages/SelfTest/SelfTestDisplay";
-import MatrixPages from "../Pages/Matrix/MatrixPages";
 import LayoutPages from "../Layout/LayoutPages";
+import DashboardPages from "../Pages/Home/DashboardPages";
+import ProjectPages from "../Pages/Project/ProjectPages";
+import ManageDataPages from "../Pages/ManageData/ManageDataPages";
+import JasaPages from "../Pages/UnitPrice/Jasa/JasaPages";
+import MaterialKonstruksiPages from "../Pages/UnitPrice/MaterialKonstruksi/MaterialKonstruksiPages";
+import TableMaterial from "../Pages/UnitPrice/MaterialKonstruksi/TableMaterial";
+import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPages";
+import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
+import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
+import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
+import MaterialAndPackagePages from "../Pages/UnitPrice/MaterialAndPackage/MaterialAndPackagePages";
+import AdministratorPages from "../Pages/Admin/AdministratorPages";
+import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
+import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
+import ReceivingTerimnalPages from "../Pages/UnitPrice/ReceivingTerminal/ReceivingTerimnalPages";
 
 const RouteComponents = () => {
   return (
@@ -23,51 +30,122 @@ const RouteComponents = () => {
             path="/dashboard"
             element={
               <LayoutPages>
-                <Dashboard />
+                <DashboardPages />
               </LayoutPages>
             }
           />
           <Route
-            path="/simulator"
+            path="/project"
             element={
-              <HomeLayout>
-                <Simulator />
-              </HomeLayout>
+              <LayoutPages>
+                <ProjectPages />
+              </LayoutPages>
             }
           />
           <Route
-            path="/object"
+            path="/rekap"
             element={
-              <HomeLayout>
-                <ObjectPages />
-              </HomeLayout>
+              <LayoutPages>
+                <RecapitulationPages />
+              </LayoutPages>
             }
           />
           <Route
-            path="/matrix"
+            path="/rab"
             element={
-              <HomeLayout>
-                <MatrixPages />
-              </HomeLayout>
+              <LayoutPages>
+                <RabPages />
+              </LayoutPages>
             }
           />
           <Route
-            path="/account"
+            path="/manage-data"
             element={
-              <HomeLayout>
-                <AccountSetting />
-              </HomeLayout>
+              <LayoutPages>
+                <ManageDataPages />
+              </LayoutPages>
             }
           />
           <Route
-            path="/selftest"
+            path="/jasa"
             element={
-              <HomeLayout>
-                <SelfTestPages />
-              </HomeLayout>
+              <LayoutPages>
+                <JasaPages />
+              </LayoutPages>
             }
           />
-          <Route path="/selftest/display" element={<SelfTestDisplay />} />
+          <Route
+            path="/material-konstruksi"
+            element={
+              <LayoutPages>
+                <MaterialKonstruksiPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/material-konstruksi/tabel"
+            element={
+              <LayoutPages>
+                <TableMaterial />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/construction-cost"
+            element={
+              <LayoutPages>
+                <ConstractionCostPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/project/:id/detail-construction"
+            element={
+              <LayoutPages>
+                <DetailCreateProjectConstruction />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/material-package"
+            element={
+              <LayoutPages>
+                <MaterialAndPackagePages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/transport"
+            element={
+              <LayoutPages>
+                <TransportPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/liquifaction-plant"
+            element={
+              <LayoutPages>
+                <LiquifactionPlantPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/receiving-terminal"
+            element={
+              <LayoutPages>
+                <ReceivingTerimnalPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/administrator"
+            element={
+              <LayoutPages>
+                <AdministratorPages />
+              </LayoutPages>
+            }
+          />
           <Route
             path="/"
             element={
