@@ -20,6 +20,7 @@ import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
 import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
 import ReceivingTerimnalPages from "../Pages/UnitPrice/ReceivingTerminal/ReceivingTerimnalPages";
+import Cobagettransport from "../Pages/UnitPrice/Transport/Cobagettransport";
 
 const RouteComponents = () => {
   return (
@@ -150,6 +151,13 @@ const RouteComponents = () => {
             path="/"
             element={
               <SignIn />
+              // <Dashboard />
+            }
+          />
+          <Route
+            path="/coba"
+            element={
+              <Cobagettransport />
               // <Dashboard />
             }
           />

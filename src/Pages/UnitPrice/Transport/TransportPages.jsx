@@ -1,28 +1,15 @@
-import React, { Component, useMemo } from 'react'
-import { useSelector } from 'react-redux'
-import { useLocation, useNavigate } from 'react-router-dom'
-import TransportTable from './TransportTable'
-
-const tipeTabs = [
-  { label: "LNGC", value: "lngc" },
-  { label: "LNG Barge", value: "lngbarge" },
-  { label: "LNG Trucking", value: "lngtrucking" },
-];
-
-const kategoriList = [
-  "Material Konstruksi",
-  "Peralatan",
-  "Upah",
-  "Jasa",
-  "Testing"
-];
+import React, { Component, useMemo, useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
+import TransportTable from './TransportTable';
+import { fetchTransportData } from '../../../Provider/HargaSatuan/transportSlice';
 
 function useQuery() {
   const { search } = useLocation();
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-class ErrorBoundary extends Component{
+class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false };
@@ -44,29 +31,42 @@ class ErrorBoundary extends Component{
   }
 }
 
-const tipeMap = {
-  lngc: "LNGC",
-  lngbarge: "LNG Barge",
-  lngtrucking: "LNG Trucking"
-};
-
 const TransportPages = () => {
-  const { data } = useSelector(state => state.transport);
+  const dispatch = useDispatch();
+  const { data } = useSelector((state) => state.transport);
   const query = useQuery();
   const navigate = useNavigate();
 
+  const [tipeTabs, setTipeTabs] = useState([]);
+  const [kategoriList, setKategoriList] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchTransportData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Extract unique `tipe` and `kategori` values from the data
+    const uniqueTipe = [...new Set(data.map((item) => item.tipe))].map((tipe) => ({
+      label: tipe,
+      value: tipe.toLowerCase().replace(/\s+/g, ''),
+    }));
+    const uniqueKategori = [...new Set(data.map((item) => item.kategori))];
+    setTipeTabs(uniqueTipe);
+    setKategoriList(uniqueKategori);
+  }, [data]);
+
   // Ambil tab dan kategori dari query string
-  const tab = query.get('tab') || 'lngc';
+  const tab = query.get('tab') || (tipeTabs[0]?.value || '');
   const kategori = query.get('kategori') || '';
 
   // Filtering logic
   const filteredData = useMemo(() => {
-    let d = data.filter(item => item.tipe === tipeMap[tab]);
+    let d = data.filter((item) => item.tipe.toLowerCase().replace(/\s+/g, '') === tab);
     if (kategori && kategoriList.includes(kategori)) {
-      d = d.filter(item => item.kategori === kategori);
+      d = d.filter((item) => item.kategori === kategori);
     }
     return d;
-  }, [data, tab, kategori]);
+  }, [data, tab, kategori, kategoriList]);
 
   // Tabs navigation
   const handleTabClick = (tabValue) => {
@@ -86,7 +86,7 @@ const TransportPages = () => {
         </p>
         {/* Tabs */}
         <div className="flex gap-2 mb-4">
-          {tipeTabs.map(tabItem => (
+          {tipeTabs.map((tabItem) => (
             <button
               key={tabItem.value}
               className={`px-4 py-2 rounded-t font-semibold border-b-2 ${
@@ -102,7 +102,7 @@ const TransportPages = () => {
         </div>
         {/* Filter kategori */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {kategoriList.map(kat => (
+          {kategoriList.map((kat) => (
             <button
               key={kat}
               className={`px-3 py-1 rounded border ${
@@ -133,4 +133,4 @@ const TransportPages = () => {
   );
 };
 
-export default TransportPages
+export default TransportPages;

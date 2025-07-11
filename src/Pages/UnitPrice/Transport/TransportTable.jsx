@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 // Kolom yang ingin ditampilkan
 const columns = [
@@ -27,20 +27,24 @@ const TransportTable = ({ data }) => {
       <table className="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 rounded">
         <thead>
           <tr className="bg-gray-100 dark:bg-gray-800">
-            {columns.map(col => (
-              <th key={col.key} className="px-2 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">{col.label}</th>
+            {columns.map((col) => (
+              <th key={col.key} className="px-2 py-2 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                {col.label}
+              </th>
             ))}
           </tr>
         </thead>
         <tbody>
           {(!data || data.length === 0) && (
             <tr>
-              <td colSpan={columns.length} className="text-center text-gray-400 py-6 bg-white dark:bg-gray-900">Tidak ada data.</td>
+              <td colSpan={columns.length} className="text-center text-gray-400 py-6 bg-white dark:bg-gray-900">
+                Tidak ada data.
+              </td>
             </tr>
           )}
-          {data && data.map(row => (
+          {data && data.map((row) => (
             <tr key={row.id} className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
-              {columns.map(col => (
+              {columns.map((col) => (
                 <td key={col.key} className="border border-gray-200 dark:border-gray-700 px-2 py-1 text-gray-900 dark:text-gray-100">
                   {col.key === "hargaSatuan" || col.key === "totalHarga"
                     ? (row[col.key] ? `Rp${Number(row[col.key]).toLocaleString()}` : "")
@@ -55,4 +59,4 @@ const TransportTable = ({ data }) => {
   );
 };
 
-export default TransportTable
+export default TransportTable;
