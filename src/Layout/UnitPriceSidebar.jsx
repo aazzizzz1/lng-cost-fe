@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import {
-  toggleHargaSatuan,
-} from "../Provider/GlobalSlice";
+import { fetchTransportData } from "../Provider/HargaSatuan/transportSlice";
+import { toggleHargaSatuan } from "../Provider/GlobalSlice";
 
 // DropdownMenu with nested items support
 function DropdownMenu({ title, items }) {
@@ -76,9 +75,24 @@ function DropdownMenu({ title, items }) {
 
 const UnitPriceSidebar = () => {
   const dispatch = useDispatch();
-  const {
-    isHargaSatuanOpen,
-  } = useSelector((state) => state.global);
+  const { data } = useSelector((state) => state.transport);
+  const { isHargaSatuanOpen } = useSelector((state) => state.global);
+
+  useEffect(() => {
+    dispatch(fetchTransportData());
+  }, [dispatch]);
+
+  // Generate Transportasi dropdown dynamically
+  const transportDropdown = {
+    title: "Transportation",
+    items: [...new Set(data.map((item) => item.infrastruktur))].map((infra) => ({
+      label: infra,
+      items: [...new Set(data.filter((item) => item.infrastruktur === infra).map((item) => item.kelompok))].map((kelompok) => ({
+        label: kelompok,
+        link: `/transport?tab=${infra.toLowerCase().replace(/\s+/g, '')}&kelompok=${encodeURIComponent(kelompok)}`,
+      })),
+    })),
+  };
 
   return (
     <li>
@@ -120,270 +134,9 @@ const UnitPriceSidebar = () => {
       </button>
       {isHargaSatuanOpen && (
         <ul className="py-2 space-y-2">
-          {/* LNG Plant Dropdown */}
-          <li>
-            <DropdownMenu
-              title="Liquifection Plant"
-              items={[
-                {
-                  label: "Onshore LNG Plant",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "Offshore LNG Plant",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Testing",
-                    },
-                  ],
-                },
-              ]}
-            />
-          </li>
           {/* Transportasi Dropdown */}
           <li>
-            <DropdownMenu
-              title="Transportasi"
-              items={[
-                {
-                  label: "LNG Carier (LNGC)",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/transport?tab=lngc&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/transport?tab=lngc&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/transport?tab=lngc&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/transport?tab=lngc&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/transport?tab=lngc&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "LNG Barge",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/transport?tab=lngbarge&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/transport?tab=lngbarge&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/transport?tab=lngbarge&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/transport?tab=lngbarge&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/transport?tab=lngbarge&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "LNG Trucking",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/transport?tab=lngtrucking&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/transport?tab=lngtrucking&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/transport?tab=lngtrucking&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/transport?tab=lngtrucking&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/transport?tab=lngtrucking&kategori=Testing",
-                    },
-                  ],
-                },
-              ]}
-            />
-          </li>
-          {/* Receiving Terminal Dropdown */}
-          <li>
-            <DropdownMenu
-              title="Receiving Terminal"
-              items={[
-                {
-                  label: "FSRU",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=fsru&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=fsru&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=fsru&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=fsru&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=fsru&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "ORF",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=orf&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=orf&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=orf&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=orf&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=orf&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "OTS",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=ots&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=ots&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=ots&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=ots&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=ots&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "ORU",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=oru&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=oru&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=oru&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=oru&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=oru&kategori=Testing",
-                    },
-                  ],
-                },
-              ]}
-            />
-          </li>
-          {/* Material & Package Dropdown */}
-          <li>
-            <DropdownMenu
-              title="Material & Package"
-              items={[
-                {
-                  label: "Material",
-                  link: "/material-package?tab=material",
-                },
-                {
-                  label: "Package",
-                  link: "/material-package?tab=package",
-                },
-              ]}
-            />
+            <DropdownMenu title={transportDropdown.title} items={transportDropdown.items} />
           </li>
         </ul>
       )}
