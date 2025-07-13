@@ -26,7 +26,7 @@ const ProfileNavbar = ({ profileRef: propProfileRef }) => {
   }, [isProfileOpen, ref, dispatch])
 
   const handleLogout = () => {
-    dispatch(logoutUser()) // Dispatch logoutUser untuk logout dan redirect ke signin
+    dispatch(logoutUser()); // Dispatch logoutUser untuk logout
   }
 
   return (

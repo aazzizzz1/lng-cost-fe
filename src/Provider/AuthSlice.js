@@ -32,12 +32,12 @@ export const loginUser = createAsyncThunk(
     try {
       const response = await axios.post(`${api}/auth/login`, { email, password });
       const { accessToken, user } = response.data.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('user', JSON.stringify(user));
+      Cookies.set('accessToken', accessToken, { secure: true, sameSite: 'Strict' }); // Simpan accessToken di cookies
+      Cookies.set('user', JSON.stringify(user), { secure: true, sameSite: 'Strict' }); // Simpan user di cookies
       return { accessToken, user };
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Login failed';
-      return rejectWithValue(errorMessage); // Use backend error message
+      return rejectWithValue(errorMessage); // Gunakan pesan error dari backend
     }
   }
 );
@@ -48,12 +48,12 @@ export const refreshToken = createAsyncThunk(
     try {
       const response = await axios.post(`${api}/auth/refresh-token`, {}, { withCredentials: true });
       const { accessToken } = response.data.data;
-      localStorage.setItem('accessToken', accessToken);
+      Cookies.set('accessToken', accessToken, { secure: true, sameSite: 'Strict' }); // Perbarui accessToken di cookies
       return accessToken;
     } catch (error) {
-      localStorage.removeItem('accessToken'); // Hapus accessToken dari localStorage
-      localStorage.removeItem('user'); // Hapus user dari localStorage
-      window.location.href = '/signin'; // Redirect ke signin jika refreshToken hilang
+      Cookies.remove('accessToken'); // Hapus accessToken dari cookies
+      Cookies.remove('user'); // Hapus user dari cookies
+      window.location.href = '/signin'; // Redirect ke signin jika refreshToken gagal
       return rejectWithValue(error.response?.data?.message || 'Failed to refresh token');
     }
   }
@@ -63,13 +63,13 @@ export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, { rejectWithValue }) => {
     try {
-      await axios.post(`${api}/auth/logout`, {}, { withCredentials: true });
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
+      Cookies.remove('accessToken'); // Hapus accessToken dari cookies
+      Cookies.remove('user'); // Hapus user dari cookies
       window.location.href = '/signin'; // Redirect ke signin setelah logout
       return true;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Logout failed');
+      console.error('Logout failed:', error.message); // Log error untuk debugging
+      return rejectWithValue('Logout failed');
     }
   }
 );
@@ -78,13 +78,14 @@ export const validateAccessToken = createAsyncThunk(
   'auth/validateAccessToken',
   async (_, { rejectWithValue }) => {
     try {
+      const accessToken = Cookies.get('accessToken'); // Ambil accessToken dari cookies
       const response = await axios.get(`${api}/auth/validate-token`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       return response.data;
     } catch (error) {
-      localStorage.removeItem('accessToken'); // Hapus accessToken dari localStorage
-      localStorage.removeItem('user'); // Hapus user dari localStorage
+      Cookies.remove('accessToken'); // Hapus accessToken dari cookies
+      Cookies.remove('user'); // Hapus user dari cookies
       window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
       return rejectWithValue(error.response?.data?.message || 'Access token invalid');
     }
@@ -94,8 +95,8 @@ export const validateAccessToken = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    accessToken: localStorage.getItem('accessToken') || null,
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    accessToken: Cookies.get('accessToken') || null, // Ambil accessToken dari cookies
+    user: JSON.parse(Cookies.get('user') || '{}'), // Ambil user dari cookies
     loading: false,
     errorMessage: '',
     successMessage: '',
@@ -155,8 +156,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.accessToken = null; // Reset accessToken saat logout
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
+      Cookies.remove('accessToken'); // Hapus accessToken dari cookies
+      Cookies.remove('user'); // Hapus user dari cookies
     },
   },
   extraReducers: (builder) => {
@@ -169,7 +170,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.successMessage = 'Registration successful';
-        window.location.href = '/signin'; // Redirect to signin page
+        window.location.href = '/signin'; // Redirect ke signin page
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
@@ -182,6 +183,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.accessToken = action.payload.accessToken; // Simpan accessToken ke state
+        state.user = action.payload.user; // Simpan user ke state
         state.successMessage = 'Login successful';
         window.location.href = '/dashboard'; // Redirect ke dashboard
       })
