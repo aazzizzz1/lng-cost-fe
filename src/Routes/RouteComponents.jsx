@@ -116,7 +116,7 @@ const RouteComponents = () => {
             }
           />
           <Route
-            path="/transport"
+            path="/transportation"
             element={
               <LayoutPages>
                 <TransportPages />

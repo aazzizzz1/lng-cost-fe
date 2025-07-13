@@ -3,16 +3,16 @@ import axios from 'axios';
 
 const api = process.env.REACT_APP_API;
 
-// Async thunk to fetch transport data
+// Async thunk to fetch transport data with dynamic filtering, sorting, and pagination
 export const fetchTransportData = createAsyncThunk(
   'transport/fetchTransportData',
-  async (_, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, sort = '', order = '', search = '', tipe = '', infrastruktur = '', kelompok = '' } = {}, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${api}/unit-prices`);
-      console.log('Fetched Transport Data:', response.data);
-      return response.data.data; // Assuming the data is in the `data` field
+      const response = await axios.get(`${api}/unit-prices`, {
+        params: { page, limit, sort, order, search, tipe, infrastruktur, kelompok },
+      });
+      return response.data; // Assuming the response contains pagination metadata and data
     } catch (error) {
-      console.error('Error fetching transport data:', error.response?.data || error.message);
       return rejectWithValue(error.response?.data || error.message);
     }
   }
@@ -20,25 +20,34 @@ export const fetchTransportData = createAsyncThunk(
 
 const initialState = {
   data: [],
-  filterTipe: "LNGC", // Tab aktif: LNGC, LNG Barge, LNG Trucking
-  filterKategori: [], // Array: Material Konstruksi, Peralatan, Upah, Jasa, Testing
-  search: "",
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+    totalData: 0,
+  },
+  filters: {
+    tipe: '',
+    infrastruktur: '',
+    kelompok: '',
+    search: '',
+    sort: '',
+    order: '',
+  },
   loading: false,
   error: null,
 };
 
 const transportSlice = createSlice({
-  name: "transport",
+  name: 'transport',
   initialState,
   reducers: {
-    setFilterTipe: (state, action) => {
-      state.filterTipe = action.payload;
+    setFilters: (state, action) => {
+      state.filters = { ...state.filters, ...action.payload };
     },
-    setFilterKategori: (state, action) => {
-      state.filterKategori = action.payload;
-    },
-    setSearch: (state, action) => {
-      state.search = action.payload;
+    setPagination: (state, action) => {
+      state.pagination = { ...state.pagination, ...action.payload };
     },
   },
   extraReducers: (builder) => {
@@ -49,7 +58,11 @@ const transportSlice = createSlice({
       })
       .addCase(fetchTransportData.fulfilled, (state, action) => {
         state.loading = false;
-        state.data = action.payload;
+        state.data = action.payload.data;
+        state.pagination.total = action.payload.pagination.totalData;
+        state.pagination.totalPages = action.payload.pagination.totalPages;
+        state.pagination.page = action.payload.pagination.currentPage;
+        state.pagination.limit = action.payload.pagination.limit;
       })
       .addCase(fetchTransportData.rejected, (state, action) => {
         state.loading = false;
@@ -58,6 +71,6 @@ const transportSlice = createSlice({
   },
 });
 
-export const { setFilterTipe, setFilterKategori, setSearch } = transportSlice.actions;
+export const { setFilters, setPagination } = transportSlice.actions;
 
 export default transportSlice.reducer;

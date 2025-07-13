@@ -1,98 +1,169 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { fetchTransportData } from "../Provider/HargaSatuan/transportSlice";
 import { toggleHargaSatuan } from "../Provider/GlobalSlice";
 
-// DropdownMenu with nested items support
-function DropdownMenu({ title, items }) {
-  const [open, setOpen] = useState(false);
-  const location = useLocation();
-
-  // Helper to check if a path is active
-  const isActive = (path) => location.pathname + location.search === path;
-
-  return (
-    <>
-      <button
-        type="button"
-        className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-        onClick={() => setOpen(!open)}
-      >
-        <span className="text-sm flex-1 ml-3 text-left whitespace-nowrap">
-          {title}
-        </span>
-        <svg
-          aria-hidden="true"
-          className={`w-4 h-4 ml-auto transition-transform ${open ? "rotate-180" : ""}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {open && (
-        <ul className="py-2 space-y-2 ml-4">
-          {items.map((item) =>
-            item.items ? (
-              // Nested dropdown
-              <li key={item.label}>
-                <DropdownMenu title={item.label} items={item.items} />
-              </li>
-            ) : item.link ? (
-              <Link to={item.link} key={item.label}>
-                <li
-                  className={
-                    isActive(item.link)
-                      ? "border-l-4 border-blue-600 bg-blue-50 dark:bg-blue-900/10"
-                      : ""
-                  }
-                >
-                  <span
-                    className={`text-xs flex items-center p-2 w-full font-medium rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8 ${
-                      isActive(item.link) ? "text-blue-600" : "text-gray-900"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                </li>
-              </Link>
-            ) : (
-              <li key={item.label}>
-                <span className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8">
-                  {item.label}
-                </span>
-              </li>
-            )
-          )}
-        </ul>
-      )}
-    </>
-  );
-}
-
 const UnitPriceSidebar = () => {
   const dispatch = useDispatch();
-  const { data } = useSelector((state) => state.transport);
+  const navigate = useNavigate();
   const { isHargaSatuanOpen } = useSelector((state) => state.global);
+  const { data: transportData } = useSelector((state) => state.transport);
+
+  const [openSections, setOpenSections] = useState({});
+  const [transportDropdownData, setTransportDropdownData] = useState([]);
 
   useEffect(() => {
-    dispatch(fetchTransportData());
-  }, [dispatch]);
+    if (openSections["root-Transportasi"]) {
+      dispatch(fetchTransportData({ tipe: "transportation" }));
+    }
+  }, [dispatch, openSections]);
 
-  // Generate Transportasi dropdown dynamically
-  const transportDropdown = {
-    title: "Transportation",
-    items: [...new Set(data.map((item) => item.infrastruktur))].map((infra) => ({
-      label: infra,
-      items: [...new Set(data.filter((item) => item.infrastruktur === infra).map((item) => item.kelompok))].map((kelompok) => ({
-        label: kelompok,
-        link: `/transport?tab=${infra.toLowerCase().replace(/\s+/g, '')}&kelompok=${encodeURIComponent(kelompok)}`,
-      })),
-    })),
+  useEffect(() => {
+    if (transportData.length > 0) {
+      const dropdownData = [...new Set(transportData.map((item) => item.infrastruktur))].map(
+        (infra) => ({
+          label: infra,
+          items: [...new Set(transportData.filter((item) => item.infrastruktur === infra).map((item) => item.kelompok))].map(
+            (kelompok) => ({
+              label: kelompok,
+              link: `/transport?tab=${infra.toLowerCase().replace(/\s+/g, "")}&kelompok=${encodeURIComponent(kelompok)}`,
+            })
+          ),
+        })
+      );
+      setTransportDropdownData(dropdownData);
+    }
+  }, [transportData]);
+
+  const toggleSection = (key) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+
+  const handleTransportClick = () => {
+    navigate("/transportation");
+  };
+
+  const renderItems = (items, parentKey) => {
+    return items.map((item) => (
+      <li key={item.label}>
+        {item.items ? (
+          <>
+            <button
+              type="button"
+              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+              onClick={() => toggleSection(`${parentKey}-${item.label}`)}
+            >
+              <span className="flex-1 text-left whitespace-nowrap ml-3">{item.label}</span>
+              <svg
+                className={`w-4 h-4 ml-auto transition-transform ${
+                  openSections[`${parentKey}-${item.label}`] ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {openSections[`${parentKey}-${item.label}`] && (
+              <ul className="ml-4 space-y-1">{renderItems(item.items, `${parentKey}-${item.label}`)}</ul>
+            )}
+          </>
+        ) : (
+          <span className="flex items-center p-2 pl-8 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8">
+            {item.label}
+          </span>
+        )}
+      </li>
+    ));
+  };
+
+  const sidebarData = [
+    {
+      label: "Liquifection Plant",
+      items: [
+        {
+          label: "Onshore LNG Plant",
+          items: [
+            { label: "Material Konstruksi" },
+            { label: "Peralatan" },
+            { label: "Upah" },
+            { label: "Jasa" },
+            { label: "Testing" },
+          ],
+        },
+        {
+          label: "Offshore LNG Plant",
+          items: [
+            { label: "Material Konstruksi" },
+            { label: "Peralatan" },
+            { label: "Upah" },
+            { label: "Jasa" },
+            { label: "Testing" },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Transportasi",
+      items: transportDropdownData,
+      onClick: handleTransportClick,
+    },
+    {
+      label: "Receiving Terminal",
+      items: [
+        {
+          label: "FSRU",
+          items: [
+            { label: "Material Konstruksi" },
+            { label: "Peralatan" },
+            { label: "Upah" },
+            { label: "Jasa" },
+            { label: "Testing" },
+          ],
+        },
+        {
+          label: "ORF",
+          items: [
+            { label: "Material Konstruksi" },
+            { label: "Peralatan" },
+            { label: "Upah" },
+            { label: "Jasa" },
+            { label: "Testing" },
+          ],
+        },
+        {
+          label: "OTS",
+          items: [
+            { label: "Material Konstruksi" },
+            { label: "Peralatan" },
+            { label: "Upah" },
+            { label: "Jasa" },
+            { label: "Testing" },
+          ],
+        },
+        {
+          label: "ORU",
+          items: [
+            { label: "Material Konstruksi" },
+            { label: "Peralatan" },
+            { label: "Upah" },
+            { label: "Jasa" },
+            { label: "Testing" },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Material & Package",
+      items: [
+        { label: "Material" },
+        { label: "Package" },
+      ],
+    },
+  ];
 
   return (
     <li>
@@ -134,10 +205,21 @@ const UnitPriceSidebar = () => {
       </button>
       {isHargaSatuanOpen && (
         <ul className="py-2 space-y-2">
-          {/* Transportasi Dropdown */}
-          <li>
-            <DropdownMenu title={transportDropdown.title} items={transportDropdown.items} />
-          </li>
+          {sidebarData.map((item) => (
+            <li key={item.label}>
+              {item.onClick ? (
+                <button
+                  type="button"
+                  className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                  onClick={item.onClick}
+                >
+                  <span className="flex-1 text-left whitespace-nowrap ml-3">{item.label}</span>
+                </button>
+              ) : (
+                renderItems(item.items, "root")
+              )}
+            </li>
+          ))}
         </ul>
       )}
     </li>

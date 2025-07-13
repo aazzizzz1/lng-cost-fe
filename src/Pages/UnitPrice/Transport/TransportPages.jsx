@@ -1,13 +1,7 @@
-import React, { Component, useMemo, useEffect, useState } from 'react';
+import React, { Component, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
 import TransportTable from './TransportTable';
-import { fetchTransportData } from '../../../Provider/HargaSatuan/transportSlice';
-
-function useQuery() {
-  const { search } = useLocation();
-  return React.useMemo(() => new URLSearchParams(search), [search]);
-}
+import { fetchTransportData, setFilters, setPagination } from '../../../Provider/HargaSatuan/transportSlice';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -33,49 +27,39 @@ class ErrorBoundary extends Component {
 
 const TransportPages = () => {
   const dispatch = useDispatch();
-  const { data } = useSelector((state) => state.transport);
-  const query = useQuery();
-  const navigate = useNavigate();
-
-  const [tipeTabs, setTipeTabs] = useState([]);
-  const [kelompokList, setKelompokList] = useState([]);
+  const { data, filters, pagination, loading } = useSelector((state) => state.transport);
 
   useEffect(() => {
-    dispatch(fetchTransportData());
-  }, [dispatch]);
+    const params = {
+      page: pagination.page,
+      limit: pagination.limit,
+      sort: filters.sort,
+      order: filters.order,
+      search: filters.search,
+      tipe: filters.tipe,
+      infrastruktur: filters.infrastruktur,
+      kelompok: filters.kelompok,
+    };
+    dispatch(fetchTransportData(params));
+  }, [dispatch, filters, pagination]);
 
-  useEffect(() => {
-    // Extract unique `infrastruktur` and `kelompok` values from the data
-    const uniqueTipe = [...new Set(data.map((item) => item.infrastruktur))].map((infrastruktur) => ({
-      label: infrastruktur,
-      value: infrastruktur.toLowerCase().replace(/\s+/g, ''),
-    }));
-    const uniqueKelompok = [...new Set(data.map((item) => item.kelompok))];
-    setTipeTabs(uniqueTipe);
-    setKelompokList(uniqueKelompok);
-  }, [data]);
-
-  // Ambil tab dan kelompok dari query string
-  const tab = query.get('tab') || (tipeTabs[0]?.value || '');
-  const kelompok = query.get('kelompok') || '';
-
-  // Filtering logic
-  const filteredData = useMemo(() => {
-    let d = data.filter((item) => item.infrastruktur.toLowerCase().replace(/\s+/g, '') === tab);
-    if (kelompok && kelompokList.includes(kelompok)) {
-      d = d.filter((item) => item.kelompok === kelompok);
-    }
-    return d;
-  }, [data, tab, kelompok, kelompokList]);
-
-  // Tabs navigation
-  const handleTabClick = (tabValue) => {
-    navigate(`/transport?tab=${tabValue}${kelompok ? `&kelompok=${encodeURIComponent(kelompok)}` : ''}`);
+  const handleFilterChange = (key, value) => {
+    dispatch(setFilters({ [key]: value }));
+    dispatch(setPagination({ page: 1 })); // Reset to first page on filter change
   };
 
-  // Kelompok navigation
-  const handleKelompokClick = (kel) => {
-    navigate(`/transport?tab=${tab}${kel ? `&kelompok=${encodeURIComponent(kel)}` : ''}`);
+  const handlePageChange = (page) => {
+    dispatch(setPagination({ page }));
+  };
+
+  const handleLimitChange = (limit) => {
+    dispatch(setPagination({ limit, page: 1 })); // Reset to first page on limit change
+  };
+
+  const handleSortChange = (key) => {
+    const newOrder = filters.order === 'asc' ? 'desc' : 'asc'; // Toggle between ascending and descending
+    dispatch(setFilters({ sort: key, order: newOrder }));
+    dispatch(setPagination({ page: 1 })); // Reset to first page on sort change
   };
 
   return (
@@ -84,50 +68,37 @@ const TransportPages = () => {
         <p className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Transportasi - Harga Satuan
         </p>
-        {/* Tabs */}
-        <div className="flex gap-2 mb-4">
-          {tipeTabs.map((tabItem) => (
-            <button
-              key={tabItem.value}
-              className={`px-4 py-2 rounded-t font-semibold border-b-2 ${
-                tab === tabItem.value
-                  ? "border-primary-700 text-primary-700 bg-primary-50 dark:bg-gray-800"
-                  : "border-transparent text-gray-700 dark:text-gray-300"
-              }`}
-              onClick={() => handleTabClick(tabItem.value)}
-            >
-              {tabItem.label}
-            </button>
-          ))}
-        </div>
-        {/* Filter kelompok */}
+        {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {kelompokList.map((kel) => (
-            <button
-              key={kel}
-              className={`px-3 py-1 rounded border ${
-                kelompok === kel
-                  ? "bg-primary-700 text-white border-primary-700"
-                  : "bg-white dark:bg-gray-800 text-gray-700 border-gray-300"
-              }`}
-              onClick={() => handleKelompokClick(kel)}
-            >
-              {kel}
-            </button>
-          ))}
-          <button
-            className={`px-3 py-1 rounded border ${
-              !kelompok
-                ? "bg-primary-700 text-white border-primary-700"
-                : "bg-white dark:bg-gray-800 text-gray-700 border-gray-300"
-            }`}
-            onClick={() => handleKelompokClick("")}
+          <input
+            type="text"
+            placeholder="Search..."
+            value={filters.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            className="px-3 py-2 border rounded"
+          />
+          <select
+            value={filters.kelompok}
+            onChange={(e) => handleFilterChange('kelompok', e.target.value)}
+            className="px-3 py-2 border rounded"
           >
-            Semua Kelompok
-          </button>
+            <option value="">Filter Kelompok</option>
+            <option value="Material & Equipment">Material & Equipment</option>
+            <option value="Construction and Installation">Construction and Installation</option>
+            <option value="Engineering & Management">Engineering & Management</option>
+            <option value="Testing & Commissioning">Testing & Commissioning</option>
+            <option value="General & Finalization">General & Finalization</option>
+          </select>
         </div>
         {/* Table */}
-        <TransportTable data={filteredData} />
+        <TransportTable
+          data={data}
+          loading={loading}
+          pagination={pagination}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
+          onSortChange={handleSortChange}
+        />
       </div>
     </ErrorBoundary>
   );
