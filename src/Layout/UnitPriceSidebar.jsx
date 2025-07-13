@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUniqueFields } from "../Provider/HargaSatuan/unitPriceSlice";
 import { toggleHargaSatuan } from "../Provider/GlobalSlice";
@@ -8,13 +8,16 @@ const UnitPriceSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isHargaSatuanOpen } = useSelector((state) => state.global);
-  const { uniqueFields = { tipe: [], infrastruktur: [], kelompok: [] }, loading } = useSelector((state) => state.unitPrice || {});
+  const { uniqueFields = { tipe: [], infrastruktur: [], kelompok: [] } } = useSelector((state) => state.unitPrice || {});
   const [openTipe, setOpenTipe] = useState({});
   const [openInfra, setOpenInfra] = useState({});
 
-  useEffect(() => {
-    dispatch(fetchUniqueFields());
-  }, [dispatch]);
+  const handleToggleHargaSatuan = () => {
+    dispatch(toggleHargaSatuan());
+    if (!isHargaSatuanOpen) {
+      dispatch(fetchUniqueFields()); // Fetch unique fields when opening the sidebar
+    }
+  };
 
   const toggleTipe = (tipe) => {
     setOpenTipe((prev) => ({ ...prev, [tipe]: !prev[tipe] }));
@@ -38,7 +41,7 @@ const UnitPriceSidebar = () => {
       <button
         type="button"
         className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-        onClick={() => dispatch(toggleHargaSatuan())}
+        onClick={handleToggleHargaSatuan}
       >
         <svg
           className="w-6 h-6 text-gray-800 dark:text-white"

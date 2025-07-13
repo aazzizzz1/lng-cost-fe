@@ -45,7 +45,18 @@ const TransportPages = () => {
     };
     dispatch(setFilters(params));
     dispatch(fetchTransportData(params));
-  }, [dispatch, location.search, pagination]);
+  }, [
+    dispatch,
+    location.search,
+    pagination.page,
+    pagination.limit,
+    filters.sort,
+    filters.order,
+    filters.search,
+    filters.tipe,
+    filters.infrastruktur,
+    filters.kelompok,
+  ]); // Added missing dependencies
 
   const handleFilterChange = (key, value) => {
     dispatch(setFilters({ [key]: value }));
