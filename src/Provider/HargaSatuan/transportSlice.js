@@ -6,11 +6,14 @@ const api = process.env.REACT_APP_API;
 // Async thunk to fetch transport data with dynamic filtering, sorting, and pagination
 export const fetchTransportData = createAsyncThunk(
   'transport/fetchTransportData',
-  async ({ page = 1, limit = 10, sort = '', order = '', search = '', tipe = '', infrastruktur = '', kelompok = '' } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, sort, order, search, tipe = '', infrastruktur = '', kelompok = '' } = {}, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${api}/unit-prices`, {
-        params: { page, limit, sort, order, search, tipe, infrastruktur, kelompok },
-      });
+      const params = { page, limit, tipe, infrastruktur, kelompok };
+      if (sort) params.sort = sort;
+      if (order) params.order = order;
+      if (search) params.search = search;
+
+      const response = await axios.get(`${api}/unit-prices`, { params });
       return response.data; // Assuming the response contains pagination metadata and data
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

@@ -1,5 +1,6 @@
 import React, { Component, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import TransportTable from './TransportTable';
 import { fetchTransportData, setFilters, setPagination } from '../../../Provider/HargaSatuan/transportSlice';
 
@@ -27,21 +28,24 @@ class ErrorBoundary extends Component {
 
 const TransportPages = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { data, filters, pagination, loading } = useSelector((state) => state.transport);
 
   useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
     const params = {
       page: pagination.page,
       limit: pagination.limit,
       sort: filters.sort,
       order: filters.order,
       search: filters.search,
-      tipe: filters.tipe,
-      infrastruktur: filters.infrastruktur,
-      kelompok: filters.kelompok,
+      tipe: queryParams.get('tipe') || filters.tipe,
+      infrastruktur: queryParams.get('infrastruktur') || filters.infrastruktur,
+      kelompok: queryParams.get('kelompok') || filters.kelompok,
     };
+    dispatch(setFilters(params));
     dispatch(fetchTransportData(params));
-  }, [dispatch, filters, pagination]);
+  }, [dispatch, location.search, pagination]);
 
   const handleFilterChange = (key, value) => {
     dispatch(setFilters({ [key]: value }));
