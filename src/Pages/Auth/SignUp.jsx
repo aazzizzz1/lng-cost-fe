@@ -75,7 +75,7 @@ const SignUp = () => {
                     htmlFor="full_name"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Full Name
+                    Email
                   </label>
                   <input
                     value={inputSignUp.full_name}

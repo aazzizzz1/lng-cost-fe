@@ -28,19 +28,65 @@ export const registerUser = createAsyncThunk(
 // Async thunk for user login
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({ username, password }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${api}/users/login`, {
-        username,
-        password
+      const response = await axios.post(`${api}/auth/login`, { email, password });
+      const { accessToken, user } = response.data.data;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { accessToken, user };
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Login failed';
+      return rejectWithValue(errorMessage); // Use backend error message
+    }
+  }
+);
+
+export const refreshToken = createAsyncThunk(
+  'auth/refreshToken',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${api}/auth/refresh-token`, {}, { withCredentials: true });
+      const { accessToken } = response.data.data;
+      localStorage.setItem('accessToken', accessToken);
+      return accessToken;
+    } catch (error) {
+      localStorage.removeItem('accessToken'); // Hapus accessToken dari localStorage
+      localStorage.removeItem('user'); // Hapus user dari localStorage
+      window.location.href = '/signin'; // Redirect ke signin jika refreshToken hilang
+      return rejectWithValue(error.response?.data?.message || 'Failed to refresh token');
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      await axios.post(`${api}/auth/logout`, {}, { withCredentials: true });
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      window.location.href = '/signin'; // Redirect ke signin setelah logout
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Logout failed');
+    }
+  }
+);
+
+export const validateAccessToken = createAsyncThunk(
+  'auth/validateAccessToken',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${api}/auth/validate-token`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
       });
-      const token = response.data.token;
-      console.log('Login Response:', response.data);
-      Cookies.set('token', token);
       return response.data;
     } catch (error) {
-      console.log('Login Error:', error.response.data);
-      return rejectWithValue(error.response.data);
+      localStorage.removeItem('accessToken'); // Hapus accessToken dari localStorage
+      localStorage.removeItem('user'); // Hapus user dari localStorage
+      window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
+      return rejectWithValue(error.response?.data?.message || 'Access token invalid');
     }
   }
 );
@@ -48,11 +94,11 @@ export const loginUser = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    token: null,
+    accessToken: localStorage.getItem('accessToken') || null,
+    user: JSON.parse(localStorage.getItem('user')) || null,
     loading: false,
-    error: null,
-    successMessage: '',
     errorMessage: '',
+    successMessage: '',
     inputSignUp: {
       full_name: '',
       username: '',
@@ -60,7 +106,7 @@ const authSlice = createSlice({
       confirm_password: ''
     },
     inputLogin: {
-      username: '',
+      email: '',
       password: ''
     },
     formSubmitted: false,
@@ -106,6 +152,12 @@ const authSlice = createSlice({
       state.termsAccepted = false;
       state.openModal = false;
     },
+    logout: (state) => {
+      state.user = null;
+      state.accessToken = null; // Reset accessToken saat logout
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -129,13 +181,20 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.token;
+        state.accessToken = action.payload.accessToken; // Simpan accessToken ke state
         state.successMessage = 'Login successful';
-        window.location.href = '/dashboard'; // Redirect to dashboard page
+        window.location.href = '/dashboard'; // Redirect ke dashboard
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.errorMessage = action.payload.message || 'Login failed';
+        state.errorMessage = action.payload || 'Login failed.';
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.accessToken = action.payload;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.accessToken = null;
+        state.user = null;
       });
   },
 });
@@ -151,7 +210,8 @@ export const {
   clearMessages,
   handleAccept,
   handleAcceptClick,
-  handleDeclineClick
+  handleDeclineClick,
+  logout
 } = authSlice.actions;
 
 export default authSlice.reducer;

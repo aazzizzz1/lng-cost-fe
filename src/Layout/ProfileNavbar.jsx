@@ -1,11 +1,12 @@
 import React, { useRef, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toggleProfileDropdown } from '../Provider/layoutSlice'
-import { Link } from 'react-router-dom'
+import { logoutUser } from '../Provider/AuthSlice' // Import logoutUser action
 
 const ProfileNavbar = ({ profileRef: propProfileRef }) => {
   const dispatch = useDispatch()
   const isProfileOpen = useSelector(state => state.layout.isProfileOpen)
+  const { user } = useSelector(state => state.auth) // Get user data from auth state
   const internalRef = useRef(null)
   const ref = propProfileRef || internalRef
 
@@ -23,6 +24,10 @@ const ProfileNavbar = ({ profileRef: propProfileRef }) => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isProfileOpen, ref, dispatch])
+
+  const handleLogout = () => {
+    dispatch(logoutUser()) // Dispatch logoutUser untuk logout dan redirect ke signin
+  }
 
   return (
     <>
@@ -55,10 +60,10 @@ const ProfileNavbar = ({ profileRef: propProfileRef }) => {
           <>
             <div className="py-3 px-4">
               <span className="block text-sm font-semibold text-gray-900 dark:text-white">
-                Neil Sims
+                {user?.username || 'Guest'}
               </span>
               <span className="block text-sm text-gray-900 truncate dark:text-white">
-                name@flowbite.com
+                {user?.email || 'No email'}
               </span>
             </div>
             <ul
@@ -164,12 +169,12 @@ const ProfileNavbar = ({ profileRef: propProfileRef }) => {
               aria-labelledby="dropdown"
             >
               <li>
-                <Link
-                  to="/signin"
+                <button
+                  onClick={handleLogout} // Tambahkan logika logout
                   className="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
                   Sign out
-                </Link>
+                </button>
               </li>
             </ul>
           </>

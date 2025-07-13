@@ -1,6 +1,8 @@
-import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { GlobalProvider } from "../Provider/GlobalContext";
+import { useDispatch, useSelector } from "react-redux";
+import { refreshToken, validateAccessToken } from "../Provider/AuthSlice";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
 import SignUp from "../Pages/Auth/SignUp";
@@ -22,6 +24,25 @@ import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/Liquifa
 import ReceivingTerimnalPages from "../Pages/UnitPrice/ReceivingTerminal/ReceivingTerimnalPages";
 import Cobagettransport from "../Pages/UnitPrice/Transport/Cobagettransport";
 
+const PrivateRoute = ({ children }) => {
+  const dispatch = useDispatch();
+  const { accessToken } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (accessToken) {
+      dispatch(validateAccessToken()).catch(() => {
+        window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
+      });
+    } else {
+      dispatch(refreshToken()).catch(() => {
+        window.location.href = '/signin'; // Redirect ke signin jika refreshToken gagal
+      });
+    }
+  }, [accessToken, dispatch]);
+
+  return accessToken ? children : <Navigate to="/signin" />;
+};
+
 const RouteComponents = () => {
   return (
     <BrowserRouter>
@@ -30,9 +51,11 @@ const RouteComponents = () => {
           <Route
             path="/dashboard"
             element={
-              <LayoutPages>
-                <DashboardPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <DashboardPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
