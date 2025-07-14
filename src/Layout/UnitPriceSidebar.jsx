@@ -8,7 +8,7 @@ const UnitPriceSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isHargaSatuanOpen } = useSelector((state) => state.global);
-  const { uniqueFields = { tipe: [], infrastruktur: [], kelompok: [] } } = useSelector((state) => state.unitPrice || {});
+  const { uniqueFields = {} } = useSelector((state) => state.unitPrice || {});
   const [openTipe, setOpenTipe] = useState({});
   const [openInfra, setOpenInfra] = useState({});
 
@@ -76,7 +76,7 @@ const UnitPriceSidebar = () => {
       </button>
       {isHargaSatuanOpen && (
         <ul className="py-2 space-y-2">
-          {uniqueFields.tipe.map((tipe) => (
+          {Object.keys(uniqueFields).map((tipe) => (
             <li key={tipe}>
               <button
                 type="button"
@@ -99,7 +99,7 @@ const UnitPriceSidebar = () => {
               </button>
               {openTipe[tipe] && (
                 <ul className="py-2 space-y-2 pl-4">
-                  {uniqueFields.infrastruktur.map((infra) => (
+                  {Object.keys(uniqueFields[tipe] || {}).map((infra) => (
                     <li key={infra}>
                       <button
                         type="button"
@@ -122,7 +122,7 @@ const UnitPriceSidebar = () => {
                       </button>
                       {openInfra[infra] && (
                         <ul className="py-2 space-y-2 pl-4">
-                          {uniqueFields.kelompok.map((kelompok) => (
+                          {(uniqueFields[tipe][infra] || []).map((kelompok) => (
                             <li key={kelompok}>
                               <button
                                 type="button"

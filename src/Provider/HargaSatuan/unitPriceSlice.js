@@ -9,7 +9,7 @@ export const fetchUniqueFields = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${api}/unit-prices/unique-fields`);
-      return response.data.data; // Assuming the response contains `data` with unique fields
+      return response.data.data; // Return grouped data directly
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
