@@ -1,70 +1,59 @@
-import { createSlice, combineReducers } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const initialState = {
-  projects: [
-    // --- Project yang sesuai dengan constraction cost ---
-    {
-      id: 100,
-      name: "FSRU Lampung",
-      jenis: "FSRU",
-      kategori: "Big Scale FSRU > 150.000 m³",
-      lokasi: "Jawa Timur",
-      tahun: 2023,
-      levelAACE: 2,
-      harga: 5000000000,
-    },
-    {
-      id: 101,
-      name: "Small LNG Plant Bau Bau",
-      jenis: "LNG Plant",
-      kategori: "Small-Scale Liquefaction Plant (100 - 800 TPD)",
-      lokasi: "Sulawesi",
-      tahun: 2020,
-      levelAACE: 5,
-      harga: 3000000000,
-    },
-    {
-      id: 102,
-      name: "LNGC Papua",
-      jenis: "LNGC",
-      kategori: "Big Scale LNGC > 100.000 m³",
-      lokasi: "Kepulauan Riau",
-      tahun: 2023,
-      levelAACE: 2,
-      harga: 7000000000,
-    },
-  ],
+  projects: [],
+  recommendedCosts: [],
 };
 
 const projectSlice = createSlice({
   name: 'projects',
   initialState,
   reducers: {
+    setProjects: (state, action) => {
+      state.projects = action.payload;
+    },
+    setRecommendedCosts: (state, action) => {
+      state.recommendedCosts = action.payload;
+    },
     createProject: (state, action) => {
       state.projects.push(action.payload);
     },
-    // reducer lain jika diperlukan
   },
 });
 
-const projectConstructionCostSlice = createSlice({
-  name: 'projectConstructionCost',
-  initialState: {},
-  reducers: {
-    saveProjectCost: (state, action) => {
-      const { projectId, items } = action.payload;
-      state[projectId] = items;
-    },
-  },
-});
+export const { setProjects, setRecommendedCosts, createProject } = projectSlice.actions;
 
-export const { createProject } = projectSlice.actions;
-export const { saveProjectCost } = projectConstructionCostSlice.actions;
+export const fetchProjects = () => async (dispatch) => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/projects');
+    dispatch(setProjects(response.data.data));
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+  }
+};
 
-// Gabungkan reducer jika perlu
-export const rootReducer = combineReducers({
-  projects: projectSlice.reducer,
-  projectConstructionCost: projectConstructionCostSlice.reducer,
-});
+export const fetchRecommendedCosts = (projectData) => async (dispatch) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/api/projects/recommend',
+      projectData
+    );
+    const data = response.data?.data || []; // Extract data from response
+    dispatch(setRecommendedCosts(data));
+    return data; // Return the payload for further use
+  } catch (error) {
+    console.error('Error fetching recommended costs:', error);
+    return []; // Fallback to an empty array in case of error
+  }
+};
+
+export const saveProjectWithCosts = (projectData) => async () => {
+  try {
+    await axios.post('http://localhost:5000/api/projects', projectData);
+  } catch (error) {
+    console.error('Error saving project:', error);
+  }
+};
 
 export default projectSlice.reducer;

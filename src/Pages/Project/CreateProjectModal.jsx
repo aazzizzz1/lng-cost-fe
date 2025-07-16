@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux"; // Tambahkan useDispatch
-import { setItems } from "../../Provider/Project/detailCreateProjectConstructionSlice"; // Import setItems
+import { fetchProvinces } from "../../Provider/administratorSlice";
+import { fetchRecommendedCosts, createProject } from "../../Provider/Project/ProjectSlice";
+import { setItems } from "../../Provider/Project/detailCreateProjectConstructionSlice";
 
 // Mapping satuan berdasarkan jenis project
 const satuanByJenis = {
@@ -16,35 +18,37 @@ const satuanByJenis = {
 };
 
 const jenisOptions = [
+  { value: "LNGBV", label: "LNG Bunkering Vessel" },
+  { value: "FSRU", label: "Floating Storage Regasification Unit" },
+  { value: "LNGC", label: "LNG Carrier" },
+  { value: "LNG Trucking", label: "LNG Trucking" },
   { value: "Onshore LNG Plant", label: "Onshore LNG Plant" },
   { value: "Offshore LNG Plant", label: "Offshore LNG Plant" },
-  { value: "LNG Carrier", label: "LNG Carrier" },
-  { value: "LNG Trucking", label: "LNG Trucking" },
-  { value: "FSRU", label: "FSRU" },
-  { value: "ORF", label: "ORF" },
-  { value: "OTS", label: "OTS" },
-  { value: "ORU", label: "ORU" },
+  { value: "ORF", label: "Onshore Receiving Facility" },
+  { value: "OTS", label: "Offshore Terminal System" },
+  { value: "ORU", label: "Onshore Regasification Unit" },
 ];
 
-const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
+const CreateProjectModal = ({ isOpen, onClose }) => {
   const [name, setName] = useState("");
-  const [jenis, setJenis] = useState("Onshore LNG Plant");
+  const [infrastruktur, setInfrastruktur] = useState("Onshore LNG Plant");
   const [kategori, setKategori] = useState("");
   const [volume, setVolume] = useState("");
   const [lokasi, setLokasi] = useState("");
   const [tahun, setTahun] = useState(new Date().getFullYear());
-  const [levelAACE, setLevelAACE] = useState(4);
-  const [harga, setHarga] = useState("");
-  const [useGalileo, setUseGalileo] = useState(""); // Ubah nama state
-  const navigate = useNavigate();
+  const [inflasi, setInflasi] = useState(5.0);
   const dispatch = useDispatch();
-  const provinces = useSelector((state) => state.administrator.provinces); // Ambil dari redux
-  const costs = useSelector((state) => state.constractionCost.costs);
-  const inflasiList = useSelector((state) => state.administrator.inflasi);
+  const navigate = useNavigate();
+  const provinces = useSelector((state) => state.administrator.provinces);
+
+  // Fetch provinces on mount
+  useEffect(() => {
+    dispatch(fetchProvinces());
+  }, [dispatch]);
 
   // Auto set kategori FSRU & LNGC berdasarkan volume
   React.useEffect(() => {
-    if (jenis === "FSRU" && volume) {
+    if (infrastruktur === "FSRU" && volume) {
       const v = Number(volume);
       if (v > 150000) {
         setKategori("BIG SCALE LNG FSRU [> 150.000 m³]");
@@ -55,7 +59,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       } else {
         setKategori("");
       }
-    } else if ((jenis === "LNG Carrier" || jenis === "LNGC") && volume) {
+    } else if (infrastruktur === "LNGC" && volume) {
       const v = Number(volume);
       if (v > 100000) {
         setKategori("BIG SCALE LNG CARRIER (LNGC) [> 100.000 m³]");
@@ -66,141 +70,79 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
       } else {
         setKategori("");
       }
+    } else if (infrastruktur === "LNGBV" && volume) {
+      const v = Number(volume);
+      if (v > 5000) {
+        setKategori("BIG SCALE LNG BUNKERING VESSEL [> 5.000 m³]");
+      } else if (v >= 1000) {
+        setKategori("MID SCALE LNG BUNKERING VESSEL [1.000 - 5.000 m³]");
+      } else if (v > 0) {
+        setKategori("SMALL SCALE LNG BUNKERING VESSEL [< 1.000 m³]");
+      } else {
+        setKategori("");
+      }
     }
-    // Jika bukan FSRU/LNGC, jangan auto set kategori
-  }, [jenis, volume]);
+    // Jika bukan FSRU/LNGC/LNGBV, jangan auto set kategori
+  }, [infrastruktur, volume]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Gabungkan satuan ke kategori jika kategori berupa angka saja
-    let kategoriFinal = kategori;
-    const satuan = satuanByJenis[jenis] || "";
-    if (
-      kategori &&
-      satuan &&
-      !kategori.toLowerCase().includes(satuan.toLowerCase())
-    ) {
-      // Jika kategori hanya angka, tambahkan satuan
-      if (/^\d+(\.\d+)?$/.test(kategori.trim())) {
-        kategoriFinal = `${kategori.trim()} ${satuan}`;
-      }
-    }
-    const newProject = {
-      id: Date.now(), // Auto generate project id
+    const projectData = {
       name,
-      jenis,
-      kategori: kategoriFinal,
+      infrastruktur,
       lokasi,
-      tahun: Number(tahun),
-      levelAACE,
-      harga: Number(harga),
-      useGalileo,
       volume: Number(volume),
+      tahun: Number(tahun),
+      kategori,
+      inflasi: Number(inflasi),
     };
-    onCreate(newProject);
 
-    // --- AUTO FILL DETAIL CONSTRUCTION JIKA ADA DI COST DB ---
-    // Cari data yang cocok di constractionCost (jenis & volume)
-    const summaryJenis = (() => {
-      if (jenis.toLowerCase().includes("fsru")) return "FSRU";
-      if (jenis.toLowerCase().includes("plant")) return "LNG Plant";
-      if (jenis.toLowerCase().includes("carrier")) return "LNGC";
-      return jenis;
-    })();
-    // Cari cost yang cocok (jenis & volume)
-    let matchedCosts = costs.filter(
-      (item) =>
-        String(item.tipe).toLowerCase() ===
-          String(summaryJenis).toLowerCase() &&
-        Number(item.volume) === Number(volume)
-    );
-    // Jika tidak ada volume yang sama persis, ambil volume terbesar yang lebih kecil
-    if (matchedCosts.length === 0) {
-      // Cari semua cost dengan tipe yang sama dan volume <= volume input
-      const candidates = costs
-        .filter(
-          (item) =>
-            String(item.tipe).toLowerCase() ===
-              String(summaryJenis).toLowerCase() &&
-            Number(item.volume) <= Number(volume)
-        );
-      if (candidates.length > 0) {
-        // Ambil volume terbesar yang lebih kecil
-        const maxVolume = Math.max(...candidates.map((item) => Number(item.volume)));
-        matchedCosts = candidates.filter((item) => Number(item.volume) === maxVolume);
+    try {
+      const response = await dispatch(fetchRecommendedCosts(projectData));
+      const recommendedCosts = response?.payload || []; // Ensure response payload is handled
+
+      if (!Array.isArray(recommendedCosts)) {
+        console.error("Invalid recommended costs data:", recommendedCosts);
+        alert("Failed to fetch recommendations. Please try again.");
+        return;
       }
-    }
-    if (matchedCosts.length > 0) {
-      // Penyesuaian harga satuan (tahun, lokasi, inflasi)
-      const inflasiProject = (() => {
-        const inf = inflasiList?.find((i) => Number(i.year) === Number(tahun));
-        return inf ? inf.value : 5.0;
-      })();
-      const getCCI = (nama) => {
-        const prov = provinces.find((p) => p.name === nama);
-        return prov ? prov.cci : 100;
-      };
-      const cciBanjarmasin = (() => {
-        const prov = provinces.find(
-          (p) => p.name.toLowerCase().includes("banjar") && p.cci === 100.7
-        );
-        return prov ? prov.cci : 100;
-      })();
-      const calculateQuantityUsingCapacityFactor = (baseQty, baseVolume, targetVolume) => {
-        // Rumus Capacity Factor:
-        // qty_target = qty_base * (volume_target / volume_base)^n
-        // n biasanya 0.6-0.7, gunakan 0.65
-        const factor = 0.73;
-        return baseQty * Math.pow(targetVolume / baseVolume, factor);
-      };
-      const items = matchedCosts.map((row) => {
-        const tahunItem = row.tahun || tahun;
-        const lokasiItem = row.lokasi || lokasi;
-        const hargaSatuanItem = row.hargaSatuan || row.harga || 0;
-        const n = Number(tahun) - Number(tahunItem);
-        const r = Number(inflasiProject) / 100;
-        let hargaTahunProject = hargaSatuanItem;
-        if (n > 0) {
-          hargaTahunProject = hargaSatuanItem * Math.pow(1 + r, n);
-        }
-        const cciItem = getCCI(lokasiItem);
-        let hargaBanjarmasin = hargaTahunProject * (cciBanjarmasin / cciItem);
-        const cciProject = getCCI(lokasi);
-        let hargaLokasiProject = hargaBanjarmasin * (cciProject / 100);
-        const adjustedQty = calculateQuantityUsingCapacityFactor(
-          row.qty || 1,
-          row.volume || 1,
-          volume || 1
-        );
-        return {
-          ...row,
-          hargaSatuan: Math.round(hargaLokasiProject),
-          totalHarga: Math.round(adjustedQty * hargaLokasiProject),
-          qty: Math.round(adjustedQty),
-          tahun: Number(tahun),
-          lokasi,
-          proyek: name,
-          projectId: newProject.id, // Pastikan projectId ikut
-        };
-      });
-      dispatch(setItems(items));
-    } else {
-      dispatch(setItems([])); // Kosongkan jika tidak ada
-    }
 
-    onClose();
-    // reset form
-    setName("");
-    setJenis("Onshore LNG Plant");
-    setKategori("");
-    setLokasi("");
-    setTahun(new Date().getFullYear());
-    setLevelAACE("Level 4");
-    setHarga("");
-    setUseGalileo("");
-    setVolume("");
-    // redirect ke detail construction cost
-    navigate(`/project/${newProject.id}/detail-construction`);
+      const newProject = {
+        id: Date.now(),
+        name,
+        infrastruktur,
+        kategori,
+        lokasi,
+        tahun: Number(tahun),
+        inflasi: Number(inflasi),
+        volume: Number(volume),
+      };
+
+      dispatch(createProject(newProject));
+
+      const constructionItems = recommendedCosts.map((cost) => ({
+        kode: cost.id,
+        uraian: cost.uraian,
+        satuan: cost.satuan,
+        qty: cost.qty,
+        hargaSatuan: cost.hargaSatuan,
+        totalHarga: cost.totalHarga,
+        kelompok: cost.kelompok,
+        tahun: cost.tahun,
+        proyek: newProject.name,
+        lokasi: newProject.lokasi,
+        tipe: newProject.infrastruktur,
+        aaceClass: cost.aaceClass,
+        isCategory: false,
+      }));
+
+      dispatch(setItems(constructionItems));
+      onClose();
+      navigate(`/project/${newProject.id}/detail-construction`);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      alert("Failed to fetch recommendations. Please try again.");
+    }
   };
 
   return isOpen ? (
@@ -227,11 +169,11 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Jenis
+                  Infrastruktur
                 </label>
                 <select
-                  value={jenis}
-                  onChange={(e) => setJenis(e.target.value)}
+                  value={infrastruktur}
+                  onChange={(e) => setInfrastruktur(e.target.value)}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 >
                   {jenisOptions.map((opt) => (
@@ -255,7 +197,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                     required
                   />
                   <div className="text-sm flex items-center px-2 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
-                    {satuanByJenis[jenis] || "-"}
+                    {satuanByJenis[infrastruktur] || "-"}
                   </div>
                 </div>
               </div>
@@ -269,14 +211,13 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                   onChange={(e) => setKategori(e.target.value)}
                   placeholder="Kategori"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  readOnly={jenis === "FSRU" && volume}
+                  readOnly={infrastruktur === "FSRU" && volume}
                 />
               </div>
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                   Lokasi
                 </label>
-                {/* Dropdown lokasi dari administrator slice */}
                 <select
                   value={lokasi}
                   onChange={(e) => setLokasi(e.target.value)}
@@ -309,8 +250,8 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 </label>
                 <input
                   type="number"
-                  // value={inflasi}
-                  // onChange={e => setTahun(e.target.value)}
+                  value={inflasi}
+                  onChange={(e) => setInflasi(e.target.value)}
                   placeholder="5%"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 />
@@ -336,7 +277,7 @@ const CreateProjectModal = ({ isOpen, onClose, onCreate }) => {
                 type="submit"
                 className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
               >
-                Add Project
+                Get Recommendations
               </button>
               <button
                 type="button"

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CreateProjectModal from "./CreateProjectModal";
-import { createProject } from "../../Provider/Project/ProjectSlice";
+import { fetchProjects, createProject } from "../../Provider/Project/ProjectSlice";
 import { setFilterJenis } from "../../Provider/Project/ConstractionCostSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -106,6 +106,10 @@ const ProjectTable = () => {
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(fetchProjects());
+  }, [dispatch]);
 
   const handleCreateProject = (newProject) => {
     dispatch(createProject(newProject));

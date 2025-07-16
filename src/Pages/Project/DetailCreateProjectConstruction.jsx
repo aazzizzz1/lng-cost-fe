@@ -12,8 +12,10 @@ import {
   openModal,
   closeModal,
   selectModal,
+  fetchRecommendedConstructionCosts,
 } from '../../Provider/Project/detailCreateProjectConstructionSlice';
 import DetailCreateProjectConstructionModal from './DetailCreateProjectConstructionModal';
+import { saveProjectWithCosts } from '../../Provider/Project/ProjectSlice';
 
 const satuanByJenis = {
   "Onshore LNG Plant": "MTPA",
@@ -36,6 +38,7 @@ const DetailCreateProjectConstruction = () => {
   const items = useSelector(selectItems);
   const modal = useSelector(selectModal);
   const costs = useSelector((state) => state.constractionCost.costs);
+  const recommendedCosts = useSelector((state) => state.projects.recommendedCosts);
 
   // Memoize kelompokListUsed to avoid unnecessary recalculations
   const kelompokListUsed = useMemo(() => [...new Set(costs.map((cost) => cost.kelompok))], [costs]);
@@ -73,6 +76,20 @@ const DetailCreateProjectConstruction = () => {
       dispatch(setItems(initialItems));
     }
   }, [dispatch, items, project, kelompokListUsed, kelompokTemplatesUsed]);
+
+  useEffect(() => {
+    if (project) {
+      dispatch(fetchRecommendedConstructionCosts({
+        name: project.name,
+        infrastruktur: project.infrastruktur,
+        lokasi: project.lokasi,
+        volume: project.volume,
+        tahun: project.tahun,
+        kategori: project.kategori,
+        inflasi: 5.0, // Default inflation assumption
+      }));
+    }
+  }, [dispatch, project]);
 
   // Handler for field changes
   const handleItemChange = (idx, field, value) => {
@@ -119,27 +136,38 @@ const DetailCreateProjectConstruction = () => {
 
   // Save to dummy construction cost slice
   const handleSave = () => {
-    const itemsWithId = items
-      .filter((item) => !item.isCategory || item.hargaSatuan > 0 || item.uraian)
-      .map((item) => ({
-        ...item,
-        accuracyLow: -15,
-        accuracyHigh: 20,
-        infrastruktur: project?.kategori || "",
-        volume: "",
-        satuanVolume: "",
-        kapasitasRegasifikasi: "",
-        satuanKapasitas: "",
-        tipe: project?.jenis || "",
-        proyek: project?.name || "",
-        tahun: project?.tahun,
-        lokasi: project?.lokasi,
-        projectId: project?.id,
-      }));
-    dispatch({
-      type: 'constractionCost/addProjectCosts',
-      payload: itemsWithId,
-    });
+    const projectData = {
+      name: "Proyek LNG BV",
+      infrastruktur: "MID SCALE LNG BV",
+      lokasi: "Riau",
+      volume: 6000,
+      tahun: 2025,
+      kategori: "MID SCALE LNG BV",
+      levelAACE: 3,
+      harga: 5000000000,
+      constructionCosts: recommendedCosts.map((cost) => ({
+        uraian: cost.uraian,
+        specification: cost.specification,
+        qty: cost.qty,
+        satuan: cost.satuan,
+        hargaSatuan: cost.hargaSatuan,
+        totalHarga: cost.totalHarga,
+        aaceClass: cost.aaceClass,
+        accuracyLow: cost.accuracyLow,
+        accuracyHigh: cost.accuracyHigh,
+        tahun: cost.tahun,
+        infrastruktur: cost.infrastruktur,
+        volume: cost.volume,
+        satuanVolume: cost.satuanVolume,
+        kapasitasRegasifikasi: cost.kapasitasRegasifikasi,
+        satuanKapasitas: cost.satuanKapasitas,
+        kelompok: cost.kelompok,
+        kelompokDetail: cost.kelompokDetail,
+        lokasi: cost.lokasi,
+        tipe: cost.tipe,
+      })),
+    };
+    dispatch(saveProjectWithCosts(projectData));
     dispatch(setFilterJenis({ tipe: project?.jenis, proyek: project?.name }));
     navigate('/construction-cost');
   };
@@ -223,6 +251,14 @@ const DetailCreateProjectConstruction = () => {
           handleSave();
         }}
       >
+        <div className="mt-6 flex justify-end">
+          <button
+            type="submit"
+            className="bg-primary-700 hover:bg-primary-800 text-white px-6 py-2 rounded font-semibold"
+          >
+            Simpan & Lihat Detail Construction Cost
+          </button>
+        </div>
         {kelompokListUsed.map((kelompok) => (
           <div key={kelompok} className="mb-8">
             <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
@@ -365,14 +401,6 @@ const DetailCreateProjectConstruction = () => {
             </button>
           </div>
         ))}
-        <div className="mt-6 flex justify-end">
-          <button
-            type="submit"
-            className="bg-primary-700 hover:bg-primary-800 text-white px-6 py-2 rounded font-semibold"
-          >
-            Simpan & Lihat Detail Construction Cost
-          </button>
-        </div>
       </form>
       {/* Modal Pilih Harga Satuan */}
       <DetailCreateProjectConstructionModal

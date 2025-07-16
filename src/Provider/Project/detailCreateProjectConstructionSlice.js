@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 // Fungsi default item
 export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe, isCategory = false) => ({
@@ -27,6 +28,19 @@ const initialState = {
     search: "",
   }
 };
+
+export const fetchRecommendedConstructionCosts = createAsyncThunk(
+  'detailCreateProjectConstruction/fetchRecommendedConstructionCosts',
+  async (projectData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/projects/recommend', projectData);
+      return response.data.data; // Return the recommended construction costs
+    } catch (error) {
+      console.error('Error fetching recommended construction costs:', error);
+      return rejectWithValue(error.response?.data || 'Failed to fetch construction costs');
+    }
+  }
+);
 
 // Slice kosong, hanya untuk namespace jika ingin menambah reducer terkait detail construction project
 const detailCreateProjectConstructionSlice = createSlice({
@@ -83,7 +97,29 @@ const detailCreateProjectConstructionSlice = createSlice({
     setModalSearch: (state, action) => {
       state.modal.search = action.payload;
     },
-  }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchRecommendedConstructionCosts.fulfilled, (state, action) => {
+      state.items = action.payload.map((item) => ({
+        kode: item.id,
+        uraian: item.uraian,
+        satuan: item.satuan,
+        qty: item.qty,
+        hargaSatuan: item.hargaSatuan,
+        totalHarga: item.totalHarga,
+        kelompok: item.kelompok,
+        tahun: item.tahun,
+        proyek: item.proyek,
+        lokasi: item.lokasi,
+        tipe: item.tipe,
+        isCategory: false,
+        aaceClass: item.aaceClass,
+      }));
+    });
+    builder.addCase(fetchRecommendedConstructionCosts.rejected, (state, action) => {
+      console.error('Failed to fetch recommended construction costs:', action.payload);
+    });
+  },
 });
 
 export const {
@@ -93,10 +129,10 @@ export const {
   deleteItem,
   openModal,
   closeModal,
-  setModalSearch
+  setModalSearch,
 } = detailCreateProjectConstructionSlice.actions;
 
-export const selectItems = state => state.detailCreateProjectConstruction.items;
-export const selectModal = state => state.detailCreateProjectConstruction.modal;
+export const selectItems = (state) => state.detailCreateProjectConstruction.items;
+export const selectModal = (state) => state.detailCreateProjectConstruction.modal;
 
 export default detailCreateProjectConstructionSlice.reducer;
