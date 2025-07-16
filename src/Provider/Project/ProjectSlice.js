@@ -4,6 +4,7 @@ import axios from 'axios';
 const initialState = {
   projects: [],
   recommendedCosts: [],
+  selectedProjectDetails: null, // Store details of the selected project
 };
 
 const projectSlice = createSlice({
@@ -19,10 +20,18 @@ const projectSlice = createSlice({
     createProject: (state, action) => {
       state.projects.push(action.payload);
     },
+    setSelectedProjectDetails: (state, action) => {
+      state.selectedProjectDetails = action.payload;
+    },
   },
 });
 
-export const { setProjects, setRecommendedCosts, createProject } = projectSlice.actions;
+export const {
+  setProjects,
+  setRecommendedCosts,
+  createProject,
+  setSelectedProjectDetails,
+} = projectSlice.actions;
 
 export const fetchProjects = () => async (dispatch) => {
   try {
@@ -45,6 +54,16 @@ export const fetchRecommendedCosts = (projectData) => async (dispatch) => {
   } catch (error) {
     console.error('Error fetching recommended costs:', error);
     return []; // Fallback to an empty array in case of error
+  }
+};
+
+export const fetchProjectById = (projectId) => async (dispatch) => {
+  try {
+    const response = await axios.get(`http://localhost:5000/api/projects/${projectId}`);
+    dispatch(setSelectedProjectDetails(response.data.data));
+  } catch (error) {
+    console.error('Error fetching project details:', error);
+    dispatch(setSelectedProjectDetails(null));
   }
 };
 
