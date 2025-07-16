@@ -137,12 +137,12 @@ const DetailCreateProjectConstruction = () => {
   // Save to dummy construction cost slice
   const handleSave = () => {
     const projectData = {
-      name: "Proyek LNG BV",
-      infrastruktur: "MID SCALE LNG BV",
-      lokasi: "Riau",
-      volume: 6000,
-      tahun: 2025,
-      kategori: "MID SCALE LNG BV",
+      name: project?.name || "New Project",
+      infrastruktur: project?.infrastruktur || "MID SCALE LNG BV",
+      lokasi: project?.lokasi || "Riau",
+      volume: project?.volume || 6000,
+      tahun: project?.tahun || 2025,
+      kategori: project?.kategori || "MID SCALE LNG BV",
       levelAACE: 3,
       harga: 5000000000,
       constructionCosts: recommendedCosts.map((cost) => ({
