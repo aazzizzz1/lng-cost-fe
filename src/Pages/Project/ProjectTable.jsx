@@ -52,6 +52,7 @@ const ProjectTable = () => {
                   <th scope="col" className="px-4 py-3">Kategori</th>
                   <th scope="col" className="px-4 py-3">Lokasi</th>
                   <th scope="col" className="px-4 py-3">Tahun</th>
+                  <th scope="col" className="px-4 py-3">AACE Level</th> {/* Added column */}
                 </tr>
               </thead>
               <tbody>
@@ -70,6 +71,7 @@ const ProjectTable = () => {
                     <td className="px-4 py-3">{project.kategori}</td>
                     <td className="px-4 py-3">{project.lokasi}</td>
                     <td className="px-4 py-3">{project.tahun}</td>
+                    <td className="px-4 py-3">{project.levelAACE || "-"}</td> {/* Display AACE Level */}
                   </tr>
                 ))}
               </tbody>
