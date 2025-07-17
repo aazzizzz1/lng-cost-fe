@@ -33,7 +33,7 @@ const UnitPriceSidebar = () => {
       infrastruktur: infra || "",
       kelompok: kelompok || "",
     }).toString();
-    navigate(`/transportation?${queryParams}`);
+    navigate(`/unitprice?${queryParams}`);
   };
 
   return (

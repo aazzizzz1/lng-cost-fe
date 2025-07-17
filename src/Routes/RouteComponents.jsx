@@ -19,10 +19,9 @@ import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
 import MaterialAndPackagePages from "../Pages/UnitPrice/MaterialAndPackage/MaterialAndPackagePages";
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
-import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
+import TransportPages from "../Pages/UnitPrice/UnitPricePages";
 import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
 import ReceivingTerimnalPages from "../Pages/UnitPrice/ReceivingTerminal/ReceivingTerimnalPages";
-import Cobagettransport from "../Pages/UnitPrice/Transport/Cobagettransport";
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -139,7 +138,7 @@ const RouteComponents = () => {
             }
           />
           <Route
-            path="/transportation"
+            path="/unitprice"
             element={
               <LayoutPages>
                 <TransportPages />
@@ -174,13 +173,6 @@ const RouteComponents = () => {
             path="/"
             element={
               <SignIn />
-              // <Dashboard />
-            }
-          />
-          <Route
-            path="/coba"
-            element={
-              <Cobagettransport />
               // <Dashboard />
             }
           />

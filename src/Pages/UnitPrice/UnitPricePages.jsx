@@ -1,8 +1,8 @@
 import React, { Component, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import TransportTable from './TransportTable';
-import { fetchTransportData, setFilters, setPagination } from '../../../Provider/HargaSatuan/transportSlice';
+import UnitPriceTable from './UnitPriceTable';
+import { fetchTransportData, setFilters, setPagination } from '../../Provider/HargaSatuan/unitPriceSlice';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -26,10 +26,10 @@ class ErrorBoundary extends Component {
   }
 }
 
-const TransportPages = () => {
+const UnitPricePages = () => {
   const dispatch = useDispatch();
   const location = useLocation();
-  const { data, filters, pagination, loading } = useSelector((state) => state.transport);
+  const { transport: { data, filters, pagination, loading } } = useSelector((state) => state.unitPrice);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -81,7 +81,7 @@ const TransportPages = () => {
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
         <p className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Transportasi - Harga Satuan
+          Unit Price - Harga Satuan
         </p>
         {/* Filters */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -106,7 +106,7 @@ const TransportPages = () => {
           </select>
         </div>
         {/* Table */}
-        <TransportTable
+        <UnitPriceTable
           data={data}
           loading={loading}
           pagination={pagination}
@@ -119,4 +119,4 @@ const TransportPages = () => {
   );
 };
 
-export default TransportPages;
+export default UnitPricePages;

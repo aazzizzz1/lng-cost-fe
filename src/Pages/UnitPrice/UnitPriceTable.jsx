@@ -21,7 +21,7 @@ const columns = [
   { key: "tipe", label: "Tipe" },
 ];
 
-const TransportTable = ({ data, loading, pagination, onPageChange, onLimitChange, onSortChange }) => {
+const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange, onSortChange }) => {
   const { page, limit, total, totalPages } = pagination;
 
   const handleSort = (key) => {
@@ -199,4 +199,4 @@ const TransportTable = ({ data, loading, pagination, onPageChange, onLimitChange
   );
 };
 
-export default TransportTable;
+export default UnitPriceTable;
