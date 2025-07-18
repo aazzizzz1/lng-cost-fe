@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchUniqueFields } from '../../Provider/HargaSatuan/unitPriceSlice'; // Import fetchUniqueFields
+import { fetchSubTypeInfra } from '../../Provider/HargaSatuan/unitPriceSlice'; // Import fetchSubTypeInfra
 
 const satuanByJenis = {
   "Onshore LNG Plant": "MTPA",
@@ -16,7 +16,7 @@ const satuanByJenis = {
 const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const dispatch = useDispatch();
   const provinces = useSelector(state => state.administrator.provinces || []);
-  const uniqueFields = useSelector(state => state.unitPrice.uniqueFields || {});
+  const subTypeInfra = useSelector(state => state.unitPrice.subTypeInfra || []); // Use subTypeInfra from slice
   const [namaRab, setNamaRab] = useState(initialData?.namaRab || "");
   const [tahun, setTahun] = useState(initialData?.tahun || 2025);
   const [inflasi, setInflasi] = useState(initialData?.inflasi || 5);
@@ -25,7 +25,7 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [volume, setVolume] = useState(initialData?.volume || "");
 
   useEffect(() => {
-    dispatch(fetchUniqueFields()); // Fetch unique fields on mount
+    dispatch(fetchSubTypeInfra()); // Fetch subtypes on mount
   }, [dispatch]);
 
   const handleSubmit = (e) => {
@@ -39,9 +39,6 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       volume,
     });
   };
-
-  const subTypes = Object.values(uniqueFields)
-    .flatMap(type => Object.keys(type)); // Extract all sub-types
 
   if (!isOpen) return null;
   return (
@@ -104,7 +101,7 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
               required
             >
               <option value="">Pilih Sub-Jenis</option>
-              {subTypes.map((subType) => (
+              {subTypeInfra.map((subType) => (
                 <option key={subType} value={subType}>
                   {subType}
                 </option>

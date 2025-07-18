@@ -76,6 +76,21 @@ export const fetchRecommendedUnitPrices = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch subtypes of infrastructure
+export const fetchSubTypeInfra = createAsyncThunk(
+  'unitPrice/fetchSubTypeInfra',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${api}/unit-prices/unique-fields`);
+      const groupedData = response.data.data;
+      const subTypes = Object.values(groupedData).flatMap(type => Object.keys(type)); // Extract all subtypes
+      return subTypes;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   uniqueFields: {
     tipe: [],
@@ -128,7 +143,8 @@ const unitPriceSlice = createSlice({
     ...initialState,
     transport: transportInitialState,
     types: [],
-    recommendedPrices: [], // Add state for recommended unit prices
+    subTypeInfra: [], // Add state for subtypes of infrastructure
+    recommendedPrices: [],
   },
   reducers: {
     setFilters: (state, action) => {
@@ -197,6 +213,18 @@ const unitPriceSlice = createSlice({
         state.recommendedPrices = action.payload;
       })
       .addCase(fetchRecommendedUnitPrices.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchSubTypeInfra.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSubTypeInfra.fulfilled, (state, action) => {
+        state.loading = false;
+        state.subTypeInfra = action.payload; // Store fetched subtypes
+      })
+      .addCase(fetchSubTypeInfra.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
