@@ -37,7 +37,7 @@ export const { setProvinces, setInflasi, updateProvinceCCI, updateInflasi } = ad
 
 export const fetchProvinces = () => async (dispatch) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/cci');
+    const response = await axios.get(`${process.env.REACT_APP_API}/cci`); // Use REACT_APP_API for base URL
     const provinces = response.data.data.map((item) => ({
       code: item.kodeProvinsi,
       name: item.provinsi,

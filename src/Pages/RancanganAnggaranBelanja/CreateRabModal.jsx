@@ -1,16 +1,6 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
-
-const jenisOptions = [
-  "Onshore LNG Plant",
-  "Offshore LNG Plant",
-  "LNG Carrier",
-  "LNG Trucking",
-  "FSRU",
-  "ORF",
-  "OTS",
-  "ORU",
-];
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUniqueFields } from '../../Provider/HargaSatuan/unitPriceSlice'; // Import fetchUniqueFields
 
 const satuanByJenis = {
   "Onshore LNG Plant": "MTPA",
@@ -24,13 +14,19 @@ const satuanByJenis = {
 };
 
 const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
+  const dispatch = useDispatch();
   const provinces = useSelector(state => state.administrator.provinces || []);
+  const uniqueFields = useSelector(state => state.unitPrice.uniqueFields || {});
   const [namaRab, setNamaRab] = useState(initialData?.namaRab || "");
   const [tahun, setTahun] = useState(initialData?.tahun || 2025);
   const [inflasi, setInflasi] = useState(initialData?.inflasi || 5);
   const [lokasi, setLokasi] = useState(initialData?.lokasi || "");
-  const [jenis, setJenis] = useState(initialData?.jenis || jenisOptions[0]);
+  const [selectedSubType, setSelectedSubType] = useState(initialData?.jenis || "");
   const [volume, setVolume] = useState(initialData?.volume || "");
+
+  useEffect(() => {
+    dispatch(fetchUniqueFields()); // Fetch unique fields on mount
+  }, [dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,10 +35,13 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       tahun,
       inflasi,
       lokasi,
-      jenis,
+      jenis: selectedSubType,
       volume,
     });
   };
+
+  const subTypes = Object.values(uniqueFields)
+    .flatMap(type => Object.keys(type)); // Extract all sub-types
 
   if (!isOpen) return null;
   return (
@@ -99,13 +98,16 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
           <div className="mb-2">
             <label className="block text-sm mb-1 text-gray-700 dark:text-gray-200">Jenis</label>
             <select
-              value={jenis}
-              onChange={e => setJenis(e.target.value)}
+              value={selectedSubType}
+              onChange={e => setSelectedSubType(e.target.value)}
               className="w-full border rounded px-2 py-1"
               required
             >
-              {jenisOptions.map(j => (
-                <option key={j} value={j}>{j}</option>
+              <option value="">Pilih Sub-Jenis</option>
+              {subTypes.map((subType) => (
+                <option key={subType} value={subType}>
+                  {subType}
+                </option>
               ))}
             </select>
           </div>
@@ -119,7 +121,7 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
                 className="w-full border rounded px-2 py-1"
                 required
               />
-              <span className="text-sm flex items-center">{satuanByJenis[jenis] || "-"}</span>
+              <span className="text-sm flex items-center">{satuanByJenis[selectedSubType] || "-"}</span>
             </div>
           </div>
           <div className="flex gap-2 justify-end">
@@ -140,7 +142,7 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreateRabModal
+export default CreateRabModal;

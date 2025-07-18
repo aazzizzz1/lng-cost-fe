@@ -62,6 +62,20 @@ export const fetchTypes = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch recommended unit prices
+export const fetchRecommendedUnitPrices = createAsyncThunk(
+  'unitPrice/fetchRecommendedUnitPrices',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${api}/unit-prices/recommend`, payload);
+      return response.data.data; // Return the recommended unit prices
+    } catch (error) {
+      console.error('Error fetching recommended unit prices:', error.response || error.message);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   uniqueFields: {
     tipe: [],
@@ -114,6 +128,7 @@ const unitPriceSlice = createSlice({
     ...initialState,
     transport: transportInitialState,
     types: [],
+    recommendedPrices: [], // Add state for recommended unit prices
   },
   reducers: {
     setFilters: (state, action) => {
@@ -172,6 +187,18 @@ const unitPriceSlice = createSlice({
       .addCase(fetchUnitPriceDataForModal.rejected, (state, action) => {
         state.modalLoading = false;
         state.modalError = action.payload;
+      })
+      .addCase(fetchRecommendedUnitPrices.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchRecommendedUnitPrices.fulfilled, (state, action) => {
+        state.loading = false;
+        state.recommendedPrices = action.payload;
+      })
+      .addCase(fetchRecommendedUnitPrices.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
