@@ -89,7 +89,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
           <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
             Showing
             <span className="font-semibold text-gray-900 dark:text-white">
-              {page * limit - limit + 1}-{Math.min(page * limit, total)}
+              {Math.min((page - 1) * limit + 1, total)}-{Math.min(page * limit, total)}
             </span>
             of
             <span className="font-semibold text-gray-900 dark:text-white">

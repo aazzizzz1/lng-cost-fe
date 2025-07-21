@@ -198,6 +198,13 @@ const unitPriceSlice = createSlice({
       .addCase(fetchTransportData.fulfilled, (state, action) => {
         state.transport.loading = false;
         state.transport.data = action.payload.data;
+        state.transport.pagination = {
+          ...state.transport.pagination,
+          total: action.payload.pagination.totalData,
+          totalPages: action.payload.pagination.totalPages,
+          page: action.payload.pagination.currentPage,
+          limit: action.payload.pagination.limit,
+        }; // Update pagination data
       })
       .addCase(fetchTransportData.rejected, (state, action) => {
         state.transport.loading = false;

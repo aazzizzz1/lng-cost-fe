@@ -44,7 +44,11 @@ const UnitPricePages = () => {
       kelompok: queryParams.get('kelompok') || filters.kelompok,
     };
     dispatch(setFilters(params));
-    dispatch(fetchTransportData(params));
+    dispatch(fetchTransportData(params)).then((response) => {
+      if (response.payload.pagination) {
+        dispatch(setPagination(response.payload.pagination)); // Update pagination state
+      }
+    });
   }, [
     dispatch,
     location.search,
