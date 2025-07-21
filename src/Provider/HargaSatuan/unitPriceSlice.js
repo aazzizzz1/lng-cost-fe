@@ -6,7 +6,12 @@ const api = process.env.REACT_APP_API;
 
 const getAuthHeaders = () => {
   const token = Cookies.get('accessToken');
-  return { Authorization: `Bearer ${token}` };
+  return { 
+    Authorization: `Bearer ${token}`,
+    'Cache-Control': 'no-cache', // Prevent caching
+    Pragma: 'no-cache',          // HTTP 1.0 backward compatibility
+    Expires: '0',                // Expire immediately
+  };
 };
 
 // Async thunk to fetch unique fields
