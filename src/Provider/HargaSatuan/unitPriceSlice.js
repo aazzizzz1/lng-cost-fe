@@ -1,14 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
-const api = process.env.REACT_APP_API || 'http://localhost:5000/api';
+const api = process.env.REACT_APP_API;
+
+const getAuthHeaders = () => {
+  const token = Cookies.get('accessToken');
+  return { Authorization: `Bearer ${token}` };
+};
 
 // Async thunk to fetch unique fields
 export const fetchUniqueFields = createAsyncThunk(
   'unitPrice/fetchUniqueFields',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${api}/unit-prices/unique-fields`);
+      const response = await axios.get(`${api}/unit-prices/unique-fields`, {
+        headers: getAuthHeaders(),
+      });
       return response.data.data; // Return grouped data directly
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -22,7 +30,10 @@ export const fetchUnitPriceData = createAsyncThunk(
   async ({ tipe = '', search = '' } = {}, { rejectWithValue }) => {
     try {
       const params = { tipe, search };
-      const response = await axios.get(`${api}/unit-prices`, { params });
+      const response = await axios.get(`${api}/unit-prices`, {
+        params,
+        headers: getAuthHeaders(),
+      });
       return response.data; // Ensure the response contains the expected data
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -40,7 +51,7 @@ export const fetchTransportData = createAsyncThunk(
       if (order) params.order = order;
       if (search) params.search = search;
 
-      const response = await axios.get(`${api}/unit-prices`, { params });
+      const response = await axios.get(`${api}/unit-prices`, { params, headers: getAuthHeaders() });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -99,6 +110,7 @@ const initialState = {
   },
   loading: false,
   modalLoading: false, // Add modal-specific loading state
+  loadingRecommended: false, // Add loading state for recommended data
   error: null,
   modalError: null, // Add modal-specific error state
 };
@@ -205,15 +217,15 @@ const unitPriceSlice = createSlice({
         state.modalError = action.payload;
       })
       .addCase(fetchRecommendedUnitPrices.pending, (state) => {
-        state.loading = true;
+        state.loadingRecommended = true; // Set loading state for recommended data
         state.error = null;
       })
       .addCase(fetchRecommendedUnitPrices.fulfilled, (state, action) => {
-        state.loading = false;
+        state.loadingRecommended = false; // Clear loading state
         state.recommendedPrices = action.payload;
       })
       .addCase(fetchRecommendedUnitPrices.rejected, (state, action) => {
-        state.loading = false;
+        state.loadingRecommended = false; // Clear loading state
         state.error = action.payload;
       })
       .addCase(fetchSubTypeInfra.pending, (state) => {

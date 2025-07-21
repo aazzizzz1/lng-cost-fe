@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const initialState = {
   projects: [],
   recommendedCosts: [],
-  selectedProjectDetails: null, // Store details of the selected project
+  selectedProjectDetails: null,
 };
 
 const projectSlice = createSlice({
@@ -33,9 +34,16 @@ export const {
   setSelectedProjectDetails,
 } = projectSlice.actions;
 
+const getAuthHeaders = () => {
+  const token = Cookies.get('accessToken');
+  return { Authorization: `Bearer ${token}` };
+};
+
 export const fetchProjects = () => async (dispatch) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/projects');
+    const response = await axios.get(`${process.env.REACT_APP_API}/projects`, {
+      headers: getAuthHeaders(),
+    });
     dispatch(setProjects(response.data.data));
   } catch (error) {
     console.error('Error fetching projects:', error);
@@ -45,21 +53,24 @@ export const fetchProjects = () => async (dispatch) => {
 export const fetchRecommendedCosts = (projectData) => async (dispatch) => {
   try {
     const response = await axios.post(
-      'http://localhost:5000/api/projects/recommend',
-      projectData
+      `${process.env.REACT_APP_API}/projects/recommend`,
+      projectData,
+      { headers: getAuthHeaders() }
     );
-    const data = response.data?.data || []; // Extract data from response
+    const data = response.data?.data || [];
     dispatch(setRecommendedCosts(data));
-    return data; // Return the payload for further use
+    return data;
   } catch (error) {
     console.error('Error fetching recommended costs:', error);
-    return []; // Fallback to an empty array in case of error
+    return [];
   }
 };
 
 export const fetchProjectById = (projectId) => async (dispatch) => {
   try {
-    const response = await axios.get(`http://localhost:5000/api/projects/${projectId}`);
+    const response = await axios.get(`${process.env.REACT_APP_API}/projects/${projectId}`, {
+      headers: getAuthHeaders(),
+    });
     dispatch(setSelectedProjectDetails(response.data.data));
   } catch (error) {
     console.error('Error fetching project details:', error);
@@ -69,7 +80,9 @@ export const fetchProjectById = (projectId) => async (dispatch) => {
 
 export const saveProjectWithCosts = (projectData) => async () => {
   try {
-    await axios.post('http://localhost:5000/api/projects', projectData);
+    await axios.post(`${process.env.REACT_APP_API}/projects`, projectData, {
+      headers: getAuthHeaders(),
+    });
   } catch (error) {
     console.error('Error saving project:', error);
   }

@@ -1,5 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import Cookies from 'js-cookie'; // Import Cookies to retrieve the token
+
+const getAuthHeaders = () => {
+  const token = Cookies.get('accessToken'); // Retrieve the token from cookies
+  return { Authorization: `Bearer ${token}` };
+};
 
 const initialState = {
   provinces: [],
@@ -37,7 +43,9 @@ export const { setProvinces, setInflasi, updateProvinceCCI, updateInflasi } = ad
 
 export const fetchProvinces = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API}/cci`); // Use REACT_APP_API for base URL
+    const response = await axios.get(`${process.env.REACT_APP_API}/cci`, {
+      headers: getAuthHeaders(),
+    }); // Use REACT_APP_API for base URL
     const provinces = response.data.data.map((item) => ({
       code: item.kodeProvinsi,
       name: item.provinsi,
@@ -51,7 +59,9 @@ export const fetchProvinces = () => async (dispatch) => {
 
 export const fetchInflasi = () => async (dispatch) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/inflasi'); // Replace with actual endpoint
+    const response = await axios.get(`${process.env.REACT_APP_API}/inflasi`, {
+      headers: getAuthHeaders(),
+    }); // Replace with actual endpoint
     dispatch(setInflasi(response.data.data));
   } catch (error) {
     console.error('Error fetching inflation data:', error);

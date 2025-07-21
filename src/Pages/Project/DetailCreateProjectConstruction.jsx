@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setFilterJenis } from '../../Provider/Project/ConstractionCostSlice';
 import {
   defaultItem,
-  setItems,
+  // setItems,
   updateItem,
   addItem,
   deleteItem,
@@ -39,6 +39,7 @@ const DetailCreateProjectConstruction = () => {
   const modal = useSelector(selectModal);
   const costs = useSelector((state) => state.constractionCost.costs);
   const recommendedCosts = useSelector((state) => state.projects.recommendedCosts);
+  const recommendedCostsLoading = useSelector((state) => state.projects.loadingRecommendedCosts);
 
   // Memoize kelompokListUsed to avoid unnecessary recalculations
   const kelompokListUsed = useMemo(() => [...new Set(costs.map((cost) => cost.kelompok))], [costs]);
@@ -56,27 +57,7 @@ const DetailCreateProjectConstruction = () => {
     }, {});
   }, [kelompokListUsed, costs]);
 
-  // Generate initial items per kelompok (only on mount)
-  useEffect(() => {
-    if ((!items || items.length === 0) && project) {
-      const initialItems = kelompokListUsed.flatMap((kelompok) =>
-        (kelompokTemplatesUsed[kelompok] || []).map((t) =>
-          defaultItem(
-            t.kode,
-            t.uraian,
-            kelompok,
-            project?.tahun,
-            project?.name,
-            project?.lokasi,
-            project?.jenis,
-            t.isCategory || false
-          )
-        )
-      );
-      dispatch(setItems(initialItems));
-    }
-  }, [dispatch, items, project, kelompokListUsed, kelompokTemplatesUsed]);
-
+  // Fetch recommended construction costs on project change
   useEffect(() => {
     if (project) {
       dispatch(fetchRecommendedConstructionCosts({
@@ -169,7 +150,7 @@ const DetailCreateProjectConstruction = () => {
     };
     dispatch(saveProjectWithCosts(projectData));
     dispatch(setFilterJenis({ tipe: project?.jenis, proyek: project?.name }));
-    navigate('/construction-cost');
+    navigate('/project');
   };
 
   // Group items by kelompok
@@ -259,148 +240,172 @@ const DetailCreateProjectConstruction = () => {
             Simpan & Lihat Detail Construction Cost
           </button>
         </div>
-        {kelompokListUsed.map((kelompok) => (
-          <div key={kelompok} className="mb-8">
-            <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
-            <div className="overflow-x-auto">
-              <table className="w-full mb-2 border dark:border-gray-700 bg-white dark:bg-gray-900 rounded">
-                <thead>
-                  <tr className="bg-gray-100 dark:bg-gray-800">
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Kode</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Uraian</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Satuan</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Qty</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Harga Satuan</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Total Harga</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">AACE Class</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Ambil Harga</th>
-                    <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {grouped[kelompok].map((item, idx) => {
-                    const absIdx = items.findIndex((it) => it === item);
-                    return (
-                      <tr
-                        key={absIdx}
-                        className={item.isCategory ? "bg-gray-50 dark:bg-gray-800 font-semibold" : "bg-white dark:bg-gray-900"}
-                      >
-                        <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">{item.kode}</td>
-                        <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                          {item.isCategory ? (
-                            item.uraian
-                          ) : (
-                            <input
-                              type="text"
-                              value={item.uraian}
-                              onChange={(e) => handleItemChange(absIdx, "uraian", e.target.value)}
-                              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                              placeholder="Sub Uraian"
-                              required
-                            />
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-4 py-2">
-                          {item.isCategory ? (
-                            ""
-                          ) : (
-                            <input
-                              type="text"
-                              value={item.satuan}
-                              onChange={(e) => handleItemChange(absIdx, "satuan", e.target.value)}
-                              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                            />
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-4 py-2">
-                          {item.isCategory ? (
-                            ""
-                          ) : (
-                            <input
-                              type="number"
-                              min={1}
-                              step="any"
-                              value={item.qty}
-                              onChange={(e) => handleItemChange(absIdx, "qty", e.target.value)}
-                              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                            />
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-4 py-2">
-                          {item.isCategory ? (
-                            ""
-                          ) : (
-                            <input
-                              type="number"
-                              min={0}
-                              step="any"
-                              value={item.hargaSatuan}
-                              onChange={(e) => handleItemChange(absIdx, "hargaSatuan", e.target.value)}
-                              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                            />
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-4 py-2 text-right text-gray-900 dark:text-white">
-                          {item.isCategory ? "" : `Rp${Number(item.totalHarga || 0).toLocaleString()}`}
-                        </td>
-                        <td className="border dark:border-gray-700 px-4 py-2">
-                          {item.isCategory ? (
-                            ""
-                          ) : (
-                            <input
-                              type="number"
-                              min={1}
-                              max={5}
-                              value={item.aaceClass}
-                              onChange={(e) => handleItemChange(absIdx, "aaceClass", e.target.value)}
-                              className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                            />
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-4 py-2">
-                          {!item.isCategory && (
-                            <button
-                              type="button"
-                              className="flex items-center gap-1 bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
-                              onClick={() => handleOpenModal("material", absIdx)}
-                              title="Ambil dari Harga Satuan"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <ellipse cx="12" cy="6" rx="8" ry="3" stroke="currentColor" strokeWidth="2" fill="none" />
-                                <path d="M4 6v6c0 1.657 3.582 3 8 3s8-1.343 8-3V6" stroke="currentColor" strokeWidth="2" fill="none" />
-                                <path d="M4 12v6c0 1.657 3.582 3 8 3s8-1.343 8-3v-6" stroke="currentColor" strokeWidth="2" fill="none" />
-                              </svg>
-                              Ambil dari Harga Satuan
-                            </button>
-                          )}
-                        </td>
-                        <td className="border dark:border-gray-700 px-4 py-2">
-                          {!item.isCategory && (
-                            <button
-                              type="button"
-                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs ml-1"
-                              onClick={() => handleDeleteItem(absIdx)}
-                              title="Hapus Item"
-                            >
-                              Hapus
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+        {recommendedCostsLoading ? (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
+            <div role="status">
+              <svg
+                aria-hidden="true"
+                className="w-12 h-12 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                viewBox="0 0 100 101"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                  fill="currentFill"
+                />
+              </svg>
+              <span className="sr-only">Loading...</span>
             </div>
-            <button
-              type="button"
-              className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1 rounded mb-2"
-              onClick={() => handleAddItem(kelompok)}
-            >
-              Tambah Item {kelompok}
-            </button>
           </div>
-        ))}
+        ) : (
+          kelompokListUsed.map((kelompok) => (
+            <div key={kelompok} className="mb-8">
+              <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
+              <div className="overflow-x-auto">
+                <table className="w-full mb-2 border dark:border-gray-700 bg-white dark:bg-gray-900 rounded">
+                  <thead>
+                    <tr className="bg-gray-100 dark:bg-gray-800">
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Kode</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Uraian</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Satuan</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Qty</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Harga Satuan</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Total Harga</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">AACE Class</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Ambil Harga</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {grouped[kelompok].map((item, idx) => {
+                      const absIdx = items.findIndex((it) => it === item);
+                      return (
+                        <tr
+                          key={absIdx}
+                          className={item.isCategory ? "bg-gray-50 dark:bg-gray-800 font-semibold" : "bg-white dark:bg-gray-900"}
+                        >
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">{item.kode}</td>
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.isCategory ? (
+                              item.uraian
+                            ) : (
+                              <input
+                                type="text"
+                                value={item.uraian}
+                                onChange={(e) => handleItemChange(absIdx, "uraian", e.target.value)}
+                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
+                                placeholder="Sub Uraian"
+                                required
+                              />
+                            )}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2">
+                            {item.isCategory ? (
+                              ""
+                            ) : (
+                              <input
+                                type="text"
+                                value={item.satuan}
+                                onChange={(e) => handleItemChange(absIdx, "satuan", e.target.value)}
+                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
+                              />
+                            )}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2">
+                            {item.isCategory ? (
+                              ""
+                            ) : (
+                              <input
+                                type="number"
+                                min={1}
+                                step="any"
+                                value={item.qty}
+                                onChange={(e) => handleItemChange(absIdx, "qty", e.target.value)}
+                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
+                              />
+                            )}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2">
+                            {item.isCategory ? (
+                              ""
+                            ) : (
+                              <input
+                                type="number"
+                                min={0}
+                                step="any"
+                                value={item.hargaSatuan}
+                                onChange={(e) => handleItemChange(absIdx, "hargaSatuan", e.target.value)}
+                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
+                              />
+                            )}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2 text-right text-gray-900 dark:text-white">
+                            {item.isCategory ? "" : `Rp${Number(item.totalHarga || 0).toLocaleString()}`}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2">
+                            {item.isCategory ? (
+                              ""
+                            ) : (
+                              <input
+                                type="number"
+                                min={1}
+                                max={5}
+                                value={item.aaceClass}
+                                onChange={(e) => handleItemChange(absIdx, "aaceClass", e.target.value)}
+                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
+                              />
+                            )}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2">
+                            {!item.isCategory && (
+                              <button
+                                type="button"
+                                className="flex items-center gap-1 bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
+                                onClick={() => handleOpenModal("material", absIdx)}
+                                title="Ambil dari Harga Satuan"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <ellipse cx="12" cy="6" rx="8" ry="3" stroke="currentColor" strokeWidth="2" fill="none" />
+                                  <path d="M4 6v6c0 1.657 3.582 3 8 3s8-1.343 8-3V6" stroke="currentColor" strokeWidth="2" fill="none" />
+                                  <path d="M4 12v6c0 1.657 3.582 3 8 3s8-1.343 8-3v-6" stroke="currentColor" strokeWidth="2" fill="none" />
+                                </svg>
+                                Ambil dari Harga Satuan
+                              </button>
+                            )}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2">
+                            {!item.isCategory && (
+                              <button
+                                type="button"
+                                className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs ml-1"
+                                onClick={() => handleDeleteItem(absIdx)}
+                                title="Hapus Item"
+                              >
+                                Hapus
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <button
+                type="button"
+                className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1 rounded mb-2"
+                onClick={() => handleAddItem(kelompok)}
+              >
+                Tambah Item {kelompok}
+              </button>
+            </div>
+          ))
+        )}
       </form>
       {/* Modal Pilih Harga Satuan */}
       <DetailCreateProjectConstructionModal

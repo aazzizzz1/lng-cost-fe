@@ -139,6 +139,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
       dispatch(setItems(constructionItems));
       onClose();
       navigate(`/project/${newProject.id}/detail-construction`);
+      // navigate(`/project`);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
       alert("Failed to fetch recommendations. Please try again.");

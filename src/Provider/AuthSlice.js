@@ -48,13 +48,12 @@ export const refreshToken = createAsyncThunk(
     try {
       const response = await axios.post(`${api}/auth/refresh-token`, {}, { withCredentials: true });
       const { accessToken } = response.data.data;
-      Cookies.set('accessToken', accessToken, { secure: true, sameSite: 'Strict' }); // Perbarui accessToken di cookies
+      Cookies.set('accessToken', accessToken, { secure: true, sameSite: 'Strict' });
       return accessToken;
     } catch (error) {
-      Cookies.remove('accessToken'); // Hapus accessToken dari cookies
-      Cookies.remove('user'); // Hapus user dari cookies
-      window.location.href = '/signin'; // Redirect ke signin jika refreshToken gagal
-      return rejectWithValue(error.response?.data?.message || 'Failed to refresh token');
+      Cookies.remove('accessToken');
+      Cookies.remove('user');
+      return rejectWithValue('Failed to refresh token');
     }
   }
 );
@@ -76,18 +75,29 @@ export const logoutUser = createAsyncThunk(
 
 export const validateAccessToken = createAsyncThunk(
   'auth/validateAccessToken',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      const accessToken = Cookies.get('accessToken'); // Ambil accessToken dari cookies
+      const accessToken = Cookies.get('accessToken'); // Retrieve accessToken from cookies
       const response = await axios.get(`${api}/auth/validate-token`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return response.data;
     } catch (error) {
-      Cookies.remove('accessToken'); // Hapus accessToken dari cookies
-      Cookies.remove('user'); // Hapus user dari cookies
-      window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
-      return rejectWithValue(error.response?.data?.message || 'Access token invalid');
+      if (error.response?.status === 401) {
+        // If token is expired, attempt to refresh it
+        try {
+          const newAccessToken = await dispatch(refreshToken()).unwrap();
+          Cookies.set('accessToken', newAccessToken, { secure: true, sameSite: 'Strict' });
+          return { message: 'Token refreshed successfully' };
+        } catch (refreshError) {
+          // If refresh fails, log out the user
+          Cookies.remove('accessToken');
+          Cookies.remove('user');
+          window.location.href = '/signin';
+          return rejectWithValue('Session expired. Please log in again.');
+        }
+      }
+      return rejectWithValue(error.response?.data?.message || 'Access token validation failed');
     }
   }
 );
@@ -95,8 +105,8 @@ export const validateAccessToken = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    accessToken: Cookies.get('accessToken') || null, // Ambil accessToken dari cookies
-    user: JSON.parse(Cookies.get('user') || '{}'), // Ambil user dari cookies
+    accessToken: Cookies.get('accessToken') || null, // Retrieve accessToken from cookies
+    user: JSON.parse(Cookies.get('user') || '{}'), // Retrieve user from cookies
     loading: false,
     errorMessage: '',
     successMessage: '',
@@ -104,11 +114,11 @@ const authSlice = createSlice({
       full_name: '',
       username: '',
       password: '',
-      confirm_password: ''
+      confirm_password: '',
     },
     inputLogin: {
       email: '',
-      password: ''
+      password: '',
     },
     formSubmitted: false,
     passwordVisible: false,
@@ -155,22 +165,21 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.user = null;
-      state.accessToken = null; // Reset accessToken saat logout
-      Cookies.remove('accessToken'); // Hapus accessToken dari cookies
-      Cookies.remove('user'); // Hapus user dari cookies
+      state.accessToken = null; // Reset accessToken on logout
+      Cookies.remove('accessToken'); // Remove accessToken from cookies
+      Cookies.remove('user'); // Remove user from cookies
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.errorMessage = '';
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.loading = false;
-        state.token = action.payload.token;
         state.successMessage = 'Registration successful';
-        window.location.href = '/signin'; // Redirect ke signin page
+        window.location.href = '/signin'; // Redirect to signin page
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
@@ -178,14 +187,14 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.errorMessage = '';
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.accessToken = action.payload.accessToken; // Simpan accessToken ke state
-        state.user = action.payload.user; // Simpan user ke state
+        state.accessToken = action.payload.accessToken; // Save accessToken to state
+        state.user = action.payload.user; // Save user to state
         state.successMessage = 'Login successful';
-        window.location.href = '/dashboard'; // Redirect ke dashboard
+        window.location.href = '/dashboard'; // Redirect to dashboard
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -213,7 +222,7 @@ export const {
   handleAccept,
   handleAcceptClick,
   handleDeclineClick,
-  logout
+  logout,
 } = authSlice.actions;
 
 export default authSlice.reducer;
