@@ -11,6 +11,9 @@ const satuanByJenis = {
   "ORF": "MMSCFD",
   "OTS": "MMSCFD",
   "ORU": "m³ / MMSCFD",
+  "LNG Bunkering Vessel": "m³",
+  "Mini LNG Plant": "MMscfd",
+  "LNG Carrier (LNGC)": "m³",
 };
 
 const jenisOptions = Object.keys(satuanByJenis);
