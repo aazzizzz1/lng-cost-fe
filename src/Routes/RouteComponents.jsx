@@ -10,18 +10,12 @@ import LayoutPages from "../Layout/LayoutPages";
 import DashboardPages from "../Pages/Home/DashboardPages";
 import ProjectPages from "../Pages/Project/ProjectPages";
 import ManageDataPages from "../Pages/ManageData/ManageDataPages";
-import JasaPages from "../Pages/UnitPrice/Jasa/JasaPages";
-import MaterialKonstruksiPages from "../Pages/UnitPrice/MaterialKonstruksi/MaterialKonstruksiPages";
-import TableMaterial from "../Pages/UnitPrice/MaterialKonstruksi/TableMaterial";
 import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPages";
 import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
 import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
-import MaterialAndPackagePages from "../Pages/UnitPrice/MaterialAndPackage/MaterialAndPackagePages";
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/UnitPricePages";
-import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
-import ReceivingTerimnalPages from "../Pages/UnitPrice/ReceivingTerminal/ReceivingTerimnalPages";
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -90,30 +84,6 @@ const RouteComponents = () => {
             }
           />
           <Route
-            path="/jasa"
-            element={
-              <LayoutPages>
-                <JasaPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/material-konstruksi"
-            element={
-              <LayoutPages>
-                <MaterialKonstruksiPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/material-konstruksi/tabel"
-            element={
-              <LayoutPages>
-                <TableMaterial />
-              </LayoutPages>
-            }
-          />
-          <Route
             path="/construction-cost"
             element={
               <LayoutPages>
@@ -130,34 +100,10 @@ const RouteComponents = () => {
             }
           />
           <Route
-            path="/material-package"
-            element={
-              <LayoutPages>
-                <MaterialAndPackagePages />
-              </LayoutPages>
-            }
-          />
-          <Route
             path="/unitprice"
             element={
               <LayoutPages>
                 <TransportPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/liquifaction-plant"
-            element={
-              <LayoutPages>
-                <LiquifactionPlantPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/receiving-terminal"
-            element={
-              <LayoutPages>
-                <ReceivingTerimnalPages />
               </LayoutPages>
             }
           />
