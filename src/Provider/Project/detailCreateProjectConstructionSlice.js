@@ -26,7 +26,8 @@ const initialState = {
     type: null,
     itemIdx: null,
     search: "",
-  }
+  },
+  loadingRecommendedCosts: false, // Add loading state
 };
 
 export const fetchRecommendedConstructionCosts = createAsyncThunk(
@@ -99,26 +100,32 @@ const detailCreateProjectConstructionSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchRecommendedConstructionCosts.fulfilled, (state, action) => {
-      state.items = action.payload.map((item) => ({
-        kode: item.id,
-        uraian: item.uraian,
-        satuan: item.satuan,
-        qty: item.qty,
-        hargaSatuan: item.hargaSatuan,
-        totalHarga: item.totalHarga,
-        kelompok: item.kelompok,
-        tahun: item.tahun,
-        proyek: item.proyek,
-        lokasi: item.lokasi,
-        tipe: item.tipe,
-        isCategory: false,
-        aaceClass: item.aaceClass,
-      }));
-    });
-    builder.addCase(fetchRecommendedConstructionCosts.rejected, (state, action) => {
-      console.error('Failed to fetch recommended construction costs:', action.payload);
-    });
+    builder
+      .addCase(fetchRecommendedConstructionCosts.pending, (state) => {
+        state.loadingRecommendedCosts = true; // Set loading to true
+      })
+      .addCase(fetchRecommendedConstructionCosts.fulfilled, (state, action) => {
+        state.loadingRecommendedCosts = false; // Set loading to false
+        state.items = action.payload.map((item) => ({
+          kode: item.id,
+          uraian: item.uraian,
+          satuan: item.satuan,
+          qty: item.qty,
+          hargaSatuan: item.hargaSatuan,
+          totalHarga: item.totalHarga,
+          kelompok: item.kelompok,
+          tahun: item.tahun,
+          proyek: item.proyek,
+          lokasi: item.lokasi,
+          tipe: item.tipe,
+          isCategory: false,
+          aaceClass: item.aaceClass,
+        }));
+      })
+      .addCase(fetchRecommendedConstructionCosts.rejected, (state) => {
+        state.loadingRecommendedCosts = false; // Set loading to false
+        console.error('Failed to fetch recommended construction costs');
+      });
   },
 });
 

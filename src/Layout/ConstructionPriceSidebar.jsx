@@ -1,20 +1,27 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { setFilterJenis } from "../Provider/Project/ConstractionCostSlice";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setFilterJenis, fetchUniqueInfrastruktur, fetchFilteredConstructionCosts } from "../Provider/Project/ConstractionCostSlice";
 import { useNavigate } from "react-router-dom";
 
 const ConstructionPriceSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [openLiquifaction, setOpenLiquifaction] = useState(false);
-  const [openTransportasi, setOpenTransportasi] = useState(false);
-  const [openReceiving, setOpenReceiving] = useState(false);
-  const [openMaterial, setOpenMaterial] = useState(false);
+  const [openSections, setOpenSections] = useState({});
+  const { uniqueInfrastruktur, loading } = useSelector((state) => state.constractionCost);
 
-  const handleClick = (jenis) => {
-    dispatch(setFilterJenis(jenis));
+  useEffect(() => {
+    dispatch(fetchUniqueInfrastruktur());
+  }, [dispatch]);
+
+  const handleClick = (tipe, infrastruktur) => {
+    dispatch(setFilterJenis({ tipe, infrastruktur }));
+    dispatch(fetchFilteredConstructionCosts({ tipe, infrastruktur }));
     navigate("/construction-cost");
+  };
+
+  const toggleSection = (section) => {
+    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   return (
@@ -60,213 +67,48 @@ const ConstructionPriceSidebar = () => {
       </button>
       {open && (
         <ul className="py-2 space-y-2">
-          {/* Liquifection Plant */}
-          <li>
-            <button
-              type="button"
-              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              onClick={() => setOpenLiquifaction((v) => !v)}
-            >
-              <span className="flex-1 text-left whitespace-nowrap ml-3">
-                Liquifection Plant
-              </span>
-              <svg
-                className={`w-4 h-4 ml-auto transition-transform ${
-                  openLiquifaction ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
+          {loading && <li>Loading...</li>}
+          {Object.entries(uniqueInfrastruktur).map(([section, items]) => (
+            <li key={section}>
+              <button
+                type="button"
+                className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                onClick={() => toggleSection(section)}
               >
-                <path d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {openLiquifaction && (
-              <ul className="ml-4 space-y-1">
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("Onshore LNG Plant")}
-                  >
-                    Onshore LNG Plant
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("Offshore LNG Plant")}
-                  >
-                    Offshore LNG Plant
-                  </button>
-                </li>
-              </ul>
-            )}
-          </li>
-          {/* Transportasi */}
-          <li>
-            <button
-              type="button"
-              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              onClick={() => setOpenTransportasi((v) => !v)}
-            >
-              <span className="flex-1 text-left whitespace-nowrap ml-3">
-                Transportasi
-              </span>
-              <svg
-                className={`w-4 h-4 ml-auto transition-transform ${
-                  openTransportasi ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {openTransportasi && (
-              <ul className="ml-4 space-y-1">
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("LNGC")}
-                  >
-                    LNG Carier (LNGC)
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("LNG Barge")}
-                  >
-                    LNG Barge
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("LNG Trucking")}
-                  >
-                    LNG Trucking
-                  </button>
-                </li>
-              </ul>
-            )}
-          </li>
-          {/* Receiving Terminal */}
-          <li>
-            <button
-              type="button"
-              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              onClick={() => setOpenReceiving((v) => !v)}
-            >
-              <span className="flex-1 text-left whitespace-nowrap ml-3">
-                Receiving Terminal
-              </span>
-              <svg
-                className={`w-4 h-4 ml-auto transition-transform ${
-                  openReceiving ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {openReceiving && (
-              <ul className="ml-4 space-y-1">
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("FSRU")}
-                  >
-                    FSRU
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("ORF")}
-                  >
-                    ORF
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("OTS")}
-                  >
-                    OTS
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("ORU")}
-                  >
-                    ORU
-                  </button>
-                </li>
-              </ul>
-            )}
-          </li>
-          {/* Material & Package */}
-          <li>
-            <button
-              type="button"
-              className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              onClick={() => setOpenMaterial((v) => !v)}
-            >
-              <span className="flex-1 text-left whitespace-nowrap ml-3">
-                Material & Package
-              </span>
-              <svg
-                className={`w-4 h-4 ml-auto transition-transform ${
-                  openMaterial ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {openMaterial && (
-              <ul className="ml-4 space-y-1">
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("Material")}
-                  >
-                    Material
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                    onClick={() => handleClick("Package")}
-                  >
-                    Package
-                  </button>
-                </li>
-              </ul>
-            )}
-          </li>
+                <span className="flex-1 text-left whitespace-nowrap ml-3">
+                  {section}
+                </span>
+                <svg
+                  className={`w-4 h-4 ml-auto transition-transform ${
+                    openSections[section] ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {openSections[section] && (
+                <ul className="ml-4 space-y-1">
+                  {Object.entries(items).map(([subSection, volumes]) => (
+                    <li key={subSection}>
+                      <button
+                        type="button"
+                        className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                        onClick={() => handleClick(section, subSection)}
+                      >
+                        {subSection} (
+                        {volumes.map((v) => v.volume).join(", ")}
+                        )
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
         </ul>
       )}
     </li>
