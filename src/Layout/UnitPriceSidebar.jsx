@@ -8,7 +8,7 @@ const UnitPriceSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isHargaSatuanOpen } = useSelector((state) => state.global);
-  const { uniqueFields = {} } = useSelector((state) => state.unitPrice || {});
+  const { uniqueFields = {}, loading } = useSelector((state) => state.unitPrice || {});
   const [openTipe, setOpenTipe] = useState({});
   const [openInfra, setOpenInfra] = useState({});
 
@@ -76,71 +76,77 @@ const UnitPriceSidebar = () => {
       </button>
       {isHargaSatuanOpen && (
         <ul className="py-2 space-y-2">
-          {Object.keys(uniqueFields).map((tipe) => (
-            <li key={tipe}>
-              <button
-                type="button"
-                className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => toggleTipe(tipe)}
-              >
-                <span className="flex-1 text-left whitespace-nowrap ml-3">{tipe}</span>
-                <svg
-                  aria-hidden="true"
-                  className={`w-4 h-4 transform transition-transform ${openTipe[tipe] ? "rotate-180" : ""}`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-              {openTipe[tipe] && (
-                <ul className="py-2 space-y-2 pl-4">
-                  {Object.keys(uniqueFields[tipe] || {}).map((infra) => (
-                    <li key={infra}>
-                      <button
-                        type="button"
-                        className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                        onClick={() => toggleInfra(infra)}
-                      >
-                        <span className="flex-1 text-left whitespace-nowrap ml-3">{infra}</span>
-                        <svg
-                          aria-hidden="true"
-                          className={`w-4 h-4 transform transition-transform ${openInfra[infra] ? "rotate-180" : ""}`}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                      {openInfra[infra] && (
-                        <ul className="py-2 space-y-2 pl-4">
-                          {(uniqueFields[tipe][infra] || []).map((kelompok) => (
-                            <li key={kelompok}>
-                              <button
-                                type="button"
-                                className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                                onClick={() => handleNavigateWithParams(tipe, infra, kelompok)}
-                              >
-                                <span className="flex-1 text-left whitespace-nowrap ml-3">{kelompok}</span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
+          {loading ? (
+            <li className="flex justify-center items-center py-4">
+              <div className="loader border-t-4 border-blue-500 rounded-full w-6 h-6 animate-spin"></div>
             </li>
-          ))}
+          ) : (
+            Object.keys(uniqueFields).map((tipe) => (
+              <li key={tipe}>
+                <button
+                  type="button"
+                  className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                  onClick={() => toggleTipe(tipe)}
+                >
+                  <span className="flex-1 text-left whitespace-nowrap ml-3">{tipe}</span>
+                  <svg
+                    aria-hidden="true"
+                    className={`w-4 h-4 transform transition-transform ${openTipe[tipe] ? "rotate-180" : ""}`}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                {openTipe[tipe] && (
+                  <ul className="py-2 space-y-2 pl-4">
+                    {Object.keys(uniqueFields[tipe] || {}).map((infra) => (
+                      <li key={infra}>
+                        <button
+                          type="button"
+                          className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                          onClick={() => toggleInfra(infra)}
+                        >
+                          <span className="flex-1 text-left whitespace-nowrap ml-3">{infra}</span>
+                          <svg
+                            aria-hidden="true"
+                            className={`w-4 h-4 transform transition-transform ${openInfra[infra] ? "rotate-180" : ""}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                        {openInfra[infra] && (
+                          <ul className="py-2 space-y-2 pl-4">
+                            {(uniqueFields[tipe][infra] || []).map((kelompok) => (
+                              <li key={kelompok}>
+                                <button
+                                  type="button"
+                                  className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                                  onClick={() => handleNavigateWithParams(tipe, infra, kelompok)}
+                                >
+                                  <span className="flex-1 text-left whitespace-nowrap ml-3">{kelompok}</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))
+          )}
         </ul>
       )}
     </li>

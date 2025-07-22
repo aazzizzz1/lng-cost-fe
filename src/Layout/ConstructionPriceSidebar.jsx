@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilterJenis, fetchUniqueInfrastruktur, fetchFilteredConstructionCosts } from "../Provider/Project/ConstractionCostSlice";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../Components/Spinner/Spinner";
 
 const ConstructionPriceSidebar = () => {
   const dispatch = useDispatch();
@@ -67,48 +68,53 @@ const ConstructionPriceSidebar = () => {
       </button>
       {open && (
         <ul className="py-2 space-y-2">
-          {loading && <li>Loading...</li>}
-          {Object.entries(uniqueInfrastruktur).map(([section, items]) => (
-            <li key={section}>
-              <button
-                type="button"
-                className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                onClick={() => toggleSection(section)}
-              >
-                <span className="flex-1 text-left whitespace-nowrap ml-3">
-                  {section}
-                </span>
-                <svg
-                  className={`w-4 h-4 ml-auto transition-transform ${
-                    openSections[section] ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {openSections[section] && (
-                <ul className="ml-4 space-y-1">
-                  {Object.entries(items).map(([subSection, volumes]) => (
-                    <li key={subSection}>
-                      <button
-                        type="button"
-                        className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
-                        onClick={() => handleClick(section, subSection)}
-                      >
-                        {subSection} (
-                        {volumes.map((v) => v.volume).join(", ")}
-                        )
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+          {loading && (
+            <li className="flex justify-center items-center py-4">
+              <Spinner />
             </li>
-          ))}
+          )}
+          {!loading &&
+            Object.entries(uniqueInfrastruktur).map(([section, items]) => (
+              <li key={section}>
+                <button
+                  type="button"
+                  className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                  onClick={() => toggleSection(section)}
+                >
+                  <span className="flex-1 text-left whitespace-nowrap ml-3">
+                    {section}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 ml-auto transition-transform ${
+                      openSections[section] ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {openSections[section] && (
+                  <ul className="ml-4 space-y-1">
+                    {Object.entries(items).map(([subSection, volumes]) => (
+                      <li key={subSection}>
+                        <button
+                          type="button"
+                          className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8"
+                          onClick={() => handleClick(section, subSection)}
+                        >
+                          {subSection} (
+                          {volumes.map((v) => v.volume).join(", ")}
+                          )
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
         </ul>
       )}
     </li>

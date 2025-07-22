@@ -1,4 +1,5 @@
 import React from 'react';
+import Spinner from '../../Components/Spinner/Spinner';
 
 // Kolom yang ingin ditampilkan
 const columns = [
@@ -34,53 +35,53 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
         <div className="flex-1 overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th scope="col" className="px-4 py-3">No</th>
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    scope="col"
-                    className="px-4 py-3 cursor-pointer hover:text-primary-600"
-                    onClick={() => handleSort(col.key)}
-                  >
-                    {col.label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <Spinner />
+            </div>
+          ) : (
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  <td colSpan={columns.length} className="text-center py-6">
-                    Loading...
-                  </td>
+                  <th scope="col" className="px-4 py-3">No</th>
+                  {columns.map((col) => (
+                    <th
+                      key={col.key}
+                      scope="col"
+                      className="px-4 py-3 cursor-pointer hover:text-primary-600"
+                      onClick={() => handleSort(col.key)}
+                    >
+                      {col.label}
+                    </th>
+                  ))}
                 </tr>
-              ) : (!data || data.length === 0) ? (
-                <tr>
-                  <td colSpan={columns.length} className="text-center py-6">
-                    Tidak ada data.
-                  </td>
-                </tr>
-              ) : (
-                data.map((row, index) => (
-                  <tr key={row.id} className="border-b dark:border-gray-700">
-                    <td className="px-4 py-3">{index + 1 + (page - 1) * limit}</td>
-                    {columns.map((col) => (
-                      <td key={col.key} className="px-4 py-3">
-                        {col.key === "hargaSatuan" || col.key === "totalHarga"
-                          ? row[col.key]
-                            ? `Rp${Number(row[col.key]).toLocaleString()}`
-                            : ""
-                          : row[col.key]}
-                      </td>
-                    ))}
+              </thead>
+              <tbody>
+                {!data || data.length === 0 ? (
+                  <tr>
+                    <td colSpan={columns.length} className="text-center py-6">
+                      Tidak ada data.
+                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  data.map((row, index) => (
+                    <tr key={row.id} className="border-b dark:border-gray-700">
+                      <td className="px-4 py-3">{index + 1 + (page - 1) * limit}</td>
+                      {columns.map((col) => (
+                        <td key={col.key} className="px-4 py-3">
+                          {col.key === "hargaSatuan" || col.key === "totalHarga"
+                            ? row[col.key]
+                              ? `Rp${Number(row[col.key]).toLocaleString()}`
+                              : ""
+                            : row[col.key]}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
         <nav
           className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
