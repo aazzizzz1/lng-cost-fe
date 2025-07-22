@@ -6,6 +6,7 @@ const initialState = {
   projects: [],
   recommendedCosts: [],
   selectedProjectDetails: null,
+  loadingRecommendedCosts: false, // Add loading state
 };
 
 const projectSlice = createSlice({
@@ -17,6 +18,9 @@ const projectSlice = createSlice({
     },
     setRecommendedCosts: (state, action) => {
       state.recommendedCosts = action.payload;
+    },
+    setLoadingRecommendedCosts: (state, action) => {
+      state.loadingRecommendedCosts = action.payload; // Add reducer for loading state
     },
     createProject: (state, action) => {
       state.projects.push(action.payload);
@@ -30,6 +34,7 @@ const projectSlice = createSlice({
 export const {
   setProjects,
   setRecommendedCosts,
+  setLoadingRecommendedCosts, // Export the new action
   createProject,
   setSelectedProjectDetails,
 } = projectSlice.actions;
@@ -51,6 +56,7 @@ export const fetchProjects = () => async (dispatch) => {
 };
 
 export const fetchRecommendedCosts = (projectData) => async (dispatch) => {
+  dispatch(setLoadingRecommendedCosts(true)); // Set loading to true
   try {
     const response = await axios.post(
       `${process.env.REACT_APP_API}/projects/recommend`,
@@ -63,6 +69,8 @@ export const fetchRecommendedCosts = (projectData) => async (dispatch) => {
   } catch (error) {
     console.error('Error fetching recommended costs:', error);
     return [];
+  } finally {
+    dispatch(setLoadingRecommendedCosts(false)); // Set loading to false
   }
 };
 

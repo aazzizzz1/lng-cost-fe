@@ -39,7 +39,7 @@ const DetailCreateProjectConstruction = () => {
   const modal = useSelector(selectModal);
   const costs = useSelector((state) => state.constractionCost.costs);
   const recommendedCosts = useSelector((state) => state.projects.recommendedCosts);
-  const recommendedCostsLoading = useSelector((state) => state.projects.loadingRecommendedCosts);
+  const recommendedCostsLoading = useSelector((state) => state.projects.loadingRecommendedCosts); // Ensure correct selector
 
   // Memoize kelompokListUsed to avoid unnecessary recalculations
   const kelompokListUsed = useMemo(() => [...new Set(costs.map((cost) => cost.kelompok))], [costs]);
@@ -160,16 +160,8 @@ const DetailCreateProjectConstruction = () => {
   }, {});
 
   // Fetch additional data for modal
-  const materialList = useSelector((state) => state.material.dataMaterial || []);
-  const jasaList = useSelector((state) => state.jasa.jasa || []);
-  const packageList = useSelector((state) => state.materialAndPackage.packages || []);
-  const transportList = useSelector((state) => state.transport.data || []);
   const provinces = useSelector((state) => state.administrator.provinces || []);
   const inflasiList = useSelector((state) => state.administrator.inflasi || []);
-  const liquifectionPlantList = useSelector((state) => state.liquifectionPlant.data || []);
-  const transportasiList = useSelector((state) => state.transport.data || []);
-  const receivingTerminalList = useSelector((state) => state.receivingTerminal.data || []);
-  const materialAndPackageList = useSelector((state) => state.materialAndPackage.packages || []);
 
   const handleOpenModal = (type, idx) => {
     dispatch(openModal({ type, itemIdx: idx, search: "" }));
@@ -412,16 +404,8 @@ const DetailCreateProjectConstruction = () => {
         modal={modal}
         items={items}
         project={project}
-        materialList={materialList}
-        jasaList={jasaList}
-        packageList={packageList}
-        transportList={transportList}
         provinces={provinces}
         inflasiList={inflasiList}
-        liquifectionPlantList={liquifectionPlantList}
-        transportasiList={transportasiList}
-        receivingTerminalList={receivingTerminalList}
-        materialAndPackageList={materialAndPackageList}
         onClose={handleCloseModal}
         dispatch={dispatch}
       />
