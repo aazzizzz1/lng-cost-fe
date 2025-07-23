@@ -42,7 +42,10 @@ const DetailCreateProjectConstruction = () => {
   const recommendedCostsLoading = useSelector((state) => state.projects.loadingRecommendedCosts); // Ensure correct selector
 
   // Memoize kelompokListUsed to avoid unnecessary recalculations
-  const kelompokListUsed = useMemo(() => [...new Set(costs.map((cost) => cost.kelompok))], [costs]);
+  const kelompokListUsed = useMemo(
+    () => [...new Set(recommendedCosts.map((cost) => cost.kelompok))],
+    [recommendedCosts]
+  );
 
   const kelompokTemplatesUsed = useMemo(() => {
     return kelompokListUsed.reduce((acc, kelompok) => {
@@ -153,9 +156,9 @@ const DetailCreateProjectConstruction = () => {
     navigate('/project');
   };
 
-  // Group items by kelompok
+  // Group recommendedCosts by kelompok
   const grouped = kelompokListUsed.reduce((acc, kelompok) => {
-    acc[kelompok] = items.filter((item) => item.kelompok === kelompok);
+    acc[kelompok] = recommendedCosts.filter((item) => item.kelompok === kelompok);
     return acc;
   }, {});
 
@@ -279,7 +282,7 @@ const DetailCreateProjectConstruction = () => {
                   </thead>
                   <tbody>
                     {grouped[kelompok].map((item, idx) => {
-                      const absIdx = items.findIndex((it) => it === item);
+                      const absIdx = recommendedCosts.findIndex((it) => it === item);
                       return (
                         <tr
                           key={absIdx}
