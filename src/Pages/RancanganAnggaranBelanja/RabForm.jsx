@@ -119,6 +119,12 @@ const RabForm = () => {
               <div className="text-xs text-gray-500 dark:text-gray-400">Volume</div>
               <div className="font-semibold text-gray-900 dark:text-white">{rabData.volume}</div>
             </div>
+            <div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Total Harga</div>
+              <div className="font-semibold text-gray-900 dark:text-white">
+                Rp{items.reduce((total, item) => total + (item.qty * item.hargaSatuan || 0), 0).toLocaleString()}
+              </div>
+            </div>
           </div>
         </div>
       )}
