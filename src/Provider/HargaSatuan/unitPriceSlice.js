@@ -107,6 +107,52 @@ export const fetchSubTypeInfra = createAsyncThunk(
   }
 );
 
+export const deleteAllUnitPrices = createAsyncThunk(
+  'unitPrice/deleteAllUnitPrices',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`${api}/unit-prices`, {
+        headers: getAuthHeaders(),
+      });
+      return response.data?.message || "All unit prices deleted.";
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete unit prices.");
+    }
+  }
+);
+
+export const uploadUnitPriceExcel = createAsyncThunk(
+  'unitPrice/uploadUnitPriceExcel',
+  async (file, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await axios.post(
+        `${api}/upload/excel`,
+        formData,
+        {
+          headers: {
+            ...getAuthHeaders(),
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      // response.data: { message, count, skippedRows }
+      return {
+        type: "success",
+        message: response.data?.message || "Excel uploaded.",
+        count: response.data?.count,
+        skippedRows: response.data?.skippedRows,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        type: "error",
+        message: error.response?.data?.message || "Failed to upload excel.",
+      });
+    }
+  }
+);
+
 const initialState = {
   uniqueFields: {
     tipe: [],
@@ -160,8 +206,13 @@ const unitPriceSlice = createSlice({
     ...initialState,
     transport: transportInitialState,
     types: [],
-    subTypeInfra: [], // Add state for subtypes of infrastructure
+    subTypeInfra: [],
     recommendedPrices: [],
+    deleteLoading: false,
+    deleteResult: null,
+    // Tambahkan state upload
+    uploadLoading: false,
+    uploadResult: null,
   },
   reducers: {
     setFilters: (state, action) => {
@@ -251,6 +302,30 @@ const unitPriceSlice = createSlice({
       .addCase(fetchSubTypeInfra.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(deleteAllUnitPrices.pending, (state) => {
+        state.deleteLoading = true;
+        state.deleteResult = null;
+      })
+      .addCase(deleteAllUnitPrices.fulfilled, (state, action) => {
+        state.deleteLoading = false;
+        state.deleteResult = { type: "success", message: action.payload };
+      })
+      .addCase(deleteAllUnitPrices.rejected, (state, action) => {
+        state.deleteLoading = false;
+        state.deleteResult = { type: "error", message: action.payload };
+      })
+      .addCase(uploadUnitPriceExcel.pending, (state) => {
+        state.uploadLoading = true;
+        state.uploadResult = null;
+      })
+      .addCase(uploadUnitPriceExcel.fulfilled, (state, action) => {
+        state.uploadLoading = false;
+        state.uploadResult = action.payload;
+      })
+      .addCase(uploadUnitPriceExcel.rejected, (state, action) => {
+        state.uploadLoading = false;
+        state.uploadResult = action.payload;
       });
   },
 });
