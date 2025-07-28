@@ -22,8 +22,8 @@ const ProjectTable = () => {
   };
 
   const handleDetailClick = () => {
-    if (selectedProject) {
-      navigate(`/project/${selectedProject.id}/detail-construction`);
+    if (projectDetails && projectDetails.id) {
+      navigate(`/project/${projectDetails.id}/detail`);
     }
   };
 
@@ -94,19 +94,19 @@ const ProjectTable = () => {
                 <div className="mt-4 flex flex-col gap-1 text-sm bg-white dark:bg-gray-800 rounded p-3 shadow">
                   <div>
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Total Harga Pekerjaan: </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.totalConstructionCost.toLocaleString()}</span>
+                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.totalConstructionCost?.toLocaleString?.() ?? (projectDetails.harga?.toLocaleString?.() ?? "-")}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700 dark:text-gray-200">PPN 11%: </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.ppn.toLocaleString()}</span>
+                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.ppn?.toLocaleString?.() ?? "-"}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Asuransi (2,5‰): </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.insurance.toLocaleString()}</span>
+                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.insurance?.toLocaleString?.() ?? "-"}</span>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Total Perkiraan: </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.totalEstimation.toLocaleString()}</span>
+                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.totalEstimation?.toLocaleString?.() ?? "-"}</span>
                   </div>
                 </div>
                 <button
@@ -115,6 +115,7 @@ const ProjectTable = () => {
                 >
                   Lihat Detail Harga Konstruksi
                 </button>
+                {/* Hapus tampilan tabel constructionCosts di sini */}
               </div>
             ) : (
               <div className="text-gray-400 dark:text-gray-300 text-center">

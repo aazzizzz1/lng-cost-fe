@@ -16,6 +16,7 @@ import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/UnitPricePages";
+import ProjectDetail from "../Pages/Project/ProjectDetail";
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -112,6 +113,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <AdministratorPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/project/:id/detail"
+            element={
+              <LayoutPages>
+                <ProjectDetail />
               </LayoutPages>
             }
           />
