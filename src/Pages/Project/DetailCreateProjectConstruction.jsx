@@ -78,6 +78,8 @@ const DetailCreateProjectConstruction = () => {
   // Handler for field changes
   const handleItemChange = (idx, field, value) => {
     if (field === "qty" || field === "hargaSatuan") {
+      // Ensure qty is not negative
+      if (field === "qty" && Number(value) < 0) value = 0;
       const item = items[idx];
       const qty = field === "qty" ? parseFloat(value) : parseFloat(item.qty || 1);
       const hargaSatuan = field === "hargaSatuan" ? parseFloat(value) : parseFloat(item.hargaSatuan || 0);
@@ -321,7 +323,7 @@ const DetailCreateProjectConstruction = () => {
                             ) : (
                               <input
                                 type="number"
-                                min={1}
+                                min={0}
                                 step="any"
                                 value={item.qty}
                                 onChange={(e) => handleItemChange(absIdx, "qty", e.target.value)}

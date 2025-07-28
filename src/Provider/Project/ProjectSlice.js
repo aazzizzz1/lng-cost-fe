@@ -28,6 +28,12 @@ const projectSlice = createSlice({
     setSelectedProjectDetails: (state, action) => {
       state.selectedProjectDetails = action.payload;
     },
+    deleteProjectById: (state, action) => {
+      state.projects = state.projects.filter(project => project.id !== action.payload);
+      if (state.selectedProjectDetails && state.selectedProjectDetails.id === action.payload) {
+        state.selectedProjectDetails = null;
+      }
+    },
   },
 });
 
@@ -37,6 +43,7 @@ export const {
   setLoadingRecommendedCosts, // Export the new action
   createProject,
   setSelectedProjectDetails,
+  deleteProjectById, // Export the new action
 } = projectSlice.actions;
 
 const getAuthHeaders = () => {
@@ -93,6 +100,17 @@ export const saveProjectWithCosts = (projectData) => async () => {
     });
   } catch (error) {
     console.error('Error saving project:', error);
+  }
+};
+
+export const deleteProject = (projectId) => async (dispatch) => {
+  try {
+    await axios.delete(`${process.env.REACT_APP_API}/projects/${projectId}`, {
+      headers: getAuthHeaders(),
+    });
+    dispatch(deleteProjectById(projectId));
+  } catch (error) {
+    console.error('Error deleting project:', error);
   }
 };
 

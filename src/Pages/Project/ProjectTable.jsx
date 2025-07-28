@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CreateProjectModal from "./CreateProjectModal";
-import { fetchProjects, fetchProjectById } from "../../Provider/Project/ProjectSlice";
+import { fetchProjects, fetchProjectById, deleteProject } from "../../Provider/Project/ProjectSlice";
 import { useNavigate } from "react-router-dom";
 
 const ProjectTable = () => {
@@ -24,6 +24,12 @@ const ProjectTable = () => {
   const handleDetailClick = () => {
     if (projectDetails && projectDetails.id) {
       navigate(`/project/${projectDetails.id}/detail`);
+    }
+  };
+
+  const handleDeleteProject = (projectId) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus project ini?")) {
+      dispatch(deleteProject(projectId));
     }
   };
 
@@ -52,10 +58,11 @@ const ProjectTable = () => {
                   <th scope="col" className="px-4 py-3">Kategori</th>
                   <th scope="col" className="px-4 py-3">Lokasi</th>
                   <th scope="col" className="px-4 py-3">Tahun</th>
-                  <th scope="col" className="px-4 py-3">AACE Level</th> {/* Added column */}
+                  <th scope="col" className="px-4 py-3">AACE Level</th>
                   <th scope="col" className="px-4 py-3">Volume</th>
                   <th scope="col" className="px-4 py-3">Infrastruktur</th>
                   <th scope="col" className="px-4 py-3">Total Harga</th>
+                  <th scope="col" className="px-4 py-3">Aksi</th> {/* Tambah kolom aksi */}
                 </tr>
               </thead>
               <tbody>
@@ -74,11 +81,22 @@ const ProjectTable = () => {
                     <td className="px-4 py-3">{project.kategori}</td>
                     <td className="px-4 py-3">{project.lokasi}</td>
                     <td className="px-4 py-3">{project.tahun}</td>
-                    <td className="px-4 py-3">{project.levelAACE || "-"}</td> {/* Display AACE Level */}
+                    <td className="px-4 py-3">{project.levelAACE || "-"}</td>
                     <td className="px-4 py-3">{project.volume || "-"}</td>
                     <td className="px-4 py-3">{project.infrastruktur}</td>
                     <td className="px-4 py-3">
                       {project.harga ? `Rp${project.harga.toLocaleString()}` : "-"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleDeleteProject(project.id);
+                        }}
+                      >
+                        Hapus
+                      </button>
                     </td>
                   </tr>
                 ))}
