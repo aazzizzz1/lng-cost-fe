@@ -9,6 +9,7 @@ import administratorReducer from './administratorSlice'; // Tambahkan import
 import detailCreateProjectConstructionReducer from './Project/detailCreateProjectConstructionSlice'; // Corrected path
 import rabReducer from './RabSlice'; // Tambahkan import RabSlice
 import unitPriceReducer from './HargaSatuan/unitPriceSlice'; // Tambahkan import unitPriceSlice
+import dashboardReducer from './dashboardSlice'; // Tambahkan import dashboardSlice
 
 export default configureStore({
   reducer: {
@@ -22,5 +23,6 @@ export default configureStore({
     detailCreateProjectConstruction: detailCreateProjectConstructionReducer, // Tambahkan ini
     rab: rabReducer, // Tambahkan reducer rab di sini
     unitPrice: unitPriceReducer, // Tambahkan ini
+    dashboard: dashboardReducer, // Tambahkan ini
   },
 });

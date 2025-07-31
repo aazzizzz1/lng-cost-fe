@@ -1,63 +1,73 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Chart from "react-apexcharts";
-
-const series = [40, 54, 56, 27];
-const options = {
-  colors: ["#1C64F2", "#16BDCA", "#9061F9"],
-  chart: {
-    height: 420,
-    width: "100%",
-    type: "pie",
-  },
-  stroke: {
-    colors: ["white"],
-    lineCap: "",
-  },
-  plotOptions: {
-    pie: {
-      labels: {
-        show: true,
-      },
-      size: "100%",
-      dataLabels: {
-        offset: -25,
-      },
-    },
-  },
-  labels: ["Material", "Pekerjaan", "Jasa", "Operasi"],
-  dataLabels: {
-    enabled: true,
-    style: {
-      fontFamily: "Inter, sans-serif",
-    },
-  },
-  legend: {
-    position: "bottom",
-    fontFamily: "Inter, sans-serif",
-  },
-  yaxis: {
-    labels: {
-      formatter: function (value) {
-        return value + "%";
-      },
-    },
-  },
-  xaxis: {
-    labels: {
-      formatter: function (value) {
-        return value + "%";
-      },
-    },
-    axisTicks: {
-      show: false,
-    },
-    axisBorder: {
-      show: false,
-    },
-  },
-};
+import { useDispatch, useSelector } from "react-redux";
+import { fetchChartData } from "../../Provider/dashboardSlice";
 
 const ChartItems = () => {
+  const dispatch = useDispatch();
+  const { labels, series, loading } = useSelector(
+    (state) => state.dashboard.chart
+  );
+
+  useEffect(() => {
+    dispatch(fetchChartData());
+  }, [dispatch]);
+
+  const options = {
+    colors: ["#1C64F2", "#16BDCA", "#9061F9", "#F43F5E", "#FBBF24", "#10B981", "#EF4444", "#F472B6", "#F59E0B", "#F97316", "#6B7280", "#9CA3AF", "#D1D5DB", "#E5E7EB", "#F3F4F6", "#F9FAFB", "#F3F4F6", "#F9FAFB", "#F3F4F6", "#F9FAFB", "#F3F4F6", "#F9FAFB"],
+    chart: {
+      height: 420,
+      width: "100%",
+      type: "pie",
+    },
+    stroke: {
+      colors: ["white"],
+      lineCap: "",
+    },
+    plotOptions: {
+      pie: {
+        labels: {
+          show: true,
+        },
+        size: "100%",
+        dataLabels: {
+          offset: -25,
+        },
+      },
+    },
+    labels: labels, // gunakan dari redux
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontFamily: "Inter, sans-serif",
+      },
+    },
+    legend: {
+      position: "bottom",
+      fontFamily: "Inter, sans-serif",
+    },
+    yaxis: {
+      labels: {
+        formatter: function (value) {
+          return value;
+        },
+      },
+    },
+    xaxis: {
+      labels: {
+        formatter: function (value) {
+          return value + "%";
+        },
+      },
+      axisTicks: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+    },
+  };
+
   return (
     <div className="max-w-xl w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-6 md:p-4">
       <div className="flex justify-between items-start w-full">
@@ -85,14 +95,18 @@ const ChartItems = () => {
         </button>
       </div>
       <div className="py-8 flex justify-center" id="pie-chart">
-        <Chart
-          options={options}
-          series={series}
-          type="pie"
-          className="w-72 lg:w-96 sm:w-64 "
-        />
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <Chart
+            options={options}
+            series={series}
+            type="pie"
+            className="w-72 lg:w-96 sm:w-64 "
+          />
+        )}
       </div>
-      <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
+      {/* <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
         <div className="flex justify-between items-center pt-2">
           <button
             className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
@@ -137,7 +151,7 @@ const ChartItems = () => {
             </svg>
           </a>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
