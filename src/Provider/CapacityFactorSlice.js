@@ -1,110 +1,102 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
-// Contoh data referensi untuk FSRU (bisa dikembangkan untuk tipe lain)
-const initialReferenceData = {
-  "Onshore LNG Plant": [
-    { capacity: 100000, cost: 50000000 },
-    { capacity: 2000000, cost: 80000000 },
-    { capacity: 3000000, cost: 120000000 },
-    { capacity: 4000000, cost: 150000000 },
-    { capacity: 5000000, cost: 180000000 },
-  ],
-  "Offshore LNG Plant": [
-    { capacity: 50000, cost: 30000000 },
-    { capacity: 100000, cost: 60000000 },
-    { capacity: 150000, cost: 90000000 },
-    { capacity: 200000, cost: 120000000 },
-    { capacity: 250000, cost: 150000000 },
-  ],
-  "LNG Carrier": [
-    { capacity: 100000, cost: 20000000 },
-    { capacity: 150000, cost: 30000000 },
-    { capacity: 200000, cost: 40000000 },
-    { capacity: 250000, cost: 50000000 },
-    { capacity: 300000, cost: 60000000 },
-  ],
-  "LNG Trucking": [
-    { capacity: 1000, cost: 50000 },
-    { capacity: 2000, cost: 100000 },
-    { capacity: 3000, cost: 150000 },
-    { capacity: 4000, cost: 200000 },
-    { capacity: 5000, cost: 250000 },
-  ],
-  ORF: [
-    { capacity: 10000, cost: 3000000 },
-    { capacity: 20000, cost: 6000000 },
-    { capacity: 30000, cost: 9000000 },
-    { capacity: 40000, cost: 12000000 },
-    { capacity: 50000, cost: 15000000 },
-  ],
-  OTS: [
-    { capacity: 5000, cost: 2000000 },
-    { capacity: 10000, cost: 4000000 },
-    { capacity: 15000, cost: 6000000 },
-    { capacity: 20000, cost: 8000000 },
-    { capacity: 25000, cost: 10000000 },
-  ],
-  ORU: [
-    { capacity: 15000, cost: 4000000 },
-    { capacity: 30000, cost: 8000000 },
-    { capacity: 45000, cost: 12000000 },
-    { capacity: 60000, cost: 16000000 },
-    { capacity: 75000, cost: 20000000 },
-  ],
-  "LNG Bunkering Vessel": [
-    { capacity: 5000, cost: 495388765654.26 },
-    { capacity: 10000, cost: 692210584882.10 },
-    { capacity: 15000, cost: 884404454600.00 },
-    { capacity: 20000, cost: 1499600000000.00 },
-  ],
-  "Mini LNG Plant": [
-    { capacity: 1, cost: 148396830000.00 },
-    { capacity: 3, cost: 185067755000.00 },
-    { capacity: 5, cost: 249975577500.00 },
-    { capacity: 1, cost: 114995817295.55 },
-    { capacity: 3, cost: 262478961993.81 },
-    { capacity: 5, cost: 446432946142.28 },
-    { capacity: 1, cost: 107952112700.00 },
-    { capacity: 3, cost: 181032836700.00 },
-    { capacity: 5, cost: 270152336900.00 },
-    { capacity: 1, cost: 182282000000.00 },
-    { capacity: 3, cost: 293538000000.00 },
-    { capacity: 5, cost: 384749000000.00 },
-    { capacity: 7, cost: 457074000000.00 },
-    { capacity: 20, cost: 1318003000000.00 },
-    { capacity: 1, cost: 266577000000.00 },
-    { capacity: 3, cost: 429281000000.00 },
-    { capacity: 5, cost: 562671000000.00 },
-    { capacity: 7, cost: 668442000000.00 },
-    { capacity: 20, cost: 1927497000000.00 },
-    { capacity: 0.8, cost: 169045000000.00 },
-    { capacity: 3.0, cost: 512162000000.00 },
-    { capacity: 5.0, cost: 776237000000.00 },
-    { capacity: 7.0, cost: 1393220000000.00 },
-    { capacity: 20.0, cost: 3846637000000.00 },
-    { capacity: 0.79, cost: 215306000000.00 },
-    { capacity: 3.16, cost: 618907000000.00 },
-    { capacity: 4.75, cost: 1037121000000.00 },
-    { capacity: 7.09, cost: 1804904000000.00 },
-    { capacity: 20.46, cost: 4953492000000.00 },
-  ],
-  FSRU: [
-    { capacity: 2500, cost: 756955700000.00 },
-    { capacity: 10000, cost: 1007095500000.00 },
-  ],
-  "LNG Carrier (LNGC)": [
-    { capacity: 20000, cost: 1409950000000.00 },
-  ],
-};
+// Ambil URL API dari .env
+const API_URL = process.env.REACT_APP_API + "/calculator/total-cost";
+
+// Async thunk untuk fetch data referensi dari backend
+export const fetchReferenceData = createAsyncThunk(
+  "capacityFactor/fetchReferenceData",
+  async () => {
+    const res = await axios.get(API_URL);
+    // Group by infrastructure, mapping volume->capacity dan totalCost->cost
+    const grouped = {};
+    res.data.data.forEach((item) => {
+      const type = item.infrastructure;
+      if (!grouped[type]) grouped[type] = [];
+      grouped[type].push({
+        capacity: item.volume,
+        cost: item.totalCost,
+        // Simpan juga unit jika perlu
+        unit: item.unit,
+        year: item.year,
+        location: item.location,
+        information: item.information,
+      });
+    });
+    return grouped;
+  }
+);
+
+// Async thunk untuk upload excel capacity factor
+export const uploadCapacityFactorExcel = createAsyncThunk(
+  "capacityFactor/uploadCapacityFactorExcel",
+  async (file, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API}/calculator/total-cost/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      // response.data: { message, count, skippedRows }
+      return {
+        type: "success",
+        message: response.data?.message || "Excel uploaded.",
+        count: response.data?.data?.count,
+        skippedRows: response.data?.data?.skippedRows,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        type: "error",
+        message: error.response?.data?.message || "Failed to upload excel.",
+      });
+    }
+  }
+);
+
+// Async thunk untuk delete all capacity factor (total cost)
+export const deleteAllCapacityFactor = createAsyncThunk(
+  "capacityFactor/deleteAllCapacityFactor",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`${process.env.REACT_APP_API}/calculator/total-cost`);
+      // response.data: { message, data: { count } }
+      return {
+        type: "success",
+        message: response.data?.message || "All capacity factor data deleted.",
+        count: response.data?.data?.count,
+      };
+    } catch (error) {
+      return rejectWithValue({
+        type: "error",
+        message: error.response?.data?.message || "Failed to delete capacity factor data.",
+      });
+    }
+  }
+);
 
 const initialState = {
-  referenceData: initialReferenceData,
+  referenceData: {},
   input: {
-    type: "FSRU",
+    type: "",
     method: "Linear Regression",
     capacity: "",
   },
   result: null,
+  loading: false,
+  error: null,
+  // Tambahkan state upload
+  cfUploadLoading: false,
+  cfUploadResult: null,
+  // Tambahkan state delete
+  cfDeleteLoading: false,
+  cfDeleteResult: null,
 };
 
 function linearRegression(data, x) {
@@ -181,6 +173,52 @@ const CapacityFactorSlice = createSlice({
       }
       state.result = result;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchReferenceData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchReferenceData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.referenceData = action.payload;
+        // Set default type jika belum ada
+        if (!state.input.type) {
+          const types = Object.keys(action.payload);
+          state.input.type = types.length > 0 ? types[0] : "";
+        }
+      })
+      .addCase(fetchReferenceData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(uploadCapacityFactorExcel.pending, (state) => {
+        state.cfUploadLoading = true;
+        state.cfUploadResult = null;
+      })
+      .addCase(uploadCapacityFactorExcel.fulfilled, (state, action) => {
+        state.cfUploadLoading = false;
+        state.cfUploadResult = action.payload;
+      })
+      .addCase(uploadCapacityFactorExcel.rejected, (state, action) => {
+        state.cfUploadLoading = false;
+        state.cfUploadResult = action.payload;
+      })
+      .addCase(deleteAllCapacityFactor.pending, (state) => {
+        state.cfDeleteLoading = true;
+        state.cfDeleteResult = null;
+      })
+      .addCase(deleteAllCapacityFactor.fulfilled, (state, action) => {
+        state.cfDeleteLoading = false;
+        state.cfDeleteResult = action.payload;
+        // Kosongkan data setelah delete
+        state.referenceData = {};
+      })
+      .addCase(deleteAllCapacityFactor.rejected, (state, action) => {
+        state.cfDeleteLoading = false;
+        state.cfDeleteResult = action.payload;
+      });
   },
 });
 
