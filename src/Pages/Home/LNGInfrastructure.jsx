@@ -1,4 +1,12 @@
 import React, { useState } from "react";
+// Import assets sesuai lokasi dan nama file di disk
+import onshorePlantImg from "../../Assets/Images/onshore lng plant.png";
+import offshorePlantImg from "../../Assets/Images/offshore lng plant.png";
+import storageTankImg from "../../Assets/Images/storagetank.png";
+import truckTankerImg from "../../Assets/Images/trucking.png";
+import lngCarrierImg from "../../Assets/Images/lngc.png";
+import fsruImg from "../../Assets/Images/fsru.png";
+import orfImg from "../../Assets/Images/gas pipe.png";
 
 // Data infrastruktur LNG dengan posisi relatif (persentase)
 const infrastructures = [
@@ -6,7 +14,7 @@ const infrastructures = [
     id: "onshore-plant",
     name: "Onshore LNG Plant",
     type: "onshore",
-    icon: "🏭",
+    icon: onshorePlantImg,
     desc: "Onshore LNG Plant: Produksi LNG di darat.",
     x: "70%",
     y: "40%",
@@ -15,7 +23,7 @@ const infrastructures = [
     id: "orf",
     name: "ORF Receiving Terminal",
     type: "onshore",
-    icon: "🏢",
+    icon: orfImg,
     desc: "ORF: Onshore Receiving Facility.",
     x: "35%",
     y: "20%",
@@ -24,7 +32,7 @@ const infrastructures = [
     id: "trucking",
     name: "Trucking",
     type: "onshore",
-    icon: "🚚",
+    icon: truckTankerImg,
     desc: "Trucking: Transportasi LNG via darat.",
     x: "5%",
     y: "25%",
@@ -33,7 +41,7 @@ const infrastructures = [
     id: "storage-tank",
     name: "Storage Tank",
     type: "onshore",
-    icon: "🛢️",
+    icon: storageTankImg,
     desc: "Storage Tank: Penyimpanan LNG.",
     x: "50%",
     y: "28%",
@@ -42,7 +50,7 @@ const infrastructures = [
     id: "lng-carrier",
     name: "LNG Carrier",
     type: "offshore",
-    icon: "⛴️",
+    icon: lngCarrierImg,
     desc: "LNG Carrier: Kapal pengangkut LNG.",
     x: "3%",
     y: "70%",
@@ -51,7 +59,7 @@ const infrastructures = [
     id: "fsru",
     name: "FSRU",
     type: "offshore",
-    icon: "🚢",
+    icon: fsruImg,
     desc: "FSRU: Floating Storage Regasification Unit.",
     x: "70%",
     y: "70%",
@@ -60,7 +68,7 @@ const infrastructures = [
     id: "offshore-plant",
     name: "Offshore LNG Plant",
     type: "offshore",
-    icon: "🏭",
+    icon: offshorePlantImg,
     desc: "Offshore LNG Plant: Produksi LNG di laut.",
     x: "85%",
     y: "60%",
@@ -239,7 +247,8 @@ const LNGInfrastructure = () => {
                     hovered === infra.id ? "0 0 24px #2563eb77" : "",
                 }}
               >
-                <span>{infra.icon}</span>
+                {/* Ganti emoji dengan gambar */}
+                <img src={infra.icon} alt={infra.name} className="w-12 h-12 object-contain" />
               </div>
               <span className="mt-2 text-sm font-bold text-slate-800 drop-shadow group-hover:text-blue-700 transition-colors duration-200 text-center">
                 {infra.name}
