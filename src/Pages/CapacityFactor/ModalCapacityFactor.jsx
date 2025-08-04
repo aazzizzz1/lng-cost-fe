@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setInput, calculateCost, fetchReferenceData } from '../../Provider/CapacityFactorSlice';
+import { setInput, calculateCostAPI, fetchReferenceData } from '../../Provider/CapacityFactorSlice';
+import { fetchProvinces } from '../../Provider/administratorSlice';
 
 const satuanByJenis = {
   "Onshore LNG Plant": "MTPA",
@@ -24,7 +25,13 @@ const methodOptions = [
 
 const ModalCapacityFactor = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
-  const { input, result, referenceData, loading, error } = useSelector(state => state.capacityFactor);
+  const { input, result, r2, r2Interpretation, referenceData, loading, error } = useSelector(state => state.capacityFactor);
+  const provinces = useSelector(state => state.administrator.provinces);
+
+  // Tambahkan state tahun, lokasi, inflasi
+  const [tahun, setTahun] = useState(new Date().getFullYear());
+  const [lokasi, setLokasi] = useState('');
+  const [inflasi, setInflasi] = useState(5.0);
 
   // Ambil tipe dari data referensi backend
   const jenisOptions = Object.keys(referenceData);
@@ -33,7 +40,10 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
     if (isOpen && jenisOptions.length === 0) {
       dispatch(fetchReferenceData());
     }
-  }, [isOpen, dispatch, jenisOptions.length]);
+    if (isOpen && provinces.length === 0) {
+      dispatch(fetchProvinces());
+    }
+  }, [isOpen, dispatch, jenisOptions.length, provinces.length]);
 
   const handleChange = (field, value) => {
     dispatch(setInput({ [field]: value }));
@@ -41,7 +51,17 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
 
   const handleCalculate = (e) => {
     e.preventDefault();
-    dispatch(calculateCost());
+    dispatch(setInput({
+      tahun: Number(tahun),
+      lokasi,
+      inflasi: Number(inflasi),
+    }));
+    dispatch(calculateCostAPI({
+      ...input,
+      tahun: Number(tahun),
+      lokasi,
+      inflasi: Number(inflasi),
+    }));
   };
 
   return isOpen ? (
@@ -49,7 +69,7 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
       <section className="bg-white dark:bg-gray-900 rounded-lg shadow-lg min-w-[32rem] max-h-[40rem] overflow-y-auto">
         <div className="p-6">
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            Kalkulasi Capacity Factor
+            Kalkulasi Cepat Estimasi Infrastruktur LNG
           </h2>
           {loading && <div className="mb-2 text-blue-600">Loading data...</div>}
           {error && <div className="mb-2 text-red-600">{error}</div>}
@@ -57,7 +77,7 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 sm:gap-6 w-full">
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Type
+                  Infrastruktur
                 </label>
                 <select
                   value={input.type}
@@ -82,6 +102,51 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
                 >
                   {methodOptions.map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+              {/* Tahun */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Tahun
+                </label>
+                <input
+                  type="number"
+                  value={tahun}
+                  onChange={(e) => setTahun(e.target.value)}
+                  placeholder="Tahun"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
+              </div>
+              {/* Inflasi */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Asumsi Inflasi (%)
+                </label>
+                <input
+                  type="number"
+                  value={inflasi}
+                  onChange={(e) => setInflasi(e.target.value)}
+                  placeholder="5%"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
+              </div>
+              {/* Lokasi */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Lokasi
+                </label>
+                <select
+                  value={lokasi}
+                  onChange={(e) => setLokasi(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  required
+                >
+                  <option value="">Pilih Lokasi</option>
+                  {provinces.map((prov) => (
+                    <option key={prov.code} value={prov.name}>
+                      {prov.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -126,7 +191,15 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
           <div className="mt-6">
             {result !== null && (
               <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg">
-                <span className="font-semibold">Estimasi Cost:</span> Rp{result.toLocaleString('id-ID')}
+                <div>
+                  <span className="font-semibold">Estimasi Cost:</span> Rp{result.toLocaleString('id-ID')}
+                </div>
+                <div>
+                  <span className="font-semibold">R²:</span> {r2}
+                </div>
+                <div>
+                  <span className="font-semibold">Interpretasi R²:</span> {r2Interpretation}
+                </div>
               </div>
             )}
           </div>

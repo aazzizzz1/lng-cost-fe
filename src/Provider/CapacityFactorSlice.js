@@ -81,14 +81,43 @@ export const deleteAllCapacityFactor = createAsyncThunk(
   }
 );
 
+// Tambahkan async thunk untuk kalkulasi cost dari backend
+export const calculateCostAPI = createAsyncThunk(
+  "capacityFactor/calculateCostAPI",
+  async (input, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API}/calculator/estimate`,
+        {
+          infrastructure: input.type,
+          location: input.lokasi,
+          year: Number(input.tahun),
+          inflation: Number(input.inflasi),
+          desiredCapacity: Number(input.capacity),
+          method: input.method,
+        }
+      );
+      // response.data.data: { estimatedCost, r2, r2Interpretation }
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to calculate cost.");
+    }
+  }
+);
+
 const initialState = {
   referenceData: {},
   input: {
     type: "",
     method: "Linear Regression",
     capacity: "",
+    tahun: new Date().getFullYear(),
+    lokasi: "",
+    inflasi: 5,
   },
   result: null,
+  r2: null,
+  r2Interpretation: null,
   loading: false,
   error: null,
   // Tambahkan state upload
@@ -99,51 +128,6 @@ const initialState = {
   cfDeleteResult: null,
 };
 
-function linearRegression(data, x) {
-  // y = a + bx
-  const n = data.length;
-  const sumX = data.reduce((acc, d) => acc + d.capacity, 0);
-  const sumY = data.reduce((acc, d) => acc + d.cost, 0);
-  const sumXY = data.reduce((acc, d) => acc + d.capacity * d.cost, 0);
-  const sumX2 = data.reduce((acc, d) => acc + d.capacity * d.capacity, 0);
-  const b = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const a = (sumY - b * sumX) / n;
-  return a + b * x;
-}
-
-function logLogRegression(data, x) {
-  // ln(y) = a + b ln(x)
-  const n = data.length;
-  const sumLnX = data.reduce((acc, d) => acc + Math.log(d.capacity), 0);
-  const sumLnY = data.reduce((acc, d) => acc + Math.log(d.cost), 0);
-  const sumLnXLnY = data.reduce(
-    (acc, d) => acc + Math.log(d.capacity) * Math.log(d.cost),
-    0
-  );
-  const sumLnX2 = data.reduce((acc, d) => acc + Math.log(d.capacity) ** 2, 0);
-  const b = (n * sumLnXLnY - sumLnX * sumLnY) / (n * sumLnX2 - sumLnX ** 2);
-  const a = (sumLnY - b * sumLnX) / n;
-  return Math.exp(a) * x ** b;
-}
-
-function capacityFactorMethod(data, x) {
-  // y2 = y1 * (x2/x1)^n, n biasanya 0.6-0.7, gunakan 0.65
-  if (data.length < 1) return null;
-  const n = 0.65;
-  // Cari data dengan kapasitas terdekat
-  let closest = data[0];
-  let minDiff = Math.abs(x - data[0].capacity);
-  for (let i = 1; i < data.length; i++) {
-    const diff = Math.abs(x - data[i].capacity);
-    if (diff < minDiff) {
-      closest = data[i];
-      minDiff = diff;
-    }
-  }
-  const { capacity: x1, cost: y1 } = closest;
-  return y1 * Math.pow(x / x1, n);
-}
-
 const CapacityFactorSlice = createSlice({
   name: "capacityFactor",
   initialState,
@@ -151,28 +135,7 @@ const CapacityFactorSlice = createSlice({
     setInput(state, action) {
       state.input = { ...state.input, ...action.payload };
     },
-    calculateCost(state) {
-      const { type, method, capacity } = state.input;
-      const data = state.referenceData[type] || [];
-      let result = null;
-      const x = Number(capacity);
-      if (!x || data.length === 0) {
-        state.result = null;
-        return;
-      }
-      // Jika kapasitas persis ada di database, ambil harga langsung
-      const found = data.find((d) => d.capacity === x);
-      if (found) {
-        result = found.cost;
-      } else if (method === "Linear Regression" && data.length >= 2) {
-        result = linearRegression(data, x);
-      } else if (method === "Log-log Regression" && data.length >= 2) {
-        result = logLogRegression(data, x);
-      } else if (method === "Capacity Factor Method" && data.length >= 1) {
-        result = capacityFactorMethod(data, x);
-      }
-      state.result = result;
-    },
+    // Hapus calculateCost reducer, gunakan API saja
   },
   extraReducers: (builder) => {
     builder
@@ -218,9 +181,29 @@ const CapacityFactorSlice = createSlice({
       .addCase(deleteAllCapacityFactor.rejected, (state, action) => {
         state.cfDeleteLoading = false;
         state.cfDeleteResult = action.payload;
+      })
+      .addCase(calculateCostAPI.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.result = null;
+        state.r2 = null;
+        state.r2Interpretation = null;
+      })
+      .addCase(calculateCostAPI.fulfilled, (state, action) => {
+        state.loading = false;
+        state.result = action.payload.estimatedCost;
+        state.r2 = action.payload.r2;
+        state.r2Interpretation = action.payload.r2Interpretation;
+      })
+      .addCase(calculateCostAPI.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.result = null;
+        state.r2 = null;
+        state.r2Interpretation = null;
       });
   },
 });
 
-export const { setInput, calculateCost } = CapacityFactorSlice.actions;
+export const { setInput } = CapacityFactorSlice.actions;
 export default CapacityFactorSlice.reducer;
