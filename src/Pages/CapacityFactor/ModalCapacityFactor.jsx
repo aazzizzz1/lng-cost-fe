@@ -32,9 +32,19 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
   const [tahun, setTahun] = useState(new Date().getFullYear());
   const [lokasi, setLokasi] = useState('');
   const [inflasi, setInflasi] = useState(5.0);
+  const [information, setInformation] = useState('');
 
   // Ambil tipe dari data referensi backend
   const jenisOptions = Object.keys(referenceData);
+
+  // Ambil daftar information unik sesuai infrastruktur yang dipilih
+  const informationOptions = input.type
+    ? Array.from(
+        new Set(
+          (referenceData[input.type] || []).map(item => item.information).filter(Boolean)
+        )
+      )
+    : [];
 
   useEffect(() => {
     if (isOpen && jenisOptions.length === 0) {
@@ -44,6 +54,11 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
       dispatch(fetchProvinces());
     }
   }, [isOpen, dispatch, jenisOptions.length, provinces.length]);
+
+  // Reset information jika infrastruktur berubah
+  useEffect(() => {
+    setInformation('');
+  }, [input.type]);
 
   const handleChange = (field, value) => {
     dispatch(setInput({ [field]: value }));
@@ -55,12 +70,14 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
       tahun: Number(tahun),
       lokasi,
       inflasi: Number(inflasi),
+      information,
     }));
     dispatch(calculateCostAPI({
       ...input,
       tahun: Number(tahun),
       lokasi,
       inflasi: Number(inflasi),
+      information,
     }));
   };
 
@@ -147,6 +164,24 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
                     <option key={prov.code} value={prov.name}>
                       {prov.name}
                     </option>
+                  ))}
+                </select>
+              </div>
+              {/* Information */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Information
+                </label>
+                <select
+                  value={information}
+                  onChange={e => setInformation(e.target.value)}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  required
+                  disabled={informationOptions.length === 0}
+                >
+                  <option value="" disabled>Pilih Information</option>
+                  {informationOptions.map((info, idx) => (
+                    <option key={idx} value={info}>{info}</option>
                   ))}
                 </select>
               </div>

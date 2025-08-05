@@ -95,6 +95,7 @@ export const calculateCostAPI = createAsyncThunk(
           inflation: Number(input.inflasi),
           desiredCapacity: Number(input.capacity),
           method: input.method,
+          information: input.information, // <-- tambahkan ini
         }
       );
       // response.data.data: { estimatedCost, r2, r2Interpretation }
