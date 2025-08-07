@@ -4,7 +4,7 @@ import { setInput, calculateCostAPI, fetchReferenceData } from '../../Provider/C
 import { fetchProvinces } from '../../Provider/administratorSlice';
 
 const satuanByJenis = {
-  "Onshore LNG Plant": "MTPA",
+  "LNG Plant": "MTPA",
   "Offshore LNG Plant": "MTPA",
   "LNG Carrier": "m³",
   "LNG Trucking": "CBM",
@@ -12,9 +12,9 @@ const satuanByJenis = {
   "ORF": "MMSCFD",
   "OTS": "MMSCFD",
   "ORU": "m³ / MMSCFD",
-  "LNG Bunkering Vessel": "m³",
+  "LNGBV": "m³",
   "Mini LNG Plant": "MMscfd",
-  "LNG Carrier (LNGC)": "m³",
+  "LNGC": "m³",
 };
 
 const methodOptions = [
