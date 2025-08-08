@@ -17,6 +17,7 @@ import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/UnitPricePages";
 import ProjectDetail from "../Pages/Project/ProjectDetail";
+import EditProjectConstruction from "../Pages/Project/EditProjectConstruction"; // + import
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -121,6 +122,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <ProjectDetail />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/project/:id/edit"
+            element={
+              <LayoutPages>
+                <EditProjectConstruction />
               </LayoutPages>
             }
           />

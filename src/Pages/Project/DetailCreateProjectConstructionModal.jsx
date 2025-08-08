@@ -87,6 +87,14 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
         value: row.uraian || "",
       })
     );
+    // ensure specification
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "specification",
+        value: row.spesifikasi || row.specification || "",
+      })
+    );
     dispatch(
       updateItem({
         idx: modal.itemIdx,
@@ -115,6 +123,72 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
         value: Math.round(adjustedQty * Math.round(hargaLokasiProject)),
       })
     );
+
+    // also fill supportive fields to avoid nulls
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "tahun",
+        value: Number(tahunProject) || Number(row.tahun) || new Date().getFullYear(),
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "lokasi",
+        value: lokasiProject || row.lokasi || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "infrastruktur",
+        value: project?.infrastruktur || row.infrastruktur || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "volume",
+        value: Number(project?.volume || row.volume || 0),
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "kapasitasRegasifikasi",
+        value: Number(project?.volume || row.kapasitasRegasifikasi || 0),
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "satuanVolume",
+        value: row.satuanVolume || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "satuanKapasitas",
+        value: row.satuanKapasitas || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "kelompok",
+        value: row.kelompok || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "kelompokDetail",
+        value: row.kelompokDetail || "",
+      })
+    );
+
     dispatch(closeModal());
   };
 

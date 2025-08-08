@@ -16,6 +16,13 @@ export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe,
   tipe,
   isCategory,
   aaceClass: 5, // Default AACE class is 5
+  specification: "", // ensure present
+  accuracyLow: 0,
+  accuracyHigh: 0,
+  satuanVolume: "",
+  kapasitasRegasifikasi: 0,
+  satuanKapasitas: "",
+  kelompokDetail: "",
 });
 
 // Initial state
@@ -109,17 +116,24 @@ const detailCreateProjectConstructionSlice = createSlice({
         state.items = action.payload.map((item) => ({
           kode: item.id,
           uraian: item.uraian,
-          satuan: item.satuan,
-          qty: item.qty,
-          hargaSatuan: item.hargaSatuan,
-          totalHarga: item.totalHarga,
-          kelompok: item.kelompok,
-          tahun: item.tahun,
-          proyek: item.proyek,
-          lokasi: item.lokasi,
-          tipe: item.tipe,
+          specification: item.specification || "",
+          satuan: item.satuan || "",
+          qty: Number(item.qty) || 0,
+          hargaSatuan: Number(item.hargaSatuan) || 0,
+          totalHarga: Number(item.totalHarga) || 0,
+          kelompok: item.kelompok || "",
+          tahun: Number(item.tahun) || new Date().getFullYear(),
+          proyek: item.proyek || "",
+          lokasi: item.lokasi || "",
+          tipe: item.tipe || "",
           isCategory: false,
-          aaceClass: item.aaceClass,
+          aaceClass: Number(item.aaceClass) || 0,
+          accuracyLow: Number.isFinite(item.accuracyLow) ? item.accuracyLow : 0,
+          accuracyHigh: Number.isFinite(item.accuracyHigh) ? item.accuracyHigh : 0,
+          satuanVolume: item.satuanVolume || "",
+          kapasitasRegasifikasi: Number(item.kapasitasRegasifikasi) || 0,
+          satuanKapasitas: item.satuanKapasitas || "",
+          kelompokDetail: item.kelompokDetail || "",
         }));
       })
       .addCase(fetchRecommendedConstructionCosts.rejected, (state) => {

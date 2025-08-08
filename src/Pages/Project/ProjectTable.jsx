@@ -88,15 +88,26 @@ const ProjectTable = () => {
                       {project.harga ? `Rp${project.harga.toLocaleString()}` : "-"}
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleDeleteProject(project.id);
-                        }}
-                      >
-                        Hapus
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          className="bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
+                          onClick={e => {
+                            e.stopPropagation();
+                            navigate(`/project/${project.id}/edit`);
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleDeleteProject(project.id);
+                          }}
+                        >
+                          Hapus
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
