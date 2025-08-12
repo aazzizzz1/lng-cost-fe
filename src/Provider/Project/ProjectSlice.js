@@ -95,7 +95,10 @@ export const fetchProjectById = (projectId) => async (dispatch) => {
 
 export const saveProjectWithCosts = (projectData) => async () => {
   try {
-    await axios.post(`${process.env.REACT_APP_API}/projects`, projectData, {
+    await axios.post(`${process.env.REACT_APP_API}/projects`, {
+      ...projectData,
+      inflasi: projectData?.inflasi === undefined ? null : Number(projectData.inflasi), // ensure inflasi included
+    }, {
       headers: getAuthHeaders(),
     });
   } catch (error) {
@@ -123,7 +126,8 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
       const volumeHeader = Number(pd.volume ?? 0);
       const lokasiHeader = pd.lokasi ?? '';
       const infraHeader = pd.infrastruktur ?? '';
-      const tipeHeader = pd.kategori ?? ''; // enforce tipe from kategori (e.g., CAPEX/OPEX)
+      const tipeHeader = pd.kategori ?? '';
+      const inflasiHeader = pd.inflasi === null || pd.inflasi === undefined ? null : Number(pd.inflasi); // NEW
 
       const normalizeNumber = (v, fallback = 0) => {
         const n = Number(v);
@@ -134,6 +138,7 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
       const costs = Array.isArray(pd.constructionCosts) ? pd.constructionCosts : [];
       const normalizedCosts = costs.map((c) => ({
         id: c.id, // keep id if present
+        workcode: normalizeString(c.workcode), // NEW
         uraian: normalizeString(c.uraian),
         specification: normalizeString(c.specification),
         qty: normalizeNumber(c.qty),
@@ -147,12 +152,9 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
         infrastruktur: normalizeString(c.infrastruktur ?? infraHeader, infraHeader),
         volume: normalizeNumber(c.volume ?? volumeHeader, volumeHeader),
         satuanVolume: normalizeString(c.satuanVolume),
-        kapasitasRegasifikasi: normalizeNumber(c.kapasitasRegasifikasi ?? volumeHeader, volumeHeader),
-        satuanKapasitas: normalizeString(c.satuanKapasitas),
         kelompok: normalizeString(c.kelompok),
         kelompokDetail: normalizeString(c.kelompokDetail),
         lokasi: normalizeString(c.lokasi ?? lokasiHeader, lokasiHeader),
-        // IMPORTANT: tipe comes from project kategori to satisfy backend
         tipe: normalizeString(tipeHeader || c.tipe, tipeHeader),
       }));
 
@@ -163,6 +165,7 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
         infrastruktur: infraHeader,
         lokasi: lokasiHeader,
         kategori: tipeHeader,
+        inflasi: inflasiHeader, // NEW
         constructionCosts: normalizedCosts,
       };
     })();

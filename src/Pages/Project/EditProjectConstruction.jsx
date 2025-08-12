@@ -38,6 +38,7 @@ const EditProjectConstruction = () => {
   const [tahun, setTahun] = useState('');
   const [volume, setVolume] = useState('');
   const [saving, setSaving] = useState(false);
+  const [inflasi, setInflasi] = useState(''); // NEW
 
   // Load project
   useEffect(() => {
@@ -53,12 +54,13 @@ const EditProjectConstruction = () => {
     setKategori(project.kategori || '');
     setTahun(project.tahun || '');
     setVolume(project.volume || '');
+    setInflasi(project.inflasi ?? ''); // NEW
 
-    // Map constructionCosts -> items state (keep fields not edited to write back)
     const mapped =
       Array.isArray(project.constructionCosts)
         ? project.constructionCosts.map((c) => ({
-            kode: c.id, // keep id in kode for reference
+            kode: c.workcode || c.id, // CHANGED: prefer workcode
+            workcode: c.workcode || '', // NEW
             uraian: c.uraian,
             specification: c.specification, // preserved
             satuan: c.satuan,
@@ -72,8 +74,6 @@ const EditProjectConstruction = () => {
             infrastruktur: c.infrastruktur,
             volume: c.volume,
             satuanVolume: c.satuanVolume,
-            kapasitasRegasifikasi: c.kapasitasRegasifikasi,
-            satuanKapasitas: c.satuanKapasitas,
             kelompok: c.kelompok,
             kelompokDetail: c.kelompokDetail,
             lokasi: c.lokasi,
@@ -119,6 +119,7 @@ const EditProjectConstruction = () => {
     const newKode = `${kodeBase}.${nextNum}`;
     dispatch(addItem({
       kode: newKode,
+      workcode: '', // NEW
       uraian: '',
       specification: '',
       satuan: '',
@@ -129,7 +130,7 @@ const EditProjectConstruction = () => {
       tahun: Number(tahun) || project?.tahun,
       proyek: name || project?.name,
       lokasi: lokasi || project?.lokasi,
-      tipe: kategori || project?.kategori || '', // use kategori instead of infrastruktur
+      tipe: kategori || project?.kategori || '',
       kelompok,
       isCategory: false,
     }));
@@ -154,7 +155,7 @@ const EditProjectConstruction = () => {
 
   // Validation: required per construction item
   const requiredItemFields = useMemo(
-    () => ['uraian','specification','satuan','qty','hargaSatuan','aaceClass','kelompok','kelompokDetail','satuanVolume','kapasitasRegasifikasi','satuanKapasitas'],
+    () => ['workcode','uraian','specification','satuan','qty','hargaSatuan','aaceClass','kelompok','kelompokDetail','satuanVolume'], // UPDATED
     []
   );
   const itemMissingMap = useMemo(() => {
@@ -170,17 +171,16 @@ const EditProjectConstruction = () => {
 
   const columns = [
     { key: 'kode', label: 'Kode' },
+    { key: 'workcode', label: 'Workcode*' },                              // NEW
     { key: 'uraian', label: 'Uraian*' },
-    { key: 'specification', label: 'Specification*' },                 // + new
+    { key: 'specification', label: 'Specification*' },
     { key: 'satuan', label: 'Satuan*' },
     { key: 'qty', label: 'Qty*' },
     { key: 'hargaSatuan', label: 'Harga Satuan*' },
     { key: 'totalHarga', label: 'Total Harga' },
     { key: 'aaceClass', label: 'AACE Class*' },
-    { key: 'kelompokDetail', label: 'Kelompok Detail*' },              // + new
-    { key: 'satuanVolume', label: 'Satuan Volume*' },                  // + new
-    { key: 'kapasitasRegasifikasi', label: 'Kapasitas Regasifikasi*' },// + new
-    { key: 'satuanKapasitas', label: 'Satuan Kapasitas*' },            // + new
+    { key: 'kelompokDetail', label: 'Kelompok Detail*' },
+    { key: 'satuanVolume', label: 'Satuan Volume*' },
     { key: 'ambil', label: 'Ambil Harga' },
     { key: 'aksi', label: 'Action' },
   ];
@@ -195,8 +195,10 @@ const EditProjectConstruction = () => {
         kategori,
         tahun: Number(tahun),
         volume: Number(volume),
+        inflasi: inflasi === '' ? null : Number(inflasi), // NEW include project inflasi
         constructionCosts: (items || []).map((it) => ({
           id: typeof it.kode === 'number' ? it.kode : undefined,
+          workcode: it.workcode || '', // NEW
           uraian: it.uraian,
           specification: it.specification || '',
           qty: Number(it.qty) || 0,
@@ -210,12 +212,10 @@ const EditProjectConstruction = () => {
           infrastruktur,
           volume: Number(volume),
           satuanVolume: it.satuanVolume || '',
-          kapasitasRegasifikasi: Number(it.kapasitasRegasifikasi ?? volume ?? 0),
-          satuanKapasitas: it.satuanKapasitas || '',
           kelompok: it.kelompok || '',
           kelompokDetail: it.kelompokDetail || '',
           lokasi,
-          tipe: kategori || '', // enforce tipe from kategori
+          tipe: kategori || '',
         })),
       };
 
@@ -303,6 +303,11 @@ const EditProjectConstruction = () => {
             <input type="number" step="any" className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
                    value={volume} onChange={(e) => setVolume(e.target.value)} />
           </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Inflasi (%)</div>
+            <input type="number" step="any" className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
+                   value={inflasi} onChange={(e) => setInflasi(e.target.value)} />
+          </div>
         </div>
       </div>
 
@@ -343,6 +348,13 @@ const EditProjectConstruction = () => {
                   return (
                     <tr key={absIdx} className="bg-white dark:bg-gray-900">
                       <td className="border dark:border-gray-700 px-3 py-2">{item.kode}</td>
+                      <td className="border dark:border-gray-700 px-3 py-2">
+                        <input
+                          value={item.workcode || ''}
+                          onChange={(e) => handleItemChange(absIdx, 'workcode', e.target.value)}
+                          className={`${inputBaseCls} ${missingFor('workcode') ? missingCls : inputBorderCls}`}
+                        />
+                      </td>
                       <td className="border dark:border-gray-700 px-3 py-2">
                         <input
                           value={item.uraian || ''}
@@ -402,21 +414,6 @@ const EditProjectConstruction = () => {
                           value={item.satuanVolume || ''}
                           onChange={(e) => handleItemChange(absIdx, 'satuanVolume', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('satuanVolume') ? missingCls : inputBorderCls}`}
-                        />
-                      </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
-                        <input
-                          type="number" min={0} step="any"
-                          value={item.kapasitasRegasifikasi ?? 0}
-                          onChange={(e) => handleItemChange(absIdx, 'kapasitasRegasifikasi', e.target.value)}
-                          className={`${inputBaseCls} ${missingFor('kapasitasRegasifikasi') ? missingCls : inputBorderCls}`}
-                        />
-                      </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
-                        <input
-                          value={item.satuanKapasitas || ''}
-                          onChange={(e) => handleItemChange(absIdx, 'satuanKapasitas', e.target.value)}
-                          className={`${inputBaseCls} ${missingFor('satuanKapasitas') ? missingCls : inputBorderCls}`}
                         />
                       </td>
                       <td className="border dark:border-gray-700 px-3 py-2">

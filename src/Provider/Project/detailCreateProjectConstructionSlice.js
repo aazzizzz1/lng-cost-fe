@@ -16,12 +16,11 @@ export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe,
   tipe,
   isCategory,
   aaceClass: 5, // Default AACE class is 5
+  workcode: "", // NEW
   specification: "", // ensure present
   accuracyLow: 0,
   accuracyHigh: 0,
   satuanVolume: "",
-  kapasitasRegasifikasi: 0,
-  satuanKapasitas: "",
   kelompokDetail: "",
 });
 
@@ -114,7 +113,8 @@ const detailCreateProjectConstructionSlice = createSlice({
       .addCase(fetchRecommendedConstructionCosts.fulfilled, (state, action) => {
         state.loadingRecommendedCosts = false; // Set loading to false
         state.items = action.payload.map((item) => ({
-          kode: item.id,
+          kode: item.workcode || item.id, // CHANGED: prefer workcode
+          workcode: item.workcode || "", // NEW
           uraian: item.uraian,
           specification: item.specification || "",
           satuan: item.satuan || "",
@@ -131,8 +131,6 @@ const detailCreateProjectConstructionSlice = createSlice({
           accuracyLow: Number.isFinite(item.accuracyLow) ? item.accuracyLow : 0,
           accuracyHigh: Number.isFinite(item.accuracyHigh) ? item.accuracyHigh : 0,
           satuanVolume: item.satuanVolume || "",
-          kapasitasRegasifikasi: Number(item.kapasitasRegasifikasi) || 0,
-          satuanKapasitas: item.satuanKapasitas || "",
           kelompokDetail: item.kelompokDetail || "",
         }));
       })

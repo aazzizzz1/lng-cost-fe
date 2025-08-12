@@ -121,7 +121,8 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
       dispatch(createProject(newProject));
 
       const constructionItems = recommendedCosts.map((cost) => ({
-        kode: cost.id,
+        kode: cost.workcode || cost.id, // CHANGED: prefer workcode
+        workcode: cost.workcode || "",   // NEW
         uraian: cost.uraian,
         satuan: cost.satuan,
         qty: cost.qty,

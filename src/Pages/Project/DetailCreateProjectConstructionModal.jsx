@@ -11,7 +11,7 @@ import {
 const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList }) => {
   const dispatch = useDispatch();
   const modal = useSelector(selectModal);
-  const { types = [], transport: { data = [], modalLoading } } = useSelector((state) => state.unitPrice);
+  const { types = [], transport: { data = [] }, modalLoading } = useSelector((state) => state.unitPrice); // FIX selector
   const search = modal.search || "";
 
   const [selectedType, setSelectedType] = useState("");
@@ -27,6 +27,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
   }, [dispatch, selectedType, search]);
 
   const modalColumns = [
+    { key: "workcode", label: "Workcode" }, // NEW
     { key: "uraian", label: "Uraian" },
     { key: "spesifikasi", label: "Spesifikasi" },
     { key: "satuan", label: "Satuan" },
@@ -83,6 +84,20 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
     dispatch(
       updateItem({
         idx: modal.itemIdx,
+        field: "workcode",
+        value: row.workcode || "",
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "kode",
+        value: row.workcode || row.kode || "", // NEW: sync kode with workcode
+      })
+    );
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
         field: "uraian",
         value: row.uraian || "",
       })
@@ -124,7 +139,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
       })
     );
 
-    // also fill supportive fields to avoid nulls
+    // supportive fields
     dispatch(
       updateItem({
         idx: modal.itemIdx,
@@ -156,22 +171,8 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
     dispatch(
       updateItem({
         idx: modal.itemIdx,
-        field: "kapasitasRegasifikasi",
-        value: Number(project?.volume || row.kapasitasRegasifikasi || 0),
-      })
-    );
-    dispatch(
-      updateItem({
-        idx: modal.itemIdx,
         field: "satuanVolume",
         value: row.satuanVolume || "",
-      })
-    );
-    dispatch(
-      updateItem({
-        idx: modal.itemIdx,
-        field: "satuanKapasitas",
-        value: row.satuanKapasitas || "",
       })
     );
     dispatch(

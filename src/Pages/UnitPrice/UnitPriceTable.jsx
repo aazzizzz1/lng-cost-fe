@@ -3,6 +3,7 @@ import Spinner from '../../Components/Spinner/Spinner';
 
 // Kolom yang ingin ditampilkan
 const columns = [
+  { key: "workcode", label: "Workcode" }, // NEW
   { key: "uraian", label: "Uraian" },
   { key: "kategori", label: "Kategori" },
   { key: "satuan", label: "Satuan" },
@@ -17,8 +18,6 @@ const columns = [
   { key: "infrastruktur", label: "Infrastruktur" },
   { key: "volume", label: "Volume" },
   { key: "satuanVolume", label: "Satuan Volume" },
-  { key: "kapasitasRegasifikasi", label: "Kapasitas Regasifikasi" },
-  { key: "satuanKapasitas", label: "Satuan Kapasitas" },
   { key: "tipe", label: "Tipe" },
 ];
 

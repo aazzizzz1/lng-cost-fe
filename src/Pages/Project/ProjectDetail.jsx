@@ -26,6 +26,7 @@ const ProjectDetail = () => {
 
   // Kolom tabel
   const columns = [
+    { key: 'workcode', label: 'Workcode' }, // NEW
     { key: 'uraian', label: 'Uraian' },
     { key: 'specification', label: 'Specification' },
     { key: 'qty', label: 'Qty', className: 'text-right' },
@@ -51,6 +52,7 @@ const ProjectDetail = () => {
         <div><b>Kategori:</b> {project.kategori}</div>
         <div><b>Infrastruktur:</b> {project.infrastruktur}</div>
         <div><b>Volume:</b> {project.volume}</div>
+        <div><b>Inflasi:</b> {project.inflasi ?? "-"}</div> {/* NEW */}
       </div>
       <div className="mb-4">
         <div className="font-semibold">Total Harga Pekerjaan: <span className="font-normal">{project.totalConstructionCost?.toLocaleString?.() ?? (project.harga?.toLocaleString?.() ?? "-")}</span></div>

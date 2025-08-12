@@ -129,9 +129,11 @@ const DetailCreateProjectConstruction = () => {
       volume: project?.volume || 6000,
       tahun: project?.tahun || 2025,
       kategori: project?.kategori || "MID SCALE LNG BV",
+      inflasi: project?.inflasi ?? 0, // NEW include inflasi
       levelAACE: 3,
       harga: 5000000000,
       constructionCosts: recommendedCosts.map((cost) => ({
+        workcode: cost.workcode || "", // NEW
         uraian: cost.uraian,
         specification: cost.specification,
         qty: cost.qty,
@@ -145,8 +147,8 @@ const DetailCreateProjectConstruction = () => {
         infrastruktur: cost.infrastruktur,
         volume: cost.volume,
         satuanVolume: cost.satuanVolume,
-        kapasitasRegasifikasi: cost.kapasitasRegasifikasi,
-        satuanKapasitas: cost.satuanKapasitas,
+        // kapasitasRegasifikasi: cost.kapasitasRegasifikasi, // REMOVED
+        // satuanKapasitas: cost.satuanKapasitas,             // REMOVED
         kelompok: cost.kelompok,
         kelompokDetail: cost.kelompokDetail,
         lokasi: cost.lokasi,
@@ -201,7 +203,7 @@ const DetailCreateProjectConstruction = () => {
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Volume</div>
             <div className="font-semibold text-gray-900 dark:text-white">
-              {project?.volume ? project.volume : "-"} <span className="text-xs">{satuanByJenis[project?.jenis] || "-"}</span>
+              {project?.volume ? project.volume : "-"} <span className="text-xs">{satuanByJenis[project?.infrastruktur] || "-"}</span>
             </div>
           </div>
           <div>
@@ -272,6 +274,7 @@ const DetailCreateProjectConstruction = () => {
                   <thead>
                     <tr className="bg-gray-100 dark:bg-gray-800">
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Kode</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Workcode</th> {/* NEW */}
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Uraian</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Satuan</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Qty</th>
@@ -290,7 +293,21 @@ const DetailCreateProjectConstruction = () => {
                           key={absIdx}
                           className={item.isCategory ? "bg-gray-50 dark:bg-gray-800 font-semibold" : "bg-white dark:bg-gray-900"}
                         >
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">{item.kode}</td>
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.workcode || item.kode || item.id /* CHANGED: prefer workcode */}
+                          </td>
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.isCategory ? "" : (
+                              <input
+                                type="text"
+                                value={item.workcode || ""}
+                                onChange={(e) => handleItemChange(absIdx, "workcode", e.target.value)}
+                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
+                                placeholder="Workcode"
+                                required
+                              />
+                            )}
+                          </td>
                           <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
                             {item.isCategory ? (
                               item.uraian
