@@ -3,6 +3,7 @@ import axios from 'axios';
 
 // Fungsi default item
 export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe, isCategory = false) => ({
+  id: undefined, // NEW: keep DB id when available
   kode,
   uraian,
   satuan: "",
@@ -111,9 +112,10 @@ const detailCreateProjectConstructionSlice = createSlice({
         state.loadingRecommendedCosts = true; // Set loading to true
       })
       .addCase(fetchRecommendedConstructionCosts.fulfilled, (state, action) => {
-        state.loadingRecommendedCosts = false; // Set loading to false
+        state.loadingRecommendedCosts = false;
         state.items = action.payload.map((item) => ({
-          kode: item.workcode || item.id, // CHANGED: prefer workcode
+          id: item.id ?? undefined,            // NEW: preserve id if provided
+          kode: item.workcode || item.id,      // prefer workcode for display
           workcode: item.workcode || "", // NEW
           uraian: item.uraian,
           specification: item.specification || "",

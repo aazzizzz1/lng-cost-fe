@@ -59,7 +59,8 @@ const EditProjectConstruction = () => {
     const mapped =
       Array.isArray(project.constructionCosts)
         ? project.constructionCosts.map((c) => ({
-            kode: c.workcode || c.id, // CHANGED: prefer workcode
+            id: c.id,                          // NEW: keep DB id
+            kode: c.workcode || c.id,          // prefer workcode for display
             workcode: c.workcode || '', // NEW
             uraian: c.uraian,
             specification: c.specification, // preserved
@@ -197,7 +198,7 @@ const EditProjectConstruction = () => {
         volume: Number(volume),
         inflasi: inflasi === '' ? null : Number(inflasi), // NEW include project inflasi
         constructionCosts: (items || []).map((it) => ({
-          id: typeof it.kode === 'number' ? it.kode : undefined,
+          id: it.id ?? undefined,               // CHANGED: use stored DB id
           workcode: it.workcode || '', // NEW
           uraian: it.uraian,
           specification: it.specification || '',

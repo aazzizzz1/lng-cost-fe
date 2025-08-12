@@ -187,8 +187,6 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
           'infrastruktur',
           'volume',
           'satuanVolume',
-          'kapasitasRegasifikasi',
-          'satuanKapasitas',
           'kelompok',
           'kelompokDetail',
           'lokasi',
