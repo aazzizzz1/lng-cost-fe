@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   isSidebarOpen: true,
   isHargaSatuanOpen: false,
-  isHargaPerkiraanOpen: false,
+  isHargaKonstruksiOpen: false, // renamed from isHargaPerkiraanOpen
   isLNGPlantOpen: false,
   isTransportationOpen: false,
   isReceivingTerminalOpen: false,
@@ -23,8 +23,8 @@ const globalSlice = createSlice({
     toggleHargaSatuan(state) {
       state.isHargaSatuanOpen = !state.isHargaSatuanOpen;
     },
-    toggleHargaPerkiraan(state) {
-      state.isHargaPerkiraanOpen = !state.isHargaPerkiraanOpen;
+    toggleHargaKonstruksi(state) {
+      state.isHargaKonstruksiOpen = !state.isHargaKonstruksiOpen;
     },
     toggleLNGPlant(state) {
       state.isLNGPlantOpen = !state.isLNGPlantOpen;
@@ -48,7 +48,7 @@ export const {
   toggleSidebar,
   setSidebarOpen,
   toggleHargaSatuan,
-  toggleHargaPerkiraan,
+  toggleHargaKonstruksi, // renamed action
   toggleLNGPlant,
   toggleTransportation,
   toggleReceivingTerminal,

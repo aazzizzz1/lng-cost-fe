@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './AuthSlice'; // Import auth reducer
 import projectReducer from './Project/ProjectSlice'; // Corrected path
 import layoutReducer from './layoutSlice'; // Import layout reducer
-import constractionCostReducer from './Project/ConstractionCostSlice'; // Corrected path
+import constractionCostReducer from './ConstructionCost/ConstractionCostSlice'; // Corrected path
 import globalReducer from './GlobalSlice'; // Tambahkan ini
 import capacityFactorReducer from './CapacityFactorSlice'; // Tambahkan import
 import administratorReducer from './administratorSlice'; // Tambahkan import

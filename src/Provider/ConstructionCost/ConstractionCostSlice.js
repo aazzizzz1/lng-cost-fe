@@ -19,11 +19,13 @@ export const fetchUniqueInfrastruktur = createAsyncThunk(
 // Fetch filtered construction costs
 export const fetchFilteredConstructionCosts = createAsyncThunk(
   'constractionCost/fetchFilteredConstructionCosts',
-  async ({ tipe, infrastruktur }, { rejectWithValue }) => {
+  async ({ tipe, infrastruktur, volume } = {}, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/construction-costs/filter`, {
-        params: { tipe, infrastruktur },
-      });
+      const params = {};
+      if (tipe) params.tipe = tipe;
+      if (infrastruktur) params.infrastruktur = infrastruktur;
+      if (volume !== undefined) params.volume = volume;
+      const response = await axios.get(`${API_URL}/construction-costs/filter`, { params });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -47,8 +49,9 @@ const constractionCostSlice = createSlice({
       // Set filter criteria
       if (typeof action.payload === 'object' && action.payload !== null) {
         state.filterJenis = {
-          tipe: action.payload.tipe,
-          proyek: action.payload.proyek,
+          tipe: action.payload.tipe ?? null,
+            proyek: action.payload.proyek ?? null,
+            volume: action.payload.volume ?? null,
         };
       } else {
         state.filterJenis = action.payload;

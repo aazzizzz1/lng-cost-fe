@@ -28,30 +28,16 @@ const columns = [
 ];
 
 const ConstractionCostTable = () => {
-  const { costs, filterJenis, loading } = useSelector((state) => state.constractionCost);
+  const { costs, loading } = useSelector((state) => state.constractionCost);
 
-  // Filter data sesuai jenis project DAN nama proyek jika filterJenis berupa object
-  const filteredCosts = useMemo(() => {
-    if (!filterJenis) return costs;
-    if (typeof filterJenis === "object" && filterJenis !== null) {
-      return costs.filter(
-        (item) =>
-          item.tipe === filterJenis.tipe &&
-          item.proyek === filterJenis.proyek
-      );
-    }
-    // fallback lama: filter hanya tipe
-    return costs.filter((item) => item.tipe === filterJenis);
-  }, [costs, filterJenis]);
-
-  // Kelompokkan data berdasarkan 'kelompok'
+  // Group langsung data yang sudah difetch ter-filter dari backend
   const grouped = useMemo(() => {
-    return filteredCosts.reduce((acc, item) => {
+    return costs.reduce((acc, item) => {
       if (!acc[item.kelompok]) acc[item.kelompok] = [];
       acc[item.kelompok].push(item);
       return acc;
     }, {});
-  }, [filteredCosts]);
+  }, [costs]);
 
   // Prepare data untuk table (flat, tapi dengan baris judul kelompok)
   let tableRows = [];
@@ -70,12 +56,12 @@ const ConstractionCostTable = () => {
 
   // Summary
   const summary = useMemo(() => {
-    const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (Number(item.totalHarga) || 0), 0);
+    const totalHargaPekerjaan = costs.reduce((sum, item) => sum + (Number(item.totalHarga) || 0), 0);
     const ppn = totalHargaPekerjaan * 0.11;
     const asuransi = totalHargaPekerjaan * 0.0025;
     const totalPerkiraan = totalHargaPekerjaan + ppn + asuransi;
     return { totalHargaPekerjaan, ppn, asuransi, totalPerkiraan };
-  }, [filteredCosts]);
+  }, [costs]);
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
