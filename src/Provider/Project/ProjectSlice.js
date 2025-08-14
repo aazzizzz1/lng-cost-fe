@@ -6,7 +6,8 @@ const initialState = {
   projects: [],
   recommendedCosts: [],
   selectedProjectDetails: null,
-  loadingRecommendedCosts: false, // Add loading state
+  loadingRecommendedCosts: false,
+  detailCache: {}, // NEW: cache project details by id
 };
 
 const projectSlice = createSlice({
@@ -28,11 +29,16 @@ const projectSlice = createSlice({
     setSelectedProjectDetails: (state, action) => {
       state.selectedProjectDetails = action.payload;
     },
+    setProjectDetailCache: (state, action) => { // NEW
+      const { id, data } = action.payload;
+      state.detailCache[id] = data;
+    },
     deleteProjectById: (state, action) => {
       state.projects = state.projects.filter(project => project.id !== action.payload);
       if (state.selectedProjectDetails && state.selectedProjectDetails.id === action.payload) {
         state.selectedProjectDetails = null;
       }
+      delete state.detailCache[action.payload]; // NEW: remove from cache
     },
   },
 });
@@ -40,10 +46,11 @@ const projectSlice = createSlice({
 export const {
   setProjects,
   setRecommendedCosts,
-  setLoadingRecommendedCosts, // Export the new action
+  setLoadingRecommendedCosts,
   createProject,
   setSelectedProjectDetails,
-  deleteProjectById, // Export the new action
+  setProjectDetailCache, // NEW
+  deleteProjectById,
 } = projectSlice.actions;
 
 const getAuthHeaders = () => {
@@ -218,6 +225,21 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
   } catch (error) {
     console.error('[updateProject] error:', error?.response?.data || error?.message || error);
     throw error;
+  }
+};
+
+export const fetchProjectDetailCache = (projectId) => async (dispatch, getState) => { // NEW
+  try {
+    if (getState().projects.detailCache[projectId]) return getState().projects.detailCache[projectId];
+    const res = await axios.get(`${process.env.REACT_APP_API}/projects/${projectId}`, {
+      headers: getAuthHeaders(),
+    });
+    const data = res.data?.data;
+    if (data) dispatch(setProjectDetailCache({ id: projectId, data }));
+    return data;
+  } catch (e) {
+    console.error('Error caching project detail:', e);
+    return null;
   }
 };
 

@@ -1,7 +1,21 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProjects } from '../../Provider/Project/ProjectSlice';
 
-const RecapModal = ({ isOpen, onClose, projects = [], onAdd }) => {
+const RecapModal = ({ isOpen, onClose, onAdd, selectedIds = [] }) => {
+  const dispatch = useDispatch();
+  const projects = useSelector(state => state.projects.projects) || [];
   const [checkedIds, setCheckedIds] = useState([]);
+
+  // Fetch all projects when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchProjects());
+      setCheckedIds([]); // reset selection when opened
+    }
+  }, [isOpen, dispatch]);
+
+  const displayProjects = projects.filter(p => !selectedIds.includes(p.id)); // exclude already selected
 
   const handleCheck = (id) => {
     setCheckedIds(prev =>
@@ -29,10 +43,12 @@ const RecapModal = ({ isOpen, onClose, projects = [], onAdd }) => {
           </h2>
           <div className="mb-4">
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-              {projects.length === 0 && (
-                <li className="py-2 text-gray-400 dark:text-gray-500 text-center">Tidak ada project tersedia.</li>
+              {displayProjects.length === 0 && (
+                <li className="py-2 text-gray-400 dark:text-gray-500 text-center">
+                  {projects.length === 0 ? 'Memuat project...' : 'Semua project sudah dipilih.'}
+                </li>
               )}
-              {projects.map(project => (
+              {displayProjects.map(project => (
                 <li key={project.id} className="flex items-center gap-2 py-2">
                   <input
                     type="checkbox"
@@ -48,7 +64,7 @@ const RecapModal = ({ isOpen, onClose, projects = [], onAdd }) => {
           <div className="flex gap-2 mt-4 justify-end">
             <button
               type="button"
-              className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
+              className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800 disabled:opacity-50"
               onClick={handleAdd}
               disabled={checkedIds.length === 0}
             >
@@ -71,4 +87,4 @@ const RecapModal = ({ isOpen, onClose, projects = [], onAdd }) => {
   );
 };
 
-export default RecapModal
+export default RecapModal;
