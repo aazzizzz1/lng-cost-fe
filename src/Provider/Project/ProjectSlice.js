@@ -53,7 +53,9 @@ const getAuthHeaders = () => {
 
 export const fetchProjects = () => async (dispatch) => {
   try {
-    const response = await axios.get(`${process.env.REACT_APP_API}/projects`, {
+    // UPDATED: use manual projects endpoint
+    // const response = await axios.get(`${process.env.REACT_APP_API}/projects`, {
+    const response = await axios.get(`${process.env.REACT_APP_API}/projects/manual`, {
       headers: getAuthHeaders(),
     });
     dispatch(setProjects(response.data.data));
