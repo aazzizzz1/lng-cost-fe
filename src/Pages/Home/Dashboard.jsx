@@ -2,21 +2,25 @@ import React, { useState } from "react";
 import ChartItems from "./ChartItems";
 import { useSelector } from "react-redux";
 import CreateProjectModal from "../Project/CreateProjectModal";
-import { useNavigate } from "react-router-dom"; // NEW
+import { useNavigate } from "react-router-dom";
+import ModalCapacityFactor from "../CapacityFactor/ModalCapacityFactor";
 
 const AccentRing = ({ accent, styles }) => {
   const a = styles[accent];
   return (
-    <span
-      className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${a.ring} to-transparent opacity-0 group-hover:opacity-100 transition-opacity`}
-    />
+    <span className={`absolute inset-0 rounded-2xl ${a.ringClass} opacity-0 group-hover:opacity-100 transition-opacity`} />
   );
 };
 
 const Dashboard = () => {
-  const { statCards, quickActions, recentEstimates, infrastructures, accentStyles } = useSelector(
-    (state) => state.dashboard
-  );
+  const {
+    statCards,
+    quickActions,
+    recentEstimates,
+    infrastructures,
+    accentStyles,
+    chartGradients,
+  } = useSelector((s) => s.dashboard);
   const { labels: chartLabels, series: chartSeries, loading: chartLoading } = useSelector(
     (state) => state.dashboard.chart
   );
@@ -27,12 +31,13 @@ const Dashboard = () => {
     .slice(0, 5);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const navigate = useNavigate(); // NEW
+  const [showCapacityModal, setShowCapacityModal] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <section className="bg-white dark:bg-gray-900">
       <div className="px-4 py-6 space-y-8 max-w-7xl mx-auto">
-        {/* Middle Section: Quick Actions & Recent Estimates */}
+        {/* Quick Actions / Recent / Stats */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Quick Actions */}
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
@@ -48,6 +53,7 @@ const Dashboard = () => {
                     if (a.id === "new-estimate") setShowCreateModal(true);
                     else if (a.id === "view-reports") navigate("/rekap"); // NEW
                     // else if (a.id === "cost-analytics") navigate("/unitprice"); // OPTIONAL example route
+                    else if (a.id === "cost-analytics") setShowCapacityModal(true);
                   }}
                   className="group flex items-center gap-3 px-5 py-3 bg-white/60 dark:bg-gray-800/60 hover:bg-blue-50 dark:hover:bg-gray-700/70 text-left transition-colors"
                 >
@@ -98,9 +104,9 @@ const Dashboard = () => {
             {statCards.map((c) => (
               <div
                 key={c.id}
-                className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white to-white/60 dark:from-gray-800 dark:to-gray-800/60 backdrop-blur shadow-sm hover:shadow-md transition-all p-5"
+                className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 shadow-sm hover:shadow-md transition-all p-5"
               >
-                <div className={`absolute inset-0 bg-gradient-to-tr ${c.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                <div className={`absolute inset-0 ${c.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
                 <div className="relative z-10 flex items-start gap-4">
                   <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/70 dark:bg-gray-700/60 shadow-inner text-xl">
                     {c.icon}
@@ -118,7 +124,6 @@ const Dashboard = () => {
         {/* Chart + Metrics */}
         <div className="grid lg:grid-cols-2 gap-6">
           <ChartItems />
-          {/* NEW: Metrics card */}
           <div className="relative rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6 overflow-hidden flex flex-col">
             <div className="pointer-events-none absolute -top-8 -left-8 w-40 h-40 rounded-full bg-gradient-to-br from-indigo-100/70 to-transparent dark:from-indigo-500/10 blur-2xl" />
             <div className="flex items-start justify-between mb-4 relative z-10">
@@ -163,13 +168,7 @@ const Dashboard = () => {
                 <ul className="space-y-4">
                   {topItems.map((item, idx) => {
                     const pct = totalValue ? (item.value / totalValue) * 100 : 0;
-                    const colorClasses = [
-                      "from-blue-500 to-blue-400",
-                      "from-cyan-500 to-cyan-400",
-                      "from-violet-500 to-violet-400",
-                      "from-amber-500 to-amber-400",
-                      "from-emerald-500 to-emerald-400",
-                    ];
+                    const grad = chartGradients[idx % chartGradients.length]; // string class like 'bg-gradient-metric-1'
                     return (
                       <li key={item.label} className="relative">
                         <div className="flex justify-between mb-1">
@@ -182,7 +181,7 @@ const Dashboard = () => {
                         </div>
                         <div className="h-2.5 w-full rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
                           <div
-                            className={`h-full rounded-full bg-gradient-to-r ${colorClasses[idx % colorClasses.length]} transition-all`}
+                            className={`h-full rounded-full ${grad} transition-all duration-500 ease-out shadow-inner`}
                             style={{ width: `${pct}%` }}
                           />
                         </div>
@@ -228,17 +227,12 @@ const Dashboard = () => {
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {infrastructures.map((c) => {
-              const a = accentStyles[c.accent]; // CHANGED
+              const a = accentStyles[c.accent];
               return (
-                <div
-                  key={c.id}
-                  className="group relative overflow-hidden rounded-2xl p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm hover:shadow-md transition-all"
-                >
-                  <AccentRing accent={c.accent} styles={accentStyles} /> {/* CHANGED */}
+                <div key={c.id} className="group relative overflow-hidden rounded-2xl p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm hover:shadow-md transition-all">
+                  <AccentRing accent={c.accent} styles={accentStyles} />
                   <div className="relative z-10 flex items-start gap-4">
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${a.iconBg} ${a.iconBorder} border`}
-                    >
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${a.iconBgClass} ${a.iconBorder} border`}>
                       {c.icon}
                     </div>
                     <div className="flex flex-col">
@@ -261,11 +255,9 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* NEW: Create Project Modal mount */}
-      <CreateProjectModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-      />
+      {/* Modals */}
+      <CreateProjectModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      <ModalCapacityFactor isOpen={showCapacityModal} onClose={() => setShowCapacityModal(false)} />
     </section>
   );
 };

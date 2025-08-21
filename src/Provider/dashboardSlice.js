@@ -19,18 +19,12 @@ export const fetchChartData = createAsyncThunk(
 const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState: {
-    chart: {
-      labels: [],
-      series: [],
-      loading: false,
-      error: null,
-    },
-    // NEW: moved constants here
+    chart: { labels: [], series: [], loading: false, error: null },
     statCards: [
-      { id: "total-estimates", label: "Total Estimates", value: 1, icon: "🧮", color: "from-blue-500/10 to-blue-500/0" },
-      { id: "infra-types", label: "Infrastructure Types", value: 6, icon: "🏗️", color: "from-emerald-500/10 to-emerald-500/0" },
-      { id: "total-value", label: "Total Value", value: "$3300.0M", icon: "💰", color: "from-fuchsia-500/10 to-fuchsia-500/0" },
-      // { id: "this-month", label: "This Month", value: 1, icon: "🕒", color: "from-orange-500/10 to-orange-500/0" },
+      { id: "total-estimates", label: "Total Estimates", value: 1, icon: "🧮", color: "bg-stat-blue" },
+      { id: "infra-types", label: "Infrastructure Types", value: 6, icon: "🏗️", color: "bg-stat-emerald" },
+      { id: "total-value", label: "Total Value", value: "$3300.0M", icon: "💰", color: "bg-stat-fuchsia" },
+      // { id: "this-month", label: "This Month", value: 1, icon: "🕒", color: "bg-stat-orange" },
     ],
     quickActions: [
       { id: "new-estimate", label: "Create New Estimate", icon: "➕" },
@@ -40,7 +34,6 @@ const dashboardSlice = createSlice({
     recentEstimates: [
       { id: 232, name: "LNG Jetty • 20 MTPA", value: "$3300.0M", date: "8/9/2025" },
     ],
-    // NEW: infrastructures replaces costCategories
     infrastructures: [
       {
         id: "onshore-plant",
@@ -99,20 +92,32 @@ const dashboardSlice = createSlice({
         accent: "amber"
       },
     ],
-    // NEW: central accent styles (dipindahkan dari Dashboard.jsx)
+    // NEW: accent styles now pure tailwind class names
     accentStyles: {
-      blue:  { ring: "from-blue-500/20 via-blue-500/0",   iconBg: "from-blue-500/20 to-blue-500/0",   iconBorder: "border-blue-400/30" },
-      cyan:  { ring: "from-cyan-500/20 via-cyan-500/0",   iconBg: "from-cyan-500/20 to-cyan-500/0",   iconBorder: "border-cyan-400/30" },
-      violet:{ ring: "from-violet-500/20 via-violet-500/0", iconBg: "from-violet-500/20 to-violet-500/0", iconBorder: "border-violet-400/30" },
-      amber: { ring: "from-amber-500/20 via-amber-500/0", iconBg: "from-amber-500/20 to-amber-500/0", iconBorder: "border-amber-400/30" },
+      blue:  { ringClass: "bg-accent-ring-blue",  iconBgClass: "bg-accent-icon-blue",  iconBorder: "border-blue-400/30" },
+      cyan:  { ringClass: "bg-accent-ring-cyan",  iconBgClass: "bg-accent-icon-cyan",  iconBorder: "border-cyan-400/30" },
+      violet:{ ringClass: "bg-accent-ring-violet",iconBgClass: "bg-accent-icon-violet",iconBorder: "border-violet-400/30" },
+      amber: { ringClass: "bg-accent-ring-amber", iconBgClass: "bg-accent-icon-amber", iconBorder: "border-amber-400/30" },
     },
+    // Unified chart palette (hex needed by ApexCharts)
+    chartColors: [
+      "#2563eb","#0891b2","#7c3aed","#f59e0b","#059669","#dc2626",
+      "#4f46e5","#c026d3","#0d9488","#e11d48","#0284c7","#65a30d",
+      "#475569","#db2777","#ea580c","#9333ea"
+    ],
+    // Progress bar gradients now single classes
+    chartGradients: [
+      "bg-gradient-metric-1","bg-gradient-metric-2","bg-gradient-metric-3","bg-gradient-metric-4",
+      "bg-gradient-metric-5","bg-gradient-metric-6","bg-gradient-metric-7","bg-gradient-metric-8",
+      "bg-gradient-metric-9","bg-gradient-metric-10","bg-gradient-metric-11","bg-gradient-metric-12",
+      "bg-gradient-metric-13","bg-gradient-metric-14","bg-gradient-metric-15","bg-gradient-metric-16"
+    ],
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchChartData.pending, (state) => {
-        state.chart.loading = true;
-        state.chart.error = null;
+        state.chart.loading = true; state.chart.error = null;
       })
       .addCase(fetchChartData.fulfilled, (state, action) => {
         state.chart.loading = false;
@@ -120,8 +125,7 @@ const dashboardSlice = createSlice({
         state.chart.series = action.payload.series || [];
       })
       .addCase(fetchChartData.rejected, (state, action) => {
-        state.chart.loading = false;
-        state.chart.error = action.payload;
+        state.chart.loading = false; state.chart.error = action.payload;
       });
   },
 });
