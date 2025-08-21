@@ -2,32 +2,10 @@ import React, { useState } from "react";
 import ChartItems from "./ChartItems";
 import { useSelector } from "react-redux";
 import CreateProjectModal from "../Project/CreateProjectModal";
+import { useNavigate } from "react-router-dom"; // NEW
 
-const accentMap = {
-  blue: {
-    ring: "from-blue-500/20 via-blue-500/0",
-    iconBg: "from-blue-500/20 to-blue-500/0",
-    iconBorder: "border-blue-400/30",
-  },
-  cyan: {
-    ring: "from-cyan-500/20 via-cyan-500/0",
-    iconBg: "from-cyan-500/20 to-cyan-500/0",
-    iconBorder: "border-cyan-400/30",
-  },
-  violet: {
-    ring: "from-violet-500/20 via-violet-500/0",
-    iconBg: "from-violet-500/20 to-violet-500/0",
-    iconBorder: "border-violet-400/30",
-  },
-  amber: {
-    ring: "from-amber-500/20 via-amber-500/0",
-    iconBg: "from-amber-500/20 to-amber-500/0",
-    iconBorder: "border-amber-400/30",
-  },
-};
-
-const AccentRing = ({ accent }) => {
-  const a = accentMap[accent];
+const AccentRing = ({ accent, styles }) => {
+  const a = styles[accent];
   return (
     <span
       className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${a.ring} to-transparent opacity-0 group-hover:opacity-100 transition-opacity`}
@@ -36,7 +14,7 @@ const AccentRing = ({ accent }) => {
 };
 
 const Dashboard = () => {
-  const { statCards, quickActions, recentEstimates, infrastructures } = useSelector(
+  const { statCards, quickActions, recentEstimates, infrastructures, accentStyles } = useSelector(
     (state) => state.dashboard
   );
   const { labels: chartLabels, series: chartSeries, loading: chartLoading } = useSelector(
@@ -49,37 +27,15 @@ const Dashboard = () => {
     .slice(0, 5);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const navigate = useNavigate(); // NEW
 
   return (
     <section className="bg-white dark:bg-gray-900">
       <div className="px-4 py-6 space-y-8 max-w-7xl mx-auto">
-        {/* Top Stat Cards */}
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {statCards.map((c) => (
-            <div
-              key={c.id}
-              className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white/70 to-white/30 dark:from-gray-800/70 dark:to-gray-800/30 backdrop-blur supports-[backdrop-filter]:bg-white/40 shadow-sm hover:shadow-md transition-all"
-            >
-              <div
-                className={`absolute inset-0 bg-gradient-to-tr ${c.color} opacity-0 group-hover:opacity-100 transition-opacity`}
-              />
-              <div className="p-5 relative z-10 flex items-start gap-4">
-                <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/70 dark:bg-gray-700/60 shadow-inner text-xl">
-                  {c.icon}
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{c.label}</span>
-                  <span className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{c.value}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Middle Section: Quick Actions & Recent Estimates */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Quick Actions */}
-          <div className="lg:col-span-2 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
               <span className="text-blue-600">⚡</span> Quick Actions
             </h2>
@@ -90,6 +46,8 @@ const Dashboard = () => {
                   key={a.id}
                   onClick={() => {
                     if (a.id === "new-estimate") setShowCreateModal(true);
+                    else if (a.id === "view-reports") navigate("/rekap"); // NEW
+                    // else if (a.id === "cost-analytics") navigate("/unitprice"); // OPTIONAL example route
                   }}
                   className="group flex items-center gap-3 px-5 py-3 bg-white/60 dark:bg-gray-800/60 hover:bg-blue-50 dark:hover:bg-gray-700/70 text-left transition-colors"
                 >
@@ -133,6 +91,27 @@ const Dashboard = () => {
             <button className="mt-4 w-full text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
               View all →
             </button>
+          </div>
+
+          {/* Stats Column */}
+          <div className="flex flex-col gap-5">
+            {statCards.map((c) => (
+              <div
+                key={c.id}
+                className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-white to-white/60 dark:from-gray-800 dark:to-gray-800/60 backdrop-blur shadow-sm hover:shadow-md transition-all p-5"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-tr ${c.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                <div className="relative z-10 flex items-start gap-4">
+                  <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/70 dark:bg-gray-700/60 shadow-inner text-xl">
+                    {c.icon}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{c.label}</span>
+                    <span className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{c.value}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -249,13 +228,13 @@ const Dashboard = () => {
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {infrastructures.map((c) => {
-              const a = accentMap[c.accent];
+              const a = accentStyles[c.accent]; // CHANGED
               return (
                 <div
                   key={c.id}
                   className="group relative overflow-hidden rounded-2xl p-5 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm hover:shadow-md transition-all"
                 >
-                  <AccentRing accent={c.accent} />
+                  <AccentRing accent={c.accent} styles={accentStyles} /> {/* CHANGED */}
                   <div className="relative z-10 flex items-start gap-4">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${a.iconBg} ${a.iconBorder} border`}

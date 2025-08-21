@@ -30,7 +30,7 @@ const dashboardSlice = createSlice({
       { id: "total-estimates", label: "Total Estimates", value: 1, icon: "🧮", color: "from-blue-500/10 to-blue-500/0" },
       { id: "infra-types", label: "Infrastructure Types", value: 6, icon: "🏗️", color: "from-emerald-500/10 to-emerald-500/0" },
       { id: "total-value", label: "Total Value", value: "$3300.0M", icon: "💰", color: "from-fuchsia-500/10 to-fuchsia-500/0" },
-      { id: "this-month", label: "This Month", value: 1, icon: "🕒", color: "from-orange-500/10 to-orange-500/0" },
+      // { id: "this-month", label: "This Month", value: 1, icon: "🕒", color: "from-orange-500/10 to-orange-500/0" },
     ],
     quickActions: [
       { id: "new-estimate", label: "Create New Estimate", icon: "➕" },
@@ -99,6 +99,13 @@ const dashboardSlice = createSlice({
         accent: "amber"
       },
     ],
+    // NEW: central accent styles (dipindahkan dari Dashboard.jsx)
+    accentStyles: {
+      blue:  { ring: "from-blue-500/20 via-blue-500/0",   iconBg: "from-blue-500/20 to-blue-500/0",   iconBorder: "border-blue-400/30" },
+      cyan:  { ring: "from-cyan-500/20 via-cyan-500/0",   iconBg: "from-cyan-500/20 to-cyan-500/0",   iconBorder: "border-cyan-400/30" },
+      violet:{ ring: "from-violet-500/20 via-violet-500/0", iconBg: "from-violet-500/20 to-violet-500/0", iconBorder: "border-violet-400/30" },
+      amber: { ring: "from-amber-500/20 via-amber-500/0", iconBg: "from-amber-500/20 to-amber-500/0", iconBorder: "border-amber-400/30" },
+    },
   },
   reducers: {},
   extraReducers: (builder) => {
