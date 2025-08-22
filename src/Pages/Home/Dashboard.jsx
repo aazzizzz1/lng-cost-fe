@@ -72,7 +72,7 @@ const Dashboard = () => {
           {/* Recent Estimates */}
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
-              <span className="text-emerald-600">🗂️</span> Recent Estimates
+              <span className="text-emerald-600">🗂️</span> Recent Capex
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Your latest cost estimations</p>
             <ul className="space-y-3">
@@ -97,6 +97,36 @@ const Dashboard = () => {
             <button className="mt-4 w-full text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
               View all →
             </button>
+            {/* OPEX Summary */}
+            <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span className="text-fuchsia-500">⚓</span> OPEX Summary
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">LNG Vessel • 135–150K CBM</p>
+                </div>
+                <span className="text-xs px-2 py-1 rounded-md bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-500/10 dark:text-fuchsia-300 border border-fuchsia-200 dark:border-fuchsia-500/30">
+                  2024
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-2.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Annual OPEX</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">$5,463,080</p>
+                </div>
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-2.5">
+                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Daily (15-yr)</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">$14,990</p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate('/opex')}
+                className="mt-3 w-full text-xs font-semibold text-white bg-fuchsia-600 hover:bg-fuchsia-700 dark:bg-fuchsia-500 dark:hover:bg-fuchsia-600 rounded-lg py-2 transition-colors"
+              >
+                Open OPEX Viewer →
+              </button>
+            </div>
           </div>
 
           {/* Stats Column */}
@@ -242,7 +272,12 @@ const Dashboard = () => {
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         {c.desc}
                       </p>
-                      <button className="mt-2 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          if (c.id === 'lng-carrier') navigate('/opex');
+                        }}
+                        className="mt-2 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
+                      >
                         Details <span>→</span>
                       </button>
                     </div>

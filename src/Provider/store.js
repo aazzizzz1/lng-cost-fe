@@ -10,6 +10,7 @@ import detailCreateProjectConstructionReducer from './Project/detailCreateProjec
 import rabReducer from './RabSlice'; // Tambahkan import RabSlice
 import unitPriceReducer from './HargaSatuan/unitPriceSlice'; // Tambahkan import unitPriceSlice
 import dashboardReducer from './dashboardSlice'; // Tambahkan import dashboardSlice
+import opexReducer from './Opex/OpexSlice'; // NEW: Opex slice
 
 export default configureStore({
   reducer: {
@@ -24,5 +25,6 @@ export default configureStore({
     rab: rabReducer, // Tambahkan reducer rab di sini
     unitPrice: unitPriceReducer, // Tambahkan ini
     dashboard: dashboardReducer, // Tambahkan ini
+  opex: opexReducer, // NEW: Opex
   },
 });

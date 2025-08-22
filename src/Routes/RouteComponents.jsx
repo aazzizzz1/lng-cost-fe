@@ -18,6 +18,7 @@ import AdministratorPages from "../Pages/Admin/AdministratorPages";
 import TransportPages from "../Pages/UnitPrice/UnitPricePages";
 import ProjectDetail from "../Pages/Project/ProjectDetail";
 import EditProjectConstruction from "../Pages/Project/EditProjectConstruction"; // + import
+import OpexPages from "../Pages/Opex/OpexPages"; // NEW
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -114,6 +115,14 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <AdministratorPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/opex"
+            element={
+              <LayoutPages>
+                <OpexPages />
               </LayoutPages>
             }
           />
