@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteAllUnitPrices, uploadUnitPriceExcel } from '../../Provider/HargaSatuan/unitPriceSlice'
 import { uploadCapacityFactorExcel, deleteAllCapacityFactor } from '../../Provider/CapacityFactorSlice'
+import DeleteModal from '../../Components/Modal/DeleteModal'; // NEW
 
 const ManageData = () => {
   const dispatch = useDispatch();
@@ -14,8 +15,25 @@ const ManageData = () => {
   const [cfSelectedFile, setCfSelectedFile] = useState(null);
   const cfFileInputRef = useRef(null);
 
+  // NEW: modal states
+  const [showDelUnitModal, setShowDelUnitModal] = useState(false);
+  const [showDelCFModal, setShowDelCFModal] = useState(false);
+  // NEW: focus refs
+  const unitYesRef = useRef(null);
+  const cfYesRef = useRef(null);
+  // NEW: focus effect
+  useEffect(() => {
+    if (showDelUnitModal && unitYesRef.current) unitYesRef.current.focus();
+  }, [showDelUnitModal]);
+  useEffect(() => {
+    if (showDelCFModal && cfYesRef.current) cfYesRef.current.focus();
+  }, [showDelCFModal]);
+
   const handleDeleteAllUnitPrices = () => {
-    dispatch(deleteAllUnitPrices());
+    dispatch(deleteAllUnitPrices()).then(() => setShowDelUnitModal(false));
+  };
+  const handleDeleteAllCapacityFactor = () => {
+    dispatch(deleteAllCapacityFactor()).then(() => setShowDelCFModal(false));
   };
 
   const handleFileChange = (e) => {
@@ -39,11 +57,6 @@ const ManageData = () => {
     if (cfSelectedFile) {
       dispatch(uploadCapacityFactorExcel(cfSelectedFile));
     }
-  };
-
-  // Handler delete all capacity factor
-  const handleDeleteAllCapacityFactor = () => {
-    dispatch(deleteAllCapacityFactor());
   };
 
   return (
@@ -87,12 +100,14 @@ const ManageData = () => {
             <div>
               <button
                 className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded shadow disabled:opacity-60 w-full"
-                onClick={handleDeleteAllUnitPrices}
+                onClick={() => setShowDelUnitModal(true)} /* CHANGED */
                 disabled={deleteLoading}
               >
                 {deleteLoading ? "Deleting..." : "Delete All Unit Prices"}
               </button>
+              {/* ...existing deleteResult message... */}
               {deleteResult && (
+                // ...existing code...
                 <div className={`mt-3 px-4 py-2 rounded text-sm ${deleteResult.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                   {deleteResult.message}
                 </div>
@@ -164,12 +179,13 @@ const ManageData = () => {
             <div>
               <button
                 className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded shadow disabled:opacity-60 w-full"
-                onClick={handleDeleteAllCapacityFactor}
+                onClick={() => setShowDelCFModal(true)} /* CHANGED */
                 disabled={cfDeleteLoading}
               >
                 {cfDeleteLoading ? "Deleting..." : "Delete All Capacity Factor"}
               </button>
               {cfDeleteResult && (
+                // ...existing code...
                 <div className={`mt-3 px-4 py-2 rounded text-sm ${cfDeleteResult.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                   <div>{cfDeleteResult.message}</div>
                   {cfDeleteResult.count !== undefined && (
@@ -213,6 +229,30 @@ const ManageData = () => {
           </section>
         </div>
       </div>
+
+      {/* NEW: Reusable Delete Modals */}
+      <DeleteModal
+        isOpen={showDelUnitModal}
+        title="Delete All Unit Prices"
+        message="This will permanently remove ALL Unit Price records from the database. This action cannot be undone. Proceed?"
+        confirmText="Yes, delete all"
+        cancelText="Cancel"
+        loading={deleteLoading}
+        onConfirm={handleDeleteAllUnitPrices}
+        onCancel={() => setShowDelUnitModal(false)}
+        danger
+      />
+      <DeleteModal
+        isOpen={showDelCFModal}
+        title="Delete All Capacity Factor Data"
+        message="All Capacity Factor (Total Cost) records will be permanently removed. Are you sure you want to continue?"
+        confirmText="Yes, delete all"
+        cancelText="Cancel"
+        loading={cfDeleteLoading}
+        onConfirm={handleDeleteAllCapacityFactor}
+        onCancel={() => setShowDelCFModal(false)}
+        danger
+      />
     </div>
   )
 }
