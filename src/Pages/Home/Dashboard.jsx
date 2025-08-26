@@ -18,9 +18,12 @@ const Dashboard = () => {
     quickActions,
     recentEstimates,
     infrastructures,
-    accentStyles,
-    chartGradients,
   } = useSelector((s) => s.dashboard);
+
+  // read shared styling from global slice
+  const accentStyles = useSelector((s) => s.global.accentStyles);
+  const chartGradients = useSelector((s) => s.global.chartGradients);
+
   const { labels: chartLabels, series: chartSeries, loading: chartLoading } = useSelector(
     (state) => state.dashboard.chart
   );

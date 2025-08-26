@@ -24,7 +24,6 @@ const dashboardSlice = createSlice({
       { id: "total-estimates", label: "Total Estimates", value: 1, icon: "🧮", color: "bg-stat-blue" },
       { id: "infra-types", label: "Infrastructure Types", value: 6, icon: "🏗️", color: "bg-stat-emerald" },
       { id: "total-value", label: "Total Value", value: "$3300.0M", icon: "💰", color: "bg-stat-fuchsia" },
-      // { id: "this-month", label: "This Month", value: 1, icon: "🕒", color: "bg-stat-orange" },
     ],
     quickActions: [
       { id: "new-estimate", label: "Create New Estimate", icon: "➕" },
@@ -91,26 +90,6 @@ const dashboardSlice = createSlice({
         icon: "🛤️",
         accent: "amber"
       },
-    ],
-    // NEW: accent styles now pure tailwind class names
-    accentStyles: {
-      blue:  { ringClass: "bg-accent-ring-blue",  iconBgClass: "bg-accent-icon-blue",  iconBorder: "border-blue-400/30" },
-      cyan:  { ringClass: "bg-accent-ring-cyan",  iconBgClass: "bg-accent-icon-cyan",  iconBorder: "border-cyan-400/30" },
-      violet:{ ringClass: "bg-accent-ring-violet",iconBgClass: "bg-accent-icon-violet",iconBorder: "border-violet-400/30" },
-      amber: { ringClass: "bg-accent-ring-amber", iconBgClass: "bg-accent-icon-amber", iconBorder: "border-amber-400/30" },
-    },
-    // Unified chart palette (hex needed by ApexCharts)
-    chartColors: [
-      "#2563eb","#0891b2","#7c3aed","#f59e0b","#059669","#dc2626",
-      "#4f46e5","#c026d3","#0d9488","#e11d48","#0284c7","#65a30d",
-      "#475569","#db2777","#ea580c","#9333ea"
-    ],
-    // Progress bar gradients now single classes
-    chartGradients: [
-      "bg-gradient-metric-1","bg-gradient-metric-2","bg-gradient-metric-3","bg-gradient-metric-4",
-      "bg-gradient-metric-5","bg-gradient-metric-6","bg-gradient-metric-7","bg-gradient-metric-8",
-      "bg-gradient-metric-9","bg-gradient-metric-10","bg-gradient-metric-11","bg-gradient-metric-12",
-      "bg-gradient-metric-13","bg-gradient-metric-14","bg-gradient-metric-15","bg-gradient-metric-16"
     ],
   },
   reducers: {},

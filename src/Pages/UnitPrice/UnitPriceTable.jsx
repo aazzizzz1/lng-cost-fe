@@ -5,7 +5,6 @@ import Spinner from '../../Components/Spinner/Spinner';
 const columns = [
   { key: "workcode", label: "Workcode" }, // NEW
   { key: "uraian", label: "Uraian" },
-  { key: "kategori", label: "Kategori" },
   { key: "satuan", label: "Satuan" },
   { key: "qty", label: "Qty" },
   { key: "hargaSatuan", label: "Harga Satuan" },
@@ -31,43 +30,52 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
   };
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900">
-      <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+    <section className="bg-gray-50 dark:bg-gray-900 py-6">
+      <div className="bg-white dark:bg-gray-800 relative shadow-xl ring-1 ring-gray-200 dark:ring-gray-700 sm:rounded-xl overflow-hidden">
         <div className="flex-1 overflow-x-auto">
           {loading ? (
-            <div className="flex justify-center items-center py-8">
+            <div className="flex justify-center items-center py-12">
               <Spinner />
             </div>
           ) : (
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th scope="col" className="px-4 py-3">No</th>
+            <table className="w-full text-sm text-left text-gray-600 dark:text-gray-300">
+              <thead className="text-xs uppercase bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-gray-300">
+                <tr className="border-b border-gray-200/70 dark:border-gray-700/60">
+                  <th scope="col" className="px-6 py-4 sticky top-0 z-10 bg-inherit font-semibold">No</th>
                   {columns.map((col) => (
                     <th
                       key={col.key}
                       scope="col"
-                      className="px-4 py-3 cursor-pointer hover:text-primary-600"
+                      title={`Sort by ${col.label}`}
+                      className="px-6 py-4 sticky top-0 z-10 bg-inherit font-semibold cursor-pointer select-none hover:text-primary-600 transition-colors"
                       onClick={() => handleSort(col.key)}
                     >
-                      {col.label}
+                      <span className="inline-flex items-center gap-2">
+                        {col.label}
+                        <span className="text-gray-400 dark:text-gray-500 text-[10px] leading-none">⇅</span>
+                      </span>
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {!data || data.length === 0 ? (
                   <tr>
-                    <td colSpan={columns.length} className="text-center py-6">
+                    <td colSpan={columns.length + 1} className="text-center py-10 text-gray-500 dark:text-gray-400">
                       Tidak ada data.
                     </td>
                   </tr>
                 ) : (
                   data.map((row, index) => (
-                    <tr key={row.id} className="border-b dark:border-gray-700">
-                      <td className="px-4 py-3">{index + 1 + (page - 1) * limit}</td>
+                    <tr
+                      key={row.id}
+                      className="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-800 dark:even:bg-gray-900 hover:bg-primary-50/60 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-700 dark:text-gray-200">
+                        {index + 1 + (page - 1) * limit}
+                      </td>
                       {columns.map((col) => (
-                        <td key={col.key} className="px-4 py-3">
+                        <td key={col.key} className="px-6 py-4 whitespace-nowrap">
                           {col.key === "hargaSatuan" || col.key === "totalHarga"
                             ? row[col.key]
                               ? `Rp${Number(row[col.key]).toLocaleString()}`
@@ -83,24 +91,24 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
           )}
         </div>
         <nav
-          className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-5 bg-white/60 dark:bg-gray-800/60 backdrop-blur supports-[backdrop-filter]:bg-white/50 dark:supports-[backdrop-filter]:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700"
           aria-label="Table navigation"
         >
-          <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+          <span className="text-sm text-gray-600 dark:text-gray-300">
             Showing
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <span className="mx-1 font-semibold text-gray-900 dark:text-white">
               {Math.min((page - 1) * limit + 1, total)}-{Math.min(page * limit, total)}
             </span>
             of
-            <span className="font-semibold text-gray-900 dark:text-white">
+            <span className="ml-1 font-semibold text-gray-900 dark:text-white">
               {total}
             </span>
           </span>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <select
               value={limit}
               onChange={(e) => onLimitChange(Number(e.target.value))}
-              className="px-3 py-2 border rounded text-sm text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              className="px-3 py-2 border rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
             >
               {[10, 30, 50].map((option) => (
                 <option key={option} value={option}>
@@ -108,26 +116,16 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                 </option>
               ))}
             </select>
-            <ul className="inline-flex items-stretch -space-x-px">
+            <ul className="inline-flex items-stretch">
               <li>
                 <button
                   disabled={page === 1}
                   onClick={() => onPageChange(page - 1)}
-                  className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  className="flex items-center justify-center h-9 px-3 text-sm rounded-l-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
                 >
                   <span className="sr-only">Previous</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
+                  <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </button>
               </li>
@@ -142,11 +140,11 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                     <li key={pageNumber}>
                       <button
                         onClick={() => onPageChange(pageNumber)}
-                        className={`flex items-center justify-center text-sm py-2 px-3 leading-tight ${
+                        className={`h-9 px-3 text-sm border-t border-b ${
                           page === pageNumber
-                            ? "text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                            : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                        }`}
+                            ? "bg-primary-600 text-white border-primary-600 hover:bg-primary-700"
+                            : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100 hover:text-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
+                        } focus:outline-none focus:ring-2 focus:ring-primary-400`}
                       >
                         {pageNumber}
                       </button>
@@ -161,7 +159,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                 ) {
                   return (
                     <li key={pageNumber}>
-                      <span className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400">
+                      <span className="h-9 px-3 inline-flex items-center justify-center text-sm border-t border-b bg-white text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400">
                         ...
                       </span>
                     </li>
@@ -173,21 +171,11 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                 <button
                   disabled={page === totalPages}
                   onClick={() => onPageChange(page + 1)}
-                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  className="flex items-center justify-center h-9 px-3 text-sm rounded-r-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
                 >
                   <span className="sr-only">Next</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4-4a1 1 0 010 1.414l-4-4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    />
+                  <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4-4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                   </svg>
                 </button>
               </li>

@@ -8,7 +8,7 @@ const ChartItems = () => {
   const { labels, series, loading } = useSelector(
     (state) => state.dashboard.chart
   );
-  const chartColors = useSelector((state) => state.dashboard.chartColors);
+  const chartColors = useSelector((state) => state.global.chartColors);
 
   useEffect(() => {
     dispatch(fetchChartData());

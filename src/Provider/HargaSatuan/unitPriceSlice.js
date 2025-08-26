@@ -49,12 +49,13 @@ export const fetchUnitPriceData = createAsyncThunk(
 // Async thunk to fetch transport data
 export const fetchTransportData = createAsyncThunk(
   'unitPrice/fetchTransportData',
-  async ({ page = 1, limit = 10, sort, order, search, tipe = '', infrastruktur = '', kelompok = '' } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, sort, order, search, tipe = '', infrastruktur = '', kelompok = '', volume = '' } = {}, { rejectWithValue }) => {
     try {
       const params = { page, limit, tipe, infrastruktur, kelompok };
       if (sort) params.sort = sort;
       if (order) params.order = order;
       if (search) params.search = search;
+      if (volume) params.volume = volume; // include volume when provided
 
       const response = await axios.get(`${api}/unit-prices`, { params, headers: getAuthHeaders() });
       return response.data;
@@ -182,6 +183,7 @@ const transportInitialState = {
     search: '',
     sort: '',
     order: '',
+    volume: '', // added volume filter
   },
   loading: false,
   error: null,

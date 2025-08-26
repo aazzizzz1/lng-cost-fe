@@ -42,10 +42,11 @@ const UnitPricePages = () => {
       tipe: queryParams.get('tipe') || filters.tipe,
       infrastruktur: queryParams.get('infrastruktur') || filters.infrastruktur,
       kelompok: queryParams.get('kelompok') || filters.kelompok,
+      volume: queryParams.get('volume') || filters.volume, // include volume from query or current filters
     };
     dispatch(setFilters(params));
     dispatch(fetchTransportData(params)).then((response) => {
-      if (response.payload.pagination) {
+      if (response.payload && response.payload.pagination) {
         dispatch(setPagination(response.payload.pagination)); // Update pagination state
       }
     });
@@ -60,6 +61,7 @@ const UnitPricePages = () => {
     filters.tipe,
     filters.infrastruktur,
     filters.kelompok,
+    filters.volume, // added dependency
   ]); // Added missing dependencies
 
   const handleFilterChange = (key, value) => {
@@ -88,26 +90,46 @@ const UnitPricePages = () => {
           Unit Price - Harga Satuan
         </p>
         {/* Filters */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={filters.search}
-            onChange={(e) => handleFilterChange('search', e.target.value)}
-            className="px-3 py-2 border rounded"
-          />
-          <select
-            value={filters.kelompok}
-            onChange={(e) => handleFilterChange('kelompok', e.target.value)}
-            className="px-3 py-2 border rounded"
-          >
-            <option value="">Filter Kelompok</option>
-            <option value="Material & Equipment">Material & Equipment</option>
-            <option value="Construction and Installation">Construction and Installation</option>
-            <option value="Engineering & Management">Engineering & Management</option>
-            <option value="Testing & Commissioning">Testing & Commissioning</option>
-            <option value="General & Finalization">General & Finalization</option>
-          </select>
+        <div className="">
+          <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+            <div className="p-3 md:p-4">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Search */}
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l3.387 3.387a1 1 0 01-1.414 1.414L12.9 14.32zM14 8a6 6 0 11-12 0 6 6 0 0112 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    aria-label="Search"
+                    placeholder="Search..."
+                    value={filters.search}
+                    onChange={(e) => handleFilterChange('search', e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+                  />
+                </div>
+
+                {/* Volume */}
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path d="M2 6a2 2 0 012-2h3l2-2h2l2 2h3a2 2 0 012 2v9a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
+                    </svg>
+                  </span>
+                  <input
+                    type="number"
+                    aria-label="Volume"
+                    placeholder="Volume (e.g. 5000)"
+                    value={filters.volume}
+                    onChange={(e) => handleFilterChange('volume', e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         {/* Table */}
         <UnitPriceTable
