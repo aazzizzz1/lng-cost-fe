@@ -4,6 +4,23 @@ import CreateProjectModal from "./CreateProjectModal";
 import { fetchProjects, fetchProjectById, deleteProject } from "../../Provider/Project/ProjectSlice";
 import { useNavigate } from "react-router-dom";
 
+// Adaptive icons (SVG, inherit color via currentColor)
+const EditIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.25 2.25 0 0 1 3.182 3.182L9.06 17.653a2 2 0 0 1-.9.53L5 19l.817-3.16a2 2 0 0 1 .53-.9L16.862 3.487z" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M19 13v5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5" />
+  </svg>
+);
+
+const TrashIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" d="M4 7h16" />
+    <path strokeWidth="1.6" strokeLinecap="round" d="M10 11v6M14 11v6" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
 const ProjectTable = () => {
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.projects);
@@ -62,17 +79,15 @@ const ProjectTable = () => {
                   <th scope="col" className="px-4 py-3">Volume</th>
                   <th scope="col" className="px-4 py-3">Infrastruktur</th>
                   <th scope="col" className="px-4 py-3">Total Harga</th>
-                  <th scope="col" className="px-4 py-3">Aksi</th> {/* Tambah kolom aksi */}
+                  <th scope="col" className="px-4 py-3 text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {projects.map((project, index) => (
                   <tr
                     key={project.id}
-                    className={`border-b dark:border-gray-700 cursor-pointer ${
-                      selectedProject && selectedProject.id === project.id
-                        ? "bg-blue-50 dark:bg-blue-900"
-                        : ""
+                    className={`border-b dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
+                      selectedProject && selectedProject.id === project.id ? "bg-blue-50 dark:bg-blue-900/40" : ""
                     }`}
                     onClick={() => handleRowClick(project)}
                   >
@@ -88,24 +103,28 @@ const ProjectTable = () => {
                       {project.harga ? `Rp${project.harga.toLocaleString()}` : "-"}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex gap-2">
+                      <div className="flex items-center justify-center gap-1.5">
                         <button
-                          className="bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
-                          onClick={e => {
+                          aria-label="Edit"
+                          title="Edit"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-600 shadow-sm"
+                          onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/project/${project.id}/edit`);
                           }}
                         >
-                          Edit
+                          <EditIcon className="w-4 h-4" />
                         </button>
                         <button
-                          className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
-                          onClick={e => {
+                          aria-label="Hapus"
+                          title="Delete"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
+                          onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteProject(project.id);
                           }}
                         >
-                          Hapus
+                          <TrashIcon className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

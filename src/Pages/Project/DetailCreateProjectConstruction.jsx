@@ -3,13 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFilterJenis } from '../../Provider/ConstructionCost/ConstractionCostSlice';
 import {
-  defaultItem,
-  // setItems,
-  updateItem,
-  addItem,
-  deleteItem,
   selectItems,
-  openModal,
   closeModal,
   selectModal,
   fetchRecommendedConstructionCosts,
@@ -37,7 +31,6 @@ const DetailCreateProjectConstruction = () => {
   const project = projects.find((p) => String(p.id) === String(id));
   const items = useSelector(selectItems);
   const modal = useSelector(selectModal);
-  const costs = useSelector((state) => state.constractionCost.costs);
   const recommendedCosts = useSelector((state) => state.projects.recommendedCosts);
   const recommendedCostsLoading = useSelector((state) => state.projects.loadingRecommendedCosts); // Ensure correct selector
 
@@ -46,19 +39,6 @@ const DetailCreateProjectConstruction = () => {
     () => [...new Set(recommendedCosts.map((cost) => cost.kelompok))],
     [recommendedCosts]
   );
-
-  const kelompokTemplatesUsed = useMemo(() => {
-    return kelompokListUsed.reduce((acc, kelompok) => {
-      acc[kelompok] = costs
-        .filter((cost) => cost.kelompok === kelompok)
-        .map((cost) => ({
-          kode: cost.id,
-          uraian: cost.detailKelompok || cost.uraian,
-          isCategory: false,
-        }));
-      return acc;
-    }, {});
-  }, [kelompokListUsed, costs]);
 
   // Fetch recommended construction costs on project change
   useEffect(() => {
@@ -70,55 +50,10 @@ const DetailCreateProjectConstruction = () => {
         volume: project.volume,
         tahun: project.tahun,
         kategori: project.kategori,
-        inflasi: 5.0, // Default inflation assumption
+        inflasi: project?.inflasi ?? 5.0, // use project's inflasi if present, fallback to 5.0
       }));
     }
   }, [dispatch, project]);
-
-  // Handler for field changes
-  const handleItemChange = (idx, field, value) => {
-    if (field === "qty" || field === "hargaSatuan") {
-      // Ensure qty is not negative
-      if (field === "qty" && Number(value) < 0) value = 0;
-      const item = items[idx];
-      const qty = field === "qty" ? parseFloat(value) : parseFloat(item.qty || 1);
-      const hargaSatuan = field === "hargaSatuan" ? parseFloat(value) : parseFloat(item.hargaSatuan || 0);
-      dispatch(updateItem({ idx, field, value }));
-      dispatch(updateItem({ idx, field: "totalHarga", value: qty * hargaSatuan }));
-    } else {
-      dispatch(updateItem({ idx, field, value }));
-    }
-  };
-
-  // Add item to a specific kelompok
-  const handleAddItem = (kelompok) => {
-    const kelompokItems = items.filter((item) => item.kelompok === kelompok && !item.isCategory);
-    const templates = kelompokTemplatesUsed[kelompok] || [];
-    let lastKode = kelompokItems.length > 0
-      ? kelompokItems[kelompokItems.length - 1].kode
-      : (templates.find((t) => t.isCategory)?.kode || "");
-    let base = typeof lastKode === "string" && lastKode.includes('.') ? lastKode.split('.')[0] : lastKode;
-    let nextNum = kelompokItems.length + 1;
-    let newKode = base ? `${base}.${nextNum}` : `${kelompok}.${nextNum}`;
-    dispatch(
-      addItem(
-        defaultItem(
-          newKode,
-          "",
-          kelompok,
-          project?.tahun,
-          project?.name,
-          project?.lokasi,
-          project?.jenis
-        )
-      )
-    );
-  };
-
-  // Delete item (categories cannot be deleted)
-  const handleDeleteItem = (idx) => {
-    dispatch(deleteItem(idx));
-  };
 
   // Save to dummy construction cost slice
   const handleSave = () => {
@@ -170,14 +105,13 @@ const DetailCreateProjectConstruction = () => {
   const provinces = useSelector((state) => state.administrator.provinces || []);
   const inflasiList = useSelector((state) => state.administrator.inflasi || []);
 
-  const handleOpenModal = (type, idx) => {
-    dispatch(openModal({ type, itemIdx: idx, search: "" }));
-  };
   const handleCloseModal = () => {
     dispatch(closeModal());
   };
 
+  // compute inflasi displayed: prefer project.inflasi, fallback to inflasiList by year
   const inflasi = (() => {
+    if (project?.inflasi !== undefined && project?.inflasi !== null) return project.inflasi;
     if (!project?.tahun) return "";
     const inf = inflasiList.find((i) => Number(i.year) === Number(project.tahun));
     return inf ? inf.value : "";
@@ -195,10 +129,6 @@ const DetailCreateProjectConstruction = () => {
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Nama Project</div>
             <div className="font-semibold text-gray-900 dark:text-white">{project?.name || "-"}</div>
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Jenis</div>
-            <div className="font-semibold text-gray-900 dark:text-white">{project?.jenis || "-"}</div>
           </div>
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Volume</div>
@@ -240,7 +170,7 @@ const DetailCreateProjectConstruction = () => {
             type="submit"
             className="bg-primary-700 hover:bg-primary-800 text-white px-6 py-2 rounded font-semibold"
           >
-            Simpan & Lihat Detail Construction Cost
+            Simpan
           </button>
         </div>
         {recommendedCostsLoading ? (
@@ -274,15 +204,16 @@ const DetailCreateProjectConstruction = () => {
                   <thead>
                     <tr className="bg-gray-100 dark:bg-gray-800">
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Kode</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Workcode</th> {/* NEW */}
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Workcode</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Uraian</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Specification</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Satuan</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Qty</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Harga Satuan</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Total Harga</th>
                       <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">AACE Class</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Ambil Harga</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Action</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Kelompok Detail</th>
+                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Satuan Volume</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -294,119 +225,47 @@ const DetailCreateProjectConstruction = () => {
                           className={item.isCategory ? "bg-gray-50 dark:bg-gray-800 font-semibold" : "bg-white dark:bg-gray-900"}
                         >
                           <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.workcode || item.kode || item.id /* CHANGED: prefer workcode */}
+                            {item.workcode || item.kode || item.id}
                           </td>
+
                           <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.isCategory ? "" : (
-                              <input
-                                type="text"
-                                value={item.workcode || ""}
-                                onChange={(e) => handleItemChange(absIdx, "workcode", e.target.value)}
-                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                                placeholder="Workcode"
-                                required
-                              />
-                            )}
+                            {item.workcode || '-'}
                           </td>
+
                           <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.isCategory ? (
-                              item.uraian
-                            ) : (
-                              <input
-                                type="text"
-                                value={item.uraian}
-                                onChange={(e) => handleItemChange(absIdx, "uraian", e.target.value)}
-                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                                placeholder="Sub Uraian"
-                                required
-                              />
-                            )}
+                            {item.uraian || '-'}
                           </td>
-                          <td className="border dark:border-gray-700 px-4 py-2">
-                            {item.isCategory ? (
-                              ""
-                            ) : (
-                              <input
-                                type="text"
-                                value={item.satuan}
-                                onChange={(e) => handleItemChange(absIdx, "satuan", e.target.value)}
-                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                              />
-                            )}
+
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.specification || '-'}
                           </td>
-                          <td className="border dark:border-gray-700 px-4 py-2">
-                            {item.isCategory ? (
-                              ""
-                            ) : (
-                              <input
-                                type="number"
-                                min={0}
-                                step="any"
-                                value={item.qty}
-                                onChange={(e) => handleItemChange(absIdx, "qty", e.target.value)}
-                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                              />
-                            )}
+
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.satuan || '-'}
                           </td>
-                          <td className="border dark:border-gray-700 px-4 py-2">
-                            {item.isCategory ? (
-                              ""
-                            ) : (
-                              <input
-                                type="number"
-                                min={0}
-                                step="any"
-                                value={item.hargaSatuan}
-                                onChange={(e) => handleItemChange(absIdx, "hargaSatuan", e.target.value)}
-                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                              />
-                            )}
+
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.qty ?? '-'}
                           </td>
+
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.hargaSatuan != null ? `Rp${Number(item.hargaSatuan).toLocaleString()}` : '-'}
+                          </td>
+
                           <td className="border dark:border-gray-700 px-4 py-2 text-right text-gray-900 dark:text-white">
-                            {item.isCategory ? "" : `Rp${Number(item.totalHarga || 0).toLocaleString()}`}
+                            {item.totalHarga != null ? `Rp${Number(item.totalHarga).toLocaleString()}` : '-'}
                           </td>
-                          <td className="border dark:border-gray-700 px-4 py-2">
-                            {item.isCategory ? (
-                              ""
-                            ) : (
-                              <input
-                                type="number"
-                                min={1}
-                                max={5}
-                                value={item.aaceClass}
-                                onChange={(e) => handleItemChange(absIdx, "aaceClass", e.target.value)}
-                                className="w-full bg-transparent border-b border-gray-300 dark:border-gray-600 focus:outline-none text-gray-900 dark:text-white"
-                              />
-                            )}
+
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.aaceClass ?? '-'}
                           </td>
-                          <td className="border dark:border-gray-700 px-4 py-2">
-                            {!item.isCategory && (
-                              <button
-                                type="button"
-                                className="flex items-center gap-1 bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
-                                onClick={() => handleOpenModal("material", absIdx)}
-                                title="Ambil dari Harga Satuan"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <ellipse cx="12" cy="6" rx="8" ry="3" stroke="currentColor" strokeWidth="2" fill="none" />
-                                  <path d="M4 6v6c0 1.657 3.582 3 8 3s8-1.343 8-3V6" stroke="currentColor" strokeWidth="2" fill="none" />
-                                  <path d="M4 12v6c0 1.657 3.582 3 8 3s8-1.343 8-3v-6" stroke="currentColor" strokeWidth="2" fill="none" />
-                                </svg>
-                                Ambil dari Harga Satuan
-                              </button>
-                            )}
+
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.kelompokDetail || '-'}
                           </td>
-                          <td className="border dark:border-gray-700 px-4 py-2">
-                            {!item.isCategory && (
-                              <button
-                                type="button"
-                                className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs ml-1"
-                                onClick={() => handleDeleteItem(absIdx)}
-                                title="Hapus Item"
-                              >
-                                Hapus
-                              </button>
-                            )}
+
+                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
+                            {item.satuanVolume || '-'}
                           </td>
                         </tr>
                       );
@@ -414,18 +273,12 @@ const DetailCreateProjectConstruction = () => {
                   </tbody>
                 </table>
               </div>
-              <button
-                type="button"
-                className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1 rounded mb-2"
-                onClick={() => handleAddItem(kelompok)}
-              >
-                Tambah Item {kelompok}
-              </button>
             </div>
           ))
         )}
       </form>
-      {/* Modal Pilih Harga Satuan */}
+
+      {/* Modal tetap dipertahankan (tidak ter-trigger di UI rekomendasi) */}
       <DetailCreateProjectConstructionModal
         modal={modal}
         items={items}

@@ -16,6 +16,24 @@ import DetailCreateProjectConstructionModal from './DetailCreateProjectConstruct
 
 const formatCurrency = (v) => (v || v === 0 ? `Rp${Number(v).toLocaleString()}` : '-');
 
+// Icons (SVG, follow currentColor)
+const PriceTagIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+      d="M7.5 3h5.379a2.25 2.25 0 011.591.659l5.371 5.371a2.25 2.25 0 010 3.182l-6.439 6.439a2.25 2.25 0 01-3.182 0L3.659 12.13A2.25 2.25 0 013 10.538V5.25A2.25 2.25 0 015.25 3H7.5z" />
+    <circle cx="9.75" cy="6.75" r="0.75" strokeWidth="1.5" />
+  </svg>
+);
+
+const TrashIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" d="M4 7h16" />
+    <path strokeWidth="1.6" strokeLinecap="round" d="M10 11v6M14 11v6" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
 const EditProjectConstruction = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -328,11 +346,16 @@ const EditProjectConstruction = () => {
         <div key={kelompok} className="mb-8">
           <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
           <div className="overflow-x-auto">
-            <table className="w-full mb-2 border dark:border-gray-700 bg-white dark:bg-gray-900 rounded text-sm">
+            <table className="w-full text-sm text-left border-separate border-spacing-y-2 border-spacing-x-0">
               <thead>
-                <tr className="bg-gray-100 dark:bg-gray-800">
+                <tr className="bg-transparent">
                   {columns.map((c) => (
-                    <th key={c.key} className="px-3 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">{c.label}</th>
+                    <th
+                      key={c.key}
+                      className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                    >
+                      {c.label}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -343,96 +366,106 @@ const EditProjectConstruction = () => {
                     const rec = itemMissingMap[absIdx];
                     return rec && rec.missing.includes(field);
                   };
-                  const inputBaseCls = "w-full bg-transparent border-b focus:outline-none";
-                  const inputBorderCls = "border-gray-300 dark:border-gray-600";
-                  const missingCls = "border-red-500 ring-1 ring-red-500";
+
+                  // Softer inputs with focus ring; missing shows red ring
+                  const inputBaseCls =
+                    "w-full bg-transparent px-2 py-1 rounded-md border border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500/60 dark:focus:ring-primary-400/40 placeholder-gray-400";
+                  const inputBorderCls = "ring-0";
+                  const missingCls = "ring-2 ring-red-500 focus:ring-red-500";
+
                   return (
-                    <tr key={absIdx} className="bg-white dark:bg-gray-900">
-                      <td className="border dark:border-gray-700 px-3 py-2">{item.kode}</td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                    <tr key={absIdx} className="group">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors rounded-l-xl">
+                        {item.kode}
+                      </td>
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           value={item.workcode || ''}
                           onChange={(e) => handleItemChange(absIdx, 'workcode', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('workcode') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           value={item.uraian || ''}
                           onChange={(e) => handleItemChange(absIdx, 'uraian', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('uraian') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <textarea
                           rows={2}
                           value={item.specification || ''}
                           onChange={(e) => handleItemChange(absIdx, 'specification', e.target.value)}
-                          className={`${inputBaseCls} ${missingFor('specification') ? missingCls : inputBorderCls}`}
+                          className={`${inputBaseCls} resize-y ${missingFor('specification') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           value={item.satuan || ''}
                           onChange={(e) => handleItemChange(absIdx, 'satuan', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('satuan') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           type="number" min={0} step="any"
                           value={item.qty ?? 0}
                           onChange={(e) => handleItemChange(absIdx, 'qty', e.target.value)}
-                          className={`${inputBaseCls} ${missingFor('qty') ? missingCls : inputBorderCls}`}
+                          className={`${inputBaseCls} text-right ${missingFor('qty') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           type="number" min={0} step="any"
                           value={item.hargaSatuan ?? 0}
                           onChange={(e) => handleItemChange(absIdx, 'hargaSatuan', e.target.value)}
-                          className={`${inputBaseCls} ${missingFor('hargaSatuan') ? missingCls : inputBorderCls}`}
+                          className={`${inputBaseCls} text-right ${missingFor('hargaSatuan') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2 text-right">{formatCurrency(item.totalHarga || 0)}</td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors text-right">
+                        {formatCurrency(item.totalHarga || 0)}
+                      </td>
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           type="number" min={1} max={5}
                           value={item.aaceClass ?? 5}
                           onChange={(e) => handleItemChange(absIdx, 'aaceClass', e.target.value)}
-                          className={`${inputBaseCls} ${missingFor('aaceClass') ? missingCls : inputBorderCls}`}
+                          className={`${inputBaseCls} text-center ${missingFor('aaceClass') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           value={item.kelompokDetail || ''}
                           onChange={(e) => handleItemChange(absIdx, 'kelompokDetail', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('kelompokDetail') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input
                           value={item.satuanVolume || ''}
                           onChange={(e) => handleItemChange(absIdx, 'satuanVolume', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('satuanVolume') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <button
                           type="button"
-                          className="bg-primary-700 hover:bg-primary-800 text-white px-2 py-1 rounded text-xs"
+                          title="Ambil Harga Satuan"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-600 shadow-sm"
                           onClick={() => handleOpenModal(absIdx)}
                         >
-                          Ambil Harga
+                          <PriceTagIcon className="w-4 h-4" />
                         </button>
                       </td>
-                      <td className="border dark:border-gray-700 px-3 py-2">
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors rounded-r-xl">
                         <button
                           type="button"
-                          className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                          title="Hapus Item"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
                           onClick={() => handleDeleteItem(absIdx)}
                         >
-                          Hapus
+                          <TrashIcon className="w-4 h-4" />
                         </button>
                       </td>
                     </tr>
