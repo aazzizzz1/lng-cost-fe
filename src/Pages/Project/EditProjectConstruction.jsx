@@ -255,7 +255,7 @@ const EditProjectConstruction = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Edit Project</h1>
 
       {/* Validation Summary */}
@@ -335,7 +335,7 @@ const EditProjectConstruction = () => {
           type="button"
           disabled={isSaveDisabled}
           onClick={handleSave}
-          className="bg-primary-700 hover:bg-primary-800 disabled:opacity-60 text-white px-6 py-2 rounded font-semibold"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 disabled:opacity-60 text-white px-6 py-2 rounded-full font-semibold shadow-md hover:scale-[1.01] transition"
         >
           {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
         </button>

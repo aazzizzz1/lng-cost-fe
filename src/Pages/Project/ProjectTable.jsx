@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import CreateProjectModal from "./CreateProjectModal";
 import { fetchProjects, fetchProjectById, deleteProject } from "../../Provider/Project/ProjectSlice";
 import { useNavigate } from "react-router-dom";
+import DeleteModal from '../../Components/Modal/DeleteModal'; // NEW
 
 // Adaptive icons (SVG, inherit color via currentColor)
 const EditIcon = ({ className = "w-4 h-4" }) => (
@@ -27,6 +28,8 @@ const ProjectTable = () => {
   const projectDetails = useSelector((state) => state.projects.selectedProjectDetails);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,10 +47,17 @@ const ProjectTable = () => {
     }
   };
 
+  // open delete confirmation modal
   const handleDeleteProject = (projectId) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus project ini?")) {
-      dispatch(deleteProject(projectId));
-    }
+    setDeleteTarget(projectId);
+    setShowDeleteModal(true);
+  };
+  // confirmed deletion — DELEGATE to projectSlice thunk, do not handle HTTP here
+  const confirmDeleteProject = () => {
+    if (!deleteTarget) return;
+    dispatch(deleteProject(deleteTarget));
+    setShowDeleteModal(false);
+    setDeleteTarget(null);
   };
 
   return (
@@ -121,7 +131,7 @@ const ProjectTable = () => {
                           className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteProject(project.id);
+                            handleDeleteProject(project.id); // now opens modal
                           }}
                         >
                           <TrashIcon className="w-4 h-4" />
@@ -172,6 +182,18 @@ const ProjectTable = () => {
             )}
           </div>
         </div>
+        {/* Delete confirmation modal */}
+        <DeleteModal
+          isOpen={showDeleteModal}
+          title="Delete Project"
+          message="This will permanently remove the selected project and its construction cost records. This action cannot be undone. Proceed?"
+          confirmText="Yes, delete"
+          cancelText="Cancel"
+          loading={false} // visual loading not tracked here; projectSlice handles backend
+          onConfirm={confirmDeleteProject}
+          onCancel={() => setShowDeleteModal(false)}
+          danger
+        />
         <CreateProjectModal
           isOpen={isCreateModalOpen}
           onClose={() => setCreateModalOpen(false)}

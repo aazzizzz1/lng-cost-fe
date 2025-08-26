@@ -117,15 +117,28 @@ const DetailCreateProjectConstruction = () => {
     return inf ? inf.value : "";
   })();
 
+  // format currency helper
+  const formatCurrency = (v) => (v || v === 0 ? `Rp${Number(v).toLocaleString()}` : '-');
+
+  // total rekomendasi dari recommendedCosts
+  const totalRecommended = useMemo(() => {
+    return (recommendedCosts || []).reduce((sum, it) => sum + (Number(it.totalHarga) || 0), 0);
+  }, [recommendedCosts]);
+
+  // compute tax/insurance and grand total
+  const ppn = totalRecommended * 0.11;
+  const insurance = totalRecommended * 0.0025; // 2.5‰ = 0.25%
+  const grandTotal = totalRecommended + ppn + insurance;
+
   return (
-    <div className="p-4">
+    <div className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       {/* text gambaran umum judul */}
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
         Gambaran Umum Project
       </h1>
       {/* Gambaran Umum Project */}
-      <div className="mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+      <div className="mb-6 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <div className="text-xs text-gray-500 dark:text-gray-400">Nama Project</div>
             <div className="font-semibold text-gray-900 dark:text-white">{project?.name || "-"}</div>
@@ -159,6 +172,27 @@ const DetailCreateProjectConstruction = () => {
         </div>
       </div>
       {/* END Gambaran Umum Project */}
+
+      {/* Summary cards (total harga, pajak, asuransi, grand total) */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="rounded-2xl p-4 bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800">
+          <div className="text-xs text-gray-500">Total Rekomendasi</div>
+          <div className="text-xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalRecommended)}</div>
+        </div>
+        <div className="rounded-2xl p-4 bg-white/80 dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800">
+          <div className="text-xs text-gray-500">PPN (11%)</div>
+          <div className="text-lg font-semibold text-amber-600 mt-1">{formatCurrency(ppn)}</div>
+        </div>
+        <div className="rounded-2xl p-4 bg-white/80 dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800">
+          <div className="text-xs text-gray-500">Asuransi (2.5‰)</div>
+          <div className="text-lg font-semibold text-fuchsia-600 mt-1">{formatCurrency(insurance)}</div>
+        </div>
+        <div className="rounded-2xl p-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg border border-primary-600">
+          <div className="text-xs opacity-90">Grand Total</div>
+          <div className="text-2xl font-extrabold mt-1">{formatCurrency(grandTotal)}</div>
+        </div>
+      </div>
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -198,75 +232,45 @@ const DetailCreateProjectConstruction = () => {
         ) : (
           kelompokListUsed.map((kelompok) => (
             <div key={kelompok} className="mb-8">
-              <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
-              <div className="overflow-x-auto">
-                <table className="w-full mb-2 border dark:border-gray-700 bg-white dark:bg-gray-900 rounded">
-                  <thead>
-                    <tr className="bg-gray-100 dark:bg-gray-800">
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Kode</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Workcode</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Uraian</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Specification</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Satuan</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Qty</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Harga Satuan</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Total Harga</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">AACE Class</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Kelompok Detail</th>
-                      <th className="px-4 py-2 border dark:border-gray-700 text-gray-900 dark:text-white">Satuan Volume</th>
+              <div className="text-base font-semibold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
+
+              <div className="overflow-x-auto rounded-lg shadow-sm">
+                <table className="w-full text-sm table-auto bg-white dark:bg-gray-900 rounded">
+                  <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                    <tr>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Kode</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Workcode</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Uraian</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Specification</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Satuan</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b text-right">Qty</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b text-right">Harga Satuan</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b text-right">Total Harga</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">AACE Class</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Kelompok Detail</th>
+                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Satuan Volume</th>
                     </tr>
                   </thead>
+
                   <tbody>
-                    {grouped[kelompok].map((item, idx) => {
+                    {grouped[kelompok].map((item) => {
                       const absIdx = recommendedCosts.findIndex((it) => it === item);
                       return (
                         <tr
                           key={absIdx}
-                          className={item.isCategory ? "bg-gray-50 dark:bg-gray-800 font-semibold" : "bg-white dark:bg-gray-900"}
+                          className={`transition hover:bg-gray-50 dark:hover:bg-gray-800 ${item.isCategory ? "bg-gray-50 dark:bg-gray-800 font-semibold" : "bg-white dark:bg-gray-900"}`}
                         >
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.workcode || item.kode || item.id}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.workcode || '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.uraian || '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.specification || '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.satuan || '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.qty ?? '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.hargaSatuan != null ? `Rp${Number(item.hargaSatuan).toLocaleString()}` : '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-right text-gray-900 dark:text-white">
-                            {item.totalHarga != null ? `Rp${Number(item.totalHarga).toLocaleString()}` : '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.aaceClass ?? '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.kelompokDetail || '-'}
-                          </td>
-
-                          <td className="border dark:border-gray-700 px-4 py-2 text-gray-900 dark:text-white">
-                            {item.satuanVolume || '-'}
-                          </td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.workcode || item.kode || item.id}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.workcode || '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.uraian || '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.specification || '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.satuan || '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b text-right">{item.qty ?? '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b text-right">{item.hargaSatuan != null ? `Rp${Number(item.hargaSatuan).toLocaleString()}` : '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b text-right">{item.totalHarga != null ? `Rp${Number(item.totalHarga).toLocaleString()}` : '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.aaceClass ?? '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.kelompokDetail || '-'}</td>
+                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.satuanVolume || '-'}</td>
                         </tr>
                       );
                     })}

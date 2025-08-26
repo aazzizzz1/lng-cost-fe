@@ -44,49 +44,66 @@ const ProjectDetail = () => {
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{project.name}</h1>
-      <div className="mb-4 text-gray-700 dark:text-gray-200">
-        <div><b>Lokasi:</b> {project.lokasi}</div>
-        <div><b>Tahun:</b> {project.tahun}</div>
-        <div><b>Kategori:</b> {project.kategori}</div>
-        <div><b>Infrastruktur:</b> {project.infrastruktur}</div>
-        <div><b>Volume:</b> {project.volume}</div>
-        <div><b>Inflasi:</b> {project.inflasi ?? "-"}</div> {/* NEW */}
+    <div className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">{project.name}</h1>
+          <div className="mt-1 flex flex-wrap gap-2">
+            <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">{project.infrastruktur}</span>
+            <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Tahun {project.tahun}</span>
+            <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Lokasi: {project.lokasi}</span>
+            <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Inflasi: {project.inflasi ?? "-"}</span>
+          </div>
+        </div>
+        <div className="text-right text-sm text-gray-600 dark:text-gray-300">
+          <div className="font-semibold">Total Harga Pekerjaan</div>
+          <div className="text-lg font-bold">{project.totalConstructionCost?.toLocaleString?.() ?? (project.harga?.toLocaleString?.() ?? "-")}</div>
+        </div>
       </div>
-      <div className="mb-4">
-        <div className="font-semibold">Total Harga Pekerjaan: <span className="font-normal">{project.totalConstructionCost?.toLocaleString?.() ?? (project.harga?.toLocaleString?.() ?? "-")}</span></div>
-        <div className="font-semibold">PPN 11%: <span className="font-normal">{project.ppn?.toLocaleString?.() ?? "-"}</span></div>
-        <div className="font-semibold">Asuransi (2,5‰): <span className="font-normal">{project.insurance?.toLocaleString?.() ?? "-"}</span></div>
-        <div className="font-semibold">Total Perkiraan: <span className="font-normal">{project.totalEstimation?.toLocaleString?.() ?? "-"}</span></div>
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+          <div className="text-xs text-gray-500">Kategori</div>
+          <div className="font-semibold">{project.kategori}</div>
+        </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+          <div className="text-xs text-gray-500">Volume</div>
+          <div className="font-semibold">{project.volume}</div>
+        </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+          <div className="text-xs text-gray-500">PPN 11%</div>
+          <div className="font-semibold">{project.ppn?.toLocaleString?.() ?? "-"}</div>
+        </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+          <div className="text-xs text-gray-500">Total Estimasi</div>
+          <div className="font-semibold">{project.totalEstimation?.toLocaleString?.() ?? "-"}</div>
+        </div>
       </div>
       {Array.isArray(project.constructionCosts) && project.constructionCosts.length > 0 ? (
-        <div>
-          <div className="font-semibold mb-2 text-gray-900 dark:text-white">Construction Costs:</div>
-          <div className="max-h-96 overflow-x-auto">
-            <table className="w-full text-xs text-left text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 rounded">
-              <thead>
+         <div>
+          <div className="font-semibold mb-3 text-gray-900 dark:text-white">Construction Costs</div>
+          <div className="max-h-96 overflow-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
+            <table className="w-full text-sm text-left table-auto">
+              <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                 <tr>
                   {columns.map((col) => (
-                    <th key={col.key} className={`px-2 py-1 border-b ${col.className || ''}`}>{col.label}</th>
+                    <th key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>{col.label}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(grouped).map(([kelompok, items], groupIdx) => (
+                {Object.entries(grouped).map(([kelompok, items]) => (
                   <React.Fragment key={kelompok}>
-                    <tr>
-                      <td colSpan={columns.length} className="bg-gray-100 dark:bg-gray-800 font-bold text-left text-base border-b border-gray-200 dark:border-gray-700 py-2 pl-2">
+                    <tr className="bg-gray-100 dark:bg-gray-800">
+                      <td colSpan={columns.length} className="font-semibold text-gray-800 dark:text-gray-100 py-2 px-3">
                         {kelompok}
                       </td>
                     </tr>
                     {items.map((cost, idx) => (
-                      <tr key={idx}>
+                      <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-900">
                         {columns.map((col) => (
-                          <td key={col.key} className={`px-2 py-1 border-b ${col.className || ''}`}>
-                            {col.isCurrency
-                              ? formatCurrency(cost[col.key])
-                              : cost[col.key] ?? '-'}
+                          <td key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>
+                            {col.isCurrency ? formatCurrency(cost[col.key]) : cost[col.key] ?? '-'
+                            }
                           </td>
                         ))}
                       </tr>
@@ -96,12 +113,12 @@ const ProjectDetail = () => {
               </tbody>
             </table>
           </div>
-        </div>
-      ) : (
-        <div className="text-gray-400 dark:text-gray-300">Tidak ada construction cost.</div>
-      )}
-    </div>
-  )
-}
-
-export default ProjectDetail
+         </div>
+       ) : (
+         <div className="text-gray-400 dark:text-gray-300">Tidak ada construction cost.</div>
+       )}
+     </div>
+   )
+ }
+ 
+ export default ProjectDetail

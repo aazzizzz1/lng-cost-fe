@@ -148,152 +148,139 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
   };
 
   return isOpen ? (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
-      <section className="bg-white dark:bg-gray-900 rounded-lg shadow-lg min-w-[32rem] max-h-[40rem] overflow-y-auto">
-        <div className="p-6">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+      <section className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] overflow-y-auto ring-1 ring-black/5">
+        <div className="p-6 md:p-8">
+          <h2 className="mb-4 text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             Add a new Project
           </h2>
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 sm:gap-6 w-full">
-              <div className="sm:col-span-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Nama Project
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nama Project"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Infrastruktur
-                </label>
-                <select
-                  value={infrastruktur}
-                  onChange={(e) => setInfrastruktur(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                >
-                  {jenisOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Volume
-                </label>
-                <div className="flex flex-row gap-2">
-                  <input
-                    type="number"
-                    value={volume}
-                    onChange={(e) => setVolume(e.target.value)}
-                    placeholder="Volume"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    required
-                  />
-                  <div className="text-sm flex items-center px-2 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 text-gray-900 dark:text-white">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Isi detail project dan dapatkan rekomendasi construction cost yang sesuai.</p>
+           <form onSubmit={handleSubmit}>
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 sm:gap-6 w-full">
+               <div className="sm:col-span-2">
+                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                   Nama Project
+                 </label>
+                 <input
+                   type="text"
+                   value={name}
+                   onChange={(e) => setName(e.target.value)}
+                   placeholder="Nama Project"
+                   className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-500 block w-full p-3 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400 dark:text-white"
+                   required
+                 />
+               </div>
+               <div>
+                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                   Infrastruktur
+                 </label>
+                 <select
+                   value={infrastruktur}
+                   onChange={(e) => setInfrastruktur(e.target.value)}
+                   className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                 >
+                   {jenisOptions.map((opt) => (
+                     <option key={opt.value} value={opt.value}>
+                       {opt.label}
+                     </option>
+                   ))}
+                 </select>
+               </div>
+               <div>
+                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                   Volume
+                 </label>
+                 <div className="flex flex-row gap-2">
+                   <input
+                     type="number"
+                     value={volume}
+                     onChange={(e) => setVolume(e.target.value)}
+                     placeholder="Volume"
+                     className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                     required
+                   />
+                   <div className="text-sm flex items-center px-3 bg-white border border-gray-100 rounded-lg shadow-sm dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                     {satuanByJenis[infrastruktur] || "-"}
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Kategori
-                </label>
-                <input
-                  type="text"
-                  value={kategori}
-                  onChange={(e) => setKategori(e.target.value)}
-                  placeholder="Kategori"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  readOnly={infrastruktur === "FSRU" && volume}
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Lokasi
-                </label>
-                <select
-                  value={lokasi}
-                  onChange={(e) => setLokasi(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required
-                >
-                  <option value="">Pilih Lokasi</option>
-                  {provinces.map((prov) => (
-                    <option key={prov.code} value={prov.name}>
-                      {prov.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Tahun
-                </label>
-                <input
-                  type="number"
-                  value={tahun}
-                  onChange={(e) => setTahun(e.target.value)}
-                  placeholder="Tahun"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Asumsi Inflasi (%)
-                </label>
-                <input
-                  type="number"
-                  value={inflasi}
-                  onChange={(e) => setInflasi(e.target.value)}
-                  placeholder="5%"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                />
-              </div>
-              {/* //Tambahan dropdown perhitungan Galileo
-              <div className="sm:col-span-2">
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Perhitungan Galileo
-                </label>
-                <select
-                  value={useGalileo}
-                  onChange={e => setUseGalileo(e.target.value)}
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  required
-                >
-                  <option value="ya">Ya</option>
-                  <option value="tidak">Tidak</option>
-                </select>
-              </div> */}
-            </div>
-            <div className="gap-2 flex flex-row mt-4">
+                   </div>
+                 </div>
+               </div>
+               <div>
+                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                   Kategori
+                 </label>
+                 <input
+                   type="text"
+                   value={kategori}
+                   onChange={(e) => setKategori(e.target.value)}
+                   placeholder="Kategori"
+                   className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                   readOnly={infrastruktur === "FSRU" && volume}
+                 />
+               </div>
+               <div>
+                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                   Lokasi
+                 </label>
+                 <select
+                   value={lokasi}
+                   onChange={(e) => setLokasi(e.target.value)}
+                   className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                   required
+                 >
+                   <option value="">Pilih Lokasi</option>
+                   {provinces.map((prov) => (
+                     <option key={prov.code} value={prov.name}>
+                       {prov.name}
+                     </option>
+                   ))}
+                 </select>
+               </div>
+               <div>
+                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                   Tahun
+                 </label>
+                 <input
+                   type="number"
+                   value={tahun}
+                   onChange={(e) => setTahun(e.target.value)}
+                   placeholder="Tahun"
+                   className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                 />
+               </div>
+               <div>
+                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                   Asumsi Inflasi (%)
+                 </label>
+                 <input
+                   type="number"
+                   value={inflasi}
+                   onChange={(e) => setInflasi(e.target.value)}
+                   placeholder="5%"
+                   className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                 />
+               </div>
+             </div>
+             <div className="gap-2 flex flex-row mt-4">
               <button
                 type="submit"
-                className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-500 rounded-lg shadow-lg hover:scale-[1.01] transform transition"
               >
+                <svg className="w-4 h-4 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M3 10h4l3 10 4-18 3 10h4"/></svg>
                 Get Recommendations
               </button>
               <button
                 type="button"
-                className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-red-700 rounded-lg focus:ring-4 focus:ring-red-200 dark:focus:ring-red-900 hover:bg-red-800"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg shadow-sm hover:bg-red-700 transition"
                 onClick={onClose}
               >
                 Discard
               </button>
-            </div>
-          </form>
-        </div>
-      </section>
-    </div>
-  ) : null;
+             </div>
+           </form>
+         </div>
+       </section>
+     </div>
+   ) : null;
 };
 
 export default CreateProjectModal;
