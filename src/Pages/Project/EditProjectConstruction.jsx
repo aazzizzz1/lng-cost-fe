@@ -189,7 +189,7 @@ const EditProjectConstruction = () => {
   const isSaveDisabled = headerMissing.length > 0 || hasMissingItems || saving;
 
   const columns = [
-    { key: 'kode', label: 'Kode' },
+    { key: 'no', label: 'No' },
     { key: 'workcode', label: 'Workcode*' },                              // NEW
     { key: 'uraian', label: 'Uraian*' },
     { key: 'specification', label: 'Specification*' },
@@ -375,8 +375,9 @@ const EditProjectConstruction = () => {
 
                   return (
                     <tr key={absIdx} className="group">
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors rounded-l-xl">
-                        {item.kode}
+                      {/* tambahkan nomor urut per group */}
+                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors rounded-l-xl font-medium text-gray-700 dark:text-gray-200">
+                        {grouped[kelompok].indexOf(item) + 1}
                       </td>
                       <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
                         <input

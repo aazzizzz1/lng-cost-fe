@@ -239,7 +239,6 @@ const DetailCreateProjectConstruction = () => {
                   <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                     <tr>
                       <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">No</th>
-                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Kode</th>
                       <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Workcode</th>
                       <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Uraian</th>
                       <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Specification</th>
@@ -263,7 +262,6 @@ const DetailCreateProjectConstruction = () => {
                         >
                           {/* tambahkan nomor */}
                           <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{grouped[kelompok].indexOf(item) + 1}</td>
-                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.workcode || item.kode || item.id}</td>
                           <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.workcode || '-'}</td>
                           <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.uraian || '-'}</td>
                           <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.specification || '-'}</td>
