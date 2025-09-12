@@ -7,26 +7,27 @@ import { setItems } from "../../Provider/Project/detailCreateProjectConstruction
 
 // Mapping satuan berdasarkan jenis project
 const satuanByJenis = {
+  "LNGBV": "CBM",
   "Onshore LNG Plant": "MTPA",
   "Offshore LNG Plant": "MTPA",
-  "LNG Carrier": "m³",
+  "LNGC": "m³",
   "LNG Trucking": "CBM",
   FSRU: "m³ / MMSCFD",
-  ORF: "MMSCFD",
+  "Onshore Receiving Facility (ORF)": "MMSCFD",
   OTS: "MMSCFD",
-  ORU: "m³ / MMSCFD",
+  "Onshore Regasification Unit (ORU)": "m³ / MMSCFD",
 };
 
 const jenisOptions = [
   { value: "LNGBV", label: "LNG Bunkering Vessel" },
-  { value: "FSRU", label: "Floating Storage Regasification Unit" },
-  { value: "LNGC", label: "LNG Carrier" },
+  { value: "FSRU", label: "Floating Storage Regasification Unit (FSRU)" },
+  { value: "LNGC", label: "LNG Carrier (LNGC)" },
   { value: "LNG Trucking", label: "LNG Trucking" },
   { value: "Onshore LNG Plant", label: "Onshore LNG Plant" },
   { value: "Offshore LNG Plant", label: "Offshore LNG Plant" },
-  { value: "ORF", label: "Onshore Receiving Facility" },
+  { value: "Onshore Receiving Facility (ORF)", label: "Onshore Receiving Facility" },
   { value: "OTS", label: "Offshore Terminal System" },
-  { value: "ORU", label: "Onshore Regasification Unit" },
+  { value: "Onshore Regasification Unit (ORU)", label: "Onshore Regasification Unit" },
 ];
 
 const CreateProjectModal = ({ isOpen, onClose }) => {

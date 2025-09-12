@@ -3,18 +3,25 @@ import Chart from "react-apexcharts";
 import { useSelector, useDispatch } from "react-redux";
 import { selectOpexInfra, selectOpexUI, selectActiveDataset, setActiveTab } from "../../Provider/Opex/OpexSlice";
 
-const Tab = ({ active, label, onClick, disabled }) => (
+const Tab = ({ active, label, onClick, disabled, isEstimate }) => (
   <button
     onClick={onClick}
     disabled={disabled}
     className={
       `px-3 py-1.5 text-xs font-semibold rounded-md border transition-colors ` +
-      (active
-        ? "bg-indigo-600 text-white border-indigo-600"
-        : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700")
+      (isEstimate
+        ? (active
+            ? "bg-yellow-400 text-white border-yellow-400"
+            : "bg-yellow-50 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700 hover:bg-yellow-100 dark:hover:bg-yellow-800")
+        : (active
+            ? "bg-indigo-600 text-white border-indigo-600"
+            : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"))
     }
   >
     {label}
+    {isEstimate && (
+      <span className="ml-1 text-[10px] font-bold uppercase text-yellow-900 dark:text-yellow-200">Est.</span>
+    )}
   </button>
 );
 
@@ -132,12 +139,24 @@ const OpexChart = () => {
     </div>
   );
 
+  const isEstimate = !!ds?.isEstimate;
+
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-gradient-to-b from-indigo-50 to-white dark:from-gray-800 dark:to-gray-800/60 p-5">
+      <div className={
+        "rounded-2xl border bg-gradient-to-b p-5 " +
+        (isEstimate
+          ? "border-yellow-400 from-yellow-50 to-white dark:from-yellow-900 dark:to-yellow-900/60"
+          : "border-gray-200 dark:border-gray-700 from-indigo-50 to-white dark:from-gray-800 dark:to-gray-800/60")
+      }>
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">{vessel.label}</h2>
+            <h2 className={
+              "text-2xl font-bold " +
+              (isEstimate ? "text-yellow-700 dark:text-yellow-300" : "text-indigo-700 dark:text-indigo-300")
+            }>
+              {vessel.label}
+            </h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{vessel.desc}</p>
           </div>
           <div className="flex gap-2">
@@ -148,10 +167,16 @@ const OpexChart = () => {
                 disabled={t.disabled}
                 active={activeTabId === t.id}
                 onClick={() => dispatch(setActiveTab({ infraId: vessel.id, tabId: t.id }))}
+                isEstimate={t.datasetKey && infrastructures.find(i => i.id === vessel.id)?.tabs?.find(tab => tab.id === t.id)?.datasetKey && (ds?.isEstimate && t.id === activeTabId)}
               />
             ))}
           </div>
         </div>
+        {isEstimate && (
+          <div className="mt-3 p-2 rounded bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-200 text-xs font-semibold border border-yellow-300 dark:border-yellow-700">
+            Data pada kategori ini merupakan hasil estimasi, bukan data aktual. Mohon gunakan dengan kehati-hatian.
+          </div>
+        )}
       </div>
 
       {/* Fleet profile card (LNG Carrier 135–150k) */}
