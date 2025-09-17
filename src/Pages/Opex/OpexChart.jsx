@@ -20,7 +20,7 @@ const Tab = ({ active, label, onClick, disabled, isEstimate }) => (
   >
     {label}
     {isEstimate && (
-      <span className="ml-1 text-[10px] font-bold uppercase text-yellow-900 dark:text-yellow-200">Est.</span>
+      <span className="ml-1 text-[10px] font-bold uppercase text-yellow-900 dark:text-yellow-200"></span>
     )}
   </button>
 );

@@ -223,23 +223,23 @@ const vessel3_5k = {
 	},
 	index: {
 		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
-		values: [100, 103, 105, 108, 112, 116, 120, 125, 130, 135, 140], // estimasi, bisa update jika ada data
+		values: [100, 103, 105, 108, 109, 110, 113, 115, 116, 120, 125], // estimasi, bisa update jika ada data
 	},
 	categoriesYoY: {
 		years: [2020, 2021, 2022, 2023, 2024],
 		series: [
-			{ name: "Manning", data: [2640, 2640, 2880, 3120, 3360] },
-			{ name: "Insurance", data: [300, 320, 350, 410, 430] },
-			{ name: "Stores, spares & lubricating oils", data: [880, 940, 950, 990, 970] }, // Stores+Spares+Luboils
-			{ name: "Repairs & maintenance", data: [280, 300, 310, 340, 340] },
-			{ name: "Dry-docking", data: [0, 430, 460, 490, 570] },
-			{ name: "Management & administration", data: [750, 750, 750, 790, 790] },
+			{ name: "Manning", data: [2900, 2900, 2900, 2900, 2900] },
+			{ name: "Insurance", data: [300, 300, 300, 300, 300] },
+			{ name: "Stores, spares & lubricating oils", data: [800, 800, 800, 800, 800] }, // Stores+Spares+Luboils
+			{ name: "Repairs & maintenance", data: [300, 300, 300, 300, 300] },
+			{ name: "Dry-docking", data: [600,  600, 600, 600, 600] },
+			{ name: "Management & administration", data: [750, 750, 750, 750, 750] },
 		],
 	},
 	totalYoY: {
 		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
-		totals: [4850, 5380, 5700, 6140, 6460, 6700, 6950, 7200, 7450, 7700], // estimasi tren naik
-		pctChange: [4.5, 10.9, 5.9, 7.7, 5.2, 3.7, 3.7, 3.6, 3.5, 3.4], // estimasi
+		totals: [4850, 5500, 5500, 5600, 5700, 5875, 6000, 6115, 6250, 6400], // estimasi tren naik
+		pctChange: [5, 2, 0.1, 0.5, 2, 2.7, 2.4, 2.1, 2.3, 3], // estimasi
 	},
 	annual2024: {
 		manning: {
@@ -734,6 +734,2018 @@ const vessel6_8k = {
 	},
 };
 
+// Dataset for 8-12k cbm LPG vessel (Estimation)
+const vessel8_12k = {
+	isEstimate: true,
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 4",
+		globalFleetNo: null,
+		globalFleetCbm: null,
+		avgAgeYrs: null,
+		youngestVesselYrs: null,
+		oldestVesselYrs: null,
+		avgScrapAgeYrs: null,
+		avgSizeCbm: 9530,
+		avgLDT: 5139,
+		avgBHP: 6828,
+		avgGT: 9158,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [3004, 3004, 3194, 3379, 3569] },
+			{ name: "Insurance", values: [348, 368, 403, 468, 488] },
+			{ name: "Stores", values: [393, 439, 439, 444, 454] },
+			{ name: "Spares", values: [363, 388, 408, 428, 408] },
+			{ name: "Lubricating Oils", values: [273, 278, 283, 293, 293] },
+			{ name: "Repair & Maintenance", values: [329, 349, 364, 394, 394] },
+			{ name: "Dry-Docking", values: [0, 518, 552, 592, 687] },
+			{ name: "Management & Administration", values: [876, 876, 876, 921, 921] },
+		],
+		totals: [5586, 6220, 6519, 6919, 7214],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 103, 106, 109, 113, 117, 121, 126, 131, 136, 141], // estimasi
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", data: [315, 335, 365, 425, 445] },
+			{ name: "Stores, spares & lubricating oils", data: [930, 1000, 1015, 1050, 1035] },
+			{ name: "Repairs & maintenance", data: [300, 320, 330, 360, 360] },
+			{ name: "Dry-docking", data: [0, 460, 490, 525, 610] },
+			{ name: "Management & administration", data: [790, 790, 790, 830, 830] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5090, 5660, 5960, 6375, 6680, 6900, 7150, 7400, 7650, 7900], // estimasi tren naik
+		pctChange: [4.5, 11.2, 5.3, 7.0, 4.8, 3.3, 3.6, 3.5, 3.4, 3.3], // estimasi
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 17 },
+				{ label: "Crew wages & overtime", value: 951518 },
+				{ label: "Crew victualling", value: 62700 },
+				{ label: "Crew travel", value: 56044 },
+				{ label: "Miscellaneous costs", value: 95149 },
+			],
+			total: 1165411,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 55675 },
+				{ label: "Protection & Indemnity", value: 82155 },
+				{ label: "War Risk", value: 4440 },
+				{ label: "FD&D", value: 6050 },
+				{ label: "COFR", value: 1205 },
+			],
+			total: 149525,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 47297 },
+				{ label: "Safety Items/Protective Equipment", value: 42403 },
+				{ label: "Chemicals & Gases", value: 14682 },
+				{ label: "Medical", value: 6520 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17819 },
+				{ label: "Maintenance Paint", value: 26095 },
+				{ label: "Tools & Hardware", value: 4894 },
+			],
+			total: 159710,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 38605 },
+				{ label: "Generator Engines", value: 25244 },
+				{ label: "Boilers", value: 8908 },
+				{ label: "ER Auxiliary Machinery", value: 25244 },
+				{ label: "Deck Machinery", value: 5938 },
+				{ label: "Electrical", value: 7423 },
+				{ label: "Cargo & Ballast System", value: 11877 },
+				{ label: "Pipes & Valves", value: 2969 },
+				{ label: "Navigation Equipment", value: 4454 },
+				{ label: "Access Equipment", value: 2969 },
+				{ label: "Spares Transportation", value: 14856 },
+			],
+			total: 148477,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 78362 },
+				{ label: "ME System Oil", value: 2947 },
+				{ label: "Aux Engine Oil", value: 8325 },
+				{ label: "Hydraulic Oils", value: 8218 },
+				{ label: "Other Oils", value: 5169 },
+			],
+			total: 103021,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 25437 },
+				{ label: "Boiler", value: 2678 },
+				{ label: "Generators", value: 24096 },
+				{ label: "ER Auxiliaries", value: 9373 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6691 },
+				{ label: "Electrical Including Rewinds", value: 9373 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6691 },
+				{ label: "Deck Machinery Inc. Cranes", value: 9373 },
+				{ label: "Navigation Equipment", value: 12051 },
+				{ label: "Access Equipment", value: 9373 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 18742 },
+			],
+			total: 133878,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 195399 }],
+			total: 195399,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 111580 },
+						{ label: "Launches & other transport", value: 15390 },
+						{ label: "Flag state inspection, certification & other charges", value: 7695 },
+						{ label: "Classification charges", value: 7695 },
+						{ label: "PSC charges", value: 2693 },
+						{ label: "Third party services", value: 3848 },
+						{ label: "Consulting fees", value: 20255 },
+						{ label: "Procurement costs", value: 25395 },
+						{ label: "Communications, printing, IT & postage", value: 19238 },
+						{ label: "Vetting", value: 34628 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 15390 },
+						{ label: "Masters entertainment", value: 3848 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3848 },
+						{ label: "Training", value: 1543 },
+						{ label: "Survey & calibration of equipment", value: 15390 },
+						{ label: "Incinerator servicing & maintenance", value: 2305 },
+						{ label: "OWS servicing & maintenance", value: 5385 },
+						{ label: "OCM servicing & maintenance", value: 1543 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1926 },
+						{ label: "Waste & garbage disposal", value: 15390 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			// subCosts: 248417 + 19238 + 52510,
+			total: 320165, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2375586,
+		perDay: 6520,
+		perDayExDryDock: 5873,
+		totalExDryDockAnnual: 2179600,
+		avgUpperRangePerDay: 7938,
+		avgLowerRangePerDay: 4911,
+	},
+};
+
+// Dataset for 12-15k cbm LPG vessel
+const vessel12_15k = {
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 3",
+		globalFleetNo: 110,
+		globalFleetCbm: 773411,
+		avgAgeYrs: 15.6,
+		youngestVesselYrs: "<0.1",
+		oldestVesselYrs: 32.6,
+		avgScrapAgeYrs: 26.9,
+		avgSizeCbm: 7031,
+		avgLDT: 3662,
+		avgBHP: 5578,
+		avgGT: 6114,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", values: [330, 350, 380, 440, 460] },
+			{ name: "Stores", values: [380, 430, 430, 430, 440] },
+			{ name: "Spares", values: [350, 370, 390, 410, 390] },
+			{ name: "Lubricating Oils", values: [250, 260, 260, 270, 270] },
+			{ name: "Repair & Maintenance", values: [320, 340, 350, 380, 380] },
+			{ name: "Dry-Docking", values: [0, 490, 520, 560, 650] },
+			{ name: "Management & Administration", values: [830, 830, 830, 870, 870] },
+		],
+		totals: [5330, 5940, 6220, 6610, 6900],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 105, 108, 112, 116, 120, 125, 130, 135, 140, 145],
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", data: [330, 350, 380, 440, 460] },
+			{ name: "Stores, spares & lubricating oils", data: [980, 1060, 1080, 1110, 1100] },
+			{ name: "Repairs & maintenance", data: [320, 340, 350, 380, 380] },
+			{ name: "Dry-docking", data: [0, 490, 520, 560, 650] },
+			{ name: "Management & administration", data: [830, 830, 830, 870, 870] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5330, 5940, 6220, 6610, 6900, 7200, 7500, 7800, 8100, 8400],
+		pctChange: [4.5, 11.5, 4.7, 6.3, 4.4, 4.3, 4.2, 4.1, 3.8, 3.7],
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 16 },
+				{ label: "Crew wages & overtime", value: 913640 },
+				{ label: "Crew victualling", value: 59280 },
+				{ label: "Crew travel", value: 53330 },
+				{ label: "Miscellaneous costs", value: 91360 },
+			],
+			total: 1117610,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 52200 },
+				{ label: "Protection & Indemnity", value: 76970 },
+				{ label: "War Risk", value: 4110 },
+				{ label: "FD&D", value: 5600 },
+				{ label: "COFR", value: 1090 },
+			],
+			total: 139970,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 46000 },
+				{ label: "Safety Items/Protective Equipment", value: 41240 },
+				{ label: "Chemicals & Gases", value: 14280 },
+				{ label: "Medical", value: 6340 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17330 },
+				{ label: "Maintenance Paint", value: 25380 },
+				{ label: "Tools & Hardware", value: 4760 },
+			],
+			total: 155330,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 36930 },
+				{ label: "Generator Engines", value: 24150 },
+				{ label: "Boilers", value: 8520 },
+				{ label: "ER Auxiliary Machinery", value: 24150 },
+				{ label: "Deck Machinery", value: 5680 },
+				{ label: "Electrical", value: 7100 },
+				{ label: "Cargo & Ballast System", value: 11360 },
+				{ label: "Pipes & Valves", value: 2840 },
+				{ label: "Navigation Equipment", value: 4260 },
+				{ label: "Access Equipment", value: 2840 },
+				{ label: "Spares Transportation", value: 14200 },
+			],
+			total: 142030,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 72320 },
+				{ label: "ME System Oil", value: 2670 },
+				{ label: "Aux Engine Oil", value: 7720 },
+				{ label: "Hydraulic Oils", value: 7720 },
+				{ label: "Other Oils", value: 4860 },
+			],
+			total: 95290,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 24560 },
+				{ label: "Boiler", value: 2590 },
+				{ label: "Generators", value: 23270 },
+				{ label: "ER Auxiliaries", value: 9050 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6460 },
+				{ label: "Electrical Including Rewinds", value: 9050 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6460 },
+				{ label: "Deck Machinery Inc. Cranes", value: 9050 },
+				{ label: "Navigation Equipment", value: 11640 },
+				{ label: "Access Equipment", value: 9050 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 18100 },
+			],
+			total: 129280,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 179370 }],
+			total: 179370,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 105520 },
+						{ label: "Launches & other transport", value: 14550 },
+						{ label: "Flag state inspection, certification & other charges", value: 7280 },
+						{ label: "Classification charges", value: 7280 },
+						{ label: "PSC charges", value: 2550 },
+						{ label: "Third party services", value: 3640 },
+						{ label: "Consulting fees", value: 19710 },
+						{ label: "Procurement costs", value: 24020 },
+						{ label: "Communications, printing, IT & postage", value: 18190 },
+						{ label: "Vetting", value: 32750 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 14550 },
+						{ label: "Masters entertainment", value: 3640 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3640 },
+						{ label: "Training", value: 1460 },
+						{ label: "Survey & calibration of equipment", value: 14550 },
+						{ label: "Incinerator servicing & maintenance", value: 2180 },
+						{ label: "OWS servicing & maintenance", value: 5090 },
+						{ label: "OCM servicing & maintenance", value: 1460 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1820 },
+						{ label: "Waste & garbage disposal", value: 14550 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 235490 + 18190 + 49930,
+			total: 303610 + 235490 + 18190, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2262490,
+		perDay: 6220,
+		perDayExDryDock: 5710,
+		totalExDryDockAnnual: 2083120,
+		avgUpperRangePerDay: 7200,
+		avgLowerRangePerDay: 4380,
+	},
+};
+
+// Dataset for 15-30k cbm LPG vessel (Estimation)
+const vessel15_30k = {
+	isEstimate: true,
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 4",
+		globalFleetNo: null,
+		globalFleetCbm: null,
+		avgAgeYrs: null,
+		youngestVesselYrs: null,
+		oldestVesselYrs: null,
+		avgScrapAgeYrs: null,
+		avgSizeCbm: 9530,
+		avgLDT: 5139,
+		avgBHP: 6828,
+		avgGT: 9158,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", values: [315, 335, 365, 425, 445] },
+			{ name: "Stores", values: [370, 415, 415, 420, 425] },
+			{ name: "Spares", values: [335, 355, 370, 390, 370] },
+			{ name: "Lubricating Oils", values: [225, 230, 230, 240, 240] },
+			{ name: "Repair & Maintenance", values: [300, 320, 330, 360, 360] },
+			{ name: "Dry-Docking", values: [0, 460, 490, 525, 610] },
+			{ name: "Management & Administration", values: [790, 790, 790, 830, 830] },
+		],
+		totals: [5090, 5660, 5960, 6375, 6680],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 103, 106, 109, 113, 117, 121, 126, 131, 136, 141], // estimasi
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", data: [315, 335, 365, 425, 445] },
+			{ name: "Stores, spares & lubricating oils", data: [930, 1000, 1015, 1050, 1035] },
+			{ name: "Repairs & maintenance", data: [300, 320, 330, 360, 360] },
+			{ name: "Dry-docking", data: [0, 460, 490, 525, 610] },
+			{ name: "Management & administration", data: [790, 790, 790, 830, 830] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5090, 5660, 5960, 6375, 6680, 6900, 7150, 7400, 7650, 7900], // estimasi tren naik
+		pctChange: [4.5, 11.2, 5.3, 7.0, 4.8, 3.3, 3.6, 3.5, 3.4, 3.3], // estimasi
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 14 },
+				{ label: "Crew wages & overtime", value: 889558 },
+				{ label: "Crew victualling", value: 51868 },
+				{ label: "Crew travel", value: 53771 },
+				{ label: "Miscellaneous costs", value: 88954 },
+			],
+			total: 1084151,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 50210 },
+				{ label: "Protection & Indemnity", value: 74035 },
+				{ label: "War Risk", value: 3955 },
+				{ label: "FD&D", value: 5385 },
+				{ label: "COFR", value: 1050 },
+			],
+			total: 134635,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 44355 },
+				{ label: "Safety Items/Protective Equipment", value: 39765 },
+				{ label: "Chemicals & Gases", value: 13770 },
+				{ label: "Medical", value: 6115 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17370 },
+				{ label: "Maintenance Paint", value: 24475 },
+				{ label: "Tools & Hardware", value: 4590 },
+			],
+			total: 150440,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 35285 },
+				{ label: "Generator Engines", value: 23075 },
+				{ label: "Boilers", value: 8140 },
+				{ label: "ER Auxiliary Machinery", value: 23075 },
+				{ label: "Deck Machinery", value: 5430 },
+				{ label: "Electrical", value: 6785 },
+				{ label: "Cargo & Ballast System", value: 10855 },
+				{ label: "Pipes & Valves", value: 2715 },
+				{ label: "Navigation Equipment", value: 4070 },
+				{ label: "Access Equipment", value: 2715 },
+				{ label: "Spares Transportation", value: 13570 },
+			],
+			total: 135715,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 63795 },
+				{ label: "ME System Oil", value: 2290 },
+				{ label: "Aux Engine Oil", value: 6805 },
+				{ label: "Hydraulic Oils", value: 7100 },
+				{ label: "Other Oils", value: 4455 },
+			],
+			total: 84445,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 23160 },
+				{ label: "Boiler", value: 2440 },
+				{ label: "Generators", value: 21945 },
+				{ label: "ER Auxiliaries", value: 8535 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6095 },
+				{ label: "Electrical Including Rewinds", value: 8535 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6095 },
+				{ label: "Deck Machinery Inc. Cranes", value: 8535 },
+				{ label: "Navigation Equipment", value: 10975 },
+				{ label: "Access Equipment", value: 8535 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 17065 },
+			],
+			total: 121915,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 173130 }],
+			total: 173130,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 100105 },
+						{ label: "Launches & other transport", value: 13805 },
+						{ label: "Flag state inspection, certification & other charges", value: 6905 },
+						{ label: "Classification charges", value: 6905 },
+						{ label: "PSC charges", value: 2420 },
+						{ label: "Third party services", value: 3455 },
+						{ label: "Consulting fees", value: 19225 },
+						{ label: "Procurement costs", value: 22785 },
+						{ label: "Communications, printing, IT & postage", value: 17260 },
+						{ label: "Vetting", value: 31070 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 13805 },
+						{ label: "Masters entertainment", value: 3455 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3455 },
+						{ label: "Training", value: 1385 },
+						{ label: "Survey & calibration of equipment", value: 13805 },
+						{ label: "Incinerator servicing & maintenance", value: 2070 },
+						{ label: "OWS servicing & maintenance", value: 4830 },
+						{ label: "OCM servicing & maintenance", value: 1385 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1725 },
+						{ label: "Waste & garbage disposal", value: 13805 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 223935 + 17260 + 47640,
+			total: 288835 + 223935 + 17260, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2173266,
+		perDay: 5960,
+		perDayExDryDock: 5705,
+		totalExDryDockAnnual: 2000137,
+		avgUpperRangePerDay: 6675,
+		avgLowerRangePerDay: 4160,
+	},
+};
+
+// Dataset for 30-40k cbm LPG vessel
+const vessel30_40k = {
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 3",
+		globalFleetNo: 110,
+		globalFleetCbm: 773411,
+		avgAgeYrs: 15.6,
+		youngestVesselYrs: "<0.1",
+		oldestVesselYrs: 32.6,
+		avgScrapAgeYrs: 26.9,
+		avgSizeCbm: 7031,
+		avgLDT: 3662,
+		avgBHP: 5578,
+		avgGT: 6114,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", values: [330, 350, 380, 440, 460] },
+			{ name: "Stores", values: [380, 430, 430, 430, 440] },
+			{ name: "Spares", values: [350, 370, 390, 410, 390] },
+			{ name: "Lubricating Oils", values: [250, 260, 260, 270, 270] },
+			{ name: "Repair & Maintenance", values: [320, 340, 350, 380, 380] },
+			{ name: "Dry-Docking", values: [0, 490, 520, 560, 650] },
+			{ name: "Management & Administration", values: [830, 830, 830, 870, 870] },
+		],
+		totals: [5330, 5940, 6220, 6610, 6900],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 105, 108, 112, 116, 120, 125, 130, 135, 140, 145],
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", data: [330, 350, 380, 440, 460] },
+			{ name: "Stores, spares & lubricating oils", data: [980, 1060, 1080, 1110, 1100] },
+			{ name: "Repairs & maintenance", data: [320, 340, 350, 380, 380] },
+			{ name: "Dry-docking", data: [0, 490, 520, 560, 650] },
+			{ name: "Management & administration", data: [830, 830, 830, 870, 870] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5330, 5940, 6220, 6610, 6900, 7200, 7500, 7800, 8100, 8400],
+		pctChange: [4.5, 11.5, 4.7, 6.3, 4.4, 4.3, 4.2, 4.1, 3.8, 3.7],
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 16 },
+				{ label: "Crew wages & overtime", value: 913640 },
+				{ label: "Crew victualling", value: 59280 },
+				{ label: "Crew travel", value: 53330 },
+				{ label: "Miscellaneous costs", value: 91360 },
+			],
+			total: 1117610,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 52200 },
+				{ label: "Protection & Indemnity", value: 76970 },
+				{ label: "War Risk", value: 4110 },
+				{ label: "FD&D", value: 5600 },
+				{ label: "COFR", value: 1090 },
+			],
+			total: 139970,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 46000 },
+				{ label: "Safety Items/Protective Equipment", value: 41240 },
+				{ label: "Chemicals & Gases", value: 14280 },
+				{ label: "Medical", value: 6340 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17330 },
+				{ label: "Maintenance Paint", value: 25380 },
+				{ label: "Tools & Hardware", value: 4760 },
+			],
+			total: 155330,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 36930 },
+				{ label: "Generator Engines", value: 24150 },
+				{ label: "Boilers", value: 8520 },
+				{ label: "ER Auxiliary Machinery", value: 24150 },
+				{ label: "Deck Machinery", value: 5680 },
+				{ label: "Electrical", value: 7100 },
+				{ label: "Cargo & Ballast System", value: 11360 },
+				{ label: "Pipes & Valves", value: 2840 },
+				{ label: "Navigation Equipment", value: 4260 },
+				{ label: "Access Equipment", value: 2840 },
+				{ label: "Spares Transportation", value: 14200 },
+			],
+			total: 142030,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 72320 },
+				{ label: "ME System Oil", value: 2670 },
+				{ label: "Aux Engine Oil", value: 7720 },
+				{ label: "Hydraulic Oils", value: 7720 },
+				{ label: "Other Oils", value: 4860 },
+			],
+			total: 95290,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 24560 },
+				{ label: "Boiler", value: 2590 },
+				{ label: "Generators", value: 23270 },
+				{ label: "ER Auxiliaries", value: 9050 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6460 },
+				{ label: "Electrical Including Rewinds", value: 9050 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6460 },
+				{ label: "Deck Machinery Inc. Cranes", value: 9050 },
+				{ label: "Navigation Equipment", value: 11640 },
+				{ label: "Access Equipment", value: 9050 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 18100 },
+			],
+			total: 129280,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 179370 }],
+			total: 179370,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 105520 },
+						{ label: "Launches & other transport", value: 14550 },
+						{ label: "Flag state inspection, certification & other charges", value: 7280 },
+						{ label: "Classification charges", value: 7280 },
+						{ label: "PSC charges", value: 2550 },
+						{ label: "Third party services", value: 3640 },
+						{ label: "Consulting fees", value: 19710 },
+						{ label: "Procurement costs", value: 24020 },
+						{ label: "Communications, printing, IT & postage", value: 18190 },
+						{ label: "Vetting", value: 32750 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 14550 },
+						{ label: "Masters entertainment", value: 3640 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3640 },
+						{ label: "Training", value: 1460 },
+						{ label: "Survey & calibration of equipment", value: 14550 },
+						{ label: "Incinerator servicing & maintenance", value: 2180 },
+						{ label: "OWS servicing & maintenance", value: 5090 },
+						{ label: "OCM servicing & maintenance", value: 1460 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1820 },
+						{ label: "Waste & garbage disposal", value: 14550 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 235490 + 18190 + 49930,
+			total: 303610 + 235490 + 18190, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2262490,
+		perDay: 6220,
+		perDayExDryDock: 5710,
+		totalExDryDockAnnual: 2083120,
+		avgUpperRangePerDay: 7200,
+		avgLowerRangePerDay: 4380,
+	},
+};
+
+// Dataset for 40-50k cbm LPG vessel (Estimation)
+const vessel40_50k = {
+	isEstimate: true,
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 4",
+		globalFleetNo: null,
+		globalFleetCbm: null,
+		avgAgeYrs: null,
+		youngestVesselYrs: null,
+		oldestVesselYrs: null,
+		avgScrapAgeYrs: null,
+		avgSizeCbm: 9530,
+		avgLDT: 5139,
+		avgBHP: 6828,
+		avgGT: 9158,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", values: [315, 335, 365, 425, 445] },
+			{ name: "Stores", values: [370, 415, 415, 420, 425] },
+			{ name: "Spares", values: [335, 355, 370, 390, 370] },
+			{ name: "Lubricating Oils", values: [225, 230, 230, 240, 240] },
+			{ name: "Repair & Maintenance", values: [300, 320, 330, 360, 360] },
+			{ name: "Dry-Docking", values: [0, 460, 490, 525, 610] },
+			{ name: "Management & Administration", values: [790, 790, 790, 830, 830] },
+		],
+		totals: [5090, 5660, 5960, 6375, 6680],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 103, 106, 109, 113, 117, 121, 126, 131, 136, 141], // estimasi
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", data: [315, 335, 365, 425, 445] },
+			{ name: "Stores, spares & lubricating oils", data: [930, 1000, 1015, 1050, 1035] },
+			{ name: "Repairs & maintenance", data: [300, 320, 330, 360, 360] },
+			{ name: "Dry-docking", data: [0, 460, 490, 525, 610] },
+			{ name: "Management & administration", data: [790, 790, 790, 830, 830] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5090, 5660, 5960, 6375, 6680, 6900, 7150, 7400, 7650, 7900], // estimasi tren naik
+		pctChange: [4.5, 11.2, 5.3, 7.0, 4.8, 3.3, 3.6, 3.5, 3.4, 3.3], // estimasi
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 14 },
+				{ label: "Crew wages & overtime", value: 889558 },
+				{ label: "Crew victualling", value: 51868 },
+				{ label: "Crew travel", value: 53771 },
+				{ label: "Miscellaneous costs", value: 88954 },
+			],
+			total: 1084151,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 50210 },
+				{ label: "Protection & Indemnity", value: 74035 },
+				{ label: "War Risk", value: 3955 },
+				{ label: "FD&D", value: 5385 },
+				{ label: "COFR", value: 1050 },
+			],
+			total: 134635,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 44355 },
+				{ label: "Safety Items/Protective Equipment", value: 39765 },
+				{ label: "Chemicals & Gases", value: 13770 },
+				{ label: "Medical", value: 6115 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17370 },
+				{ label: "Maintenance Paint", value: 24475 },
+				{ label: "Tools & Hardware", value: 4590 },
+			],
+			total: 150440,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 35285 },
+				{ label: "Generator Engines", value: 23075 },
+				{ label: "Boilers", value: 8140 },
+				{ label: "ER Auxiliary Machinery", value: 23075 },
+				{ label: "Deck Machinery", value: 5430 },
+				{ label: "Electrical", value: 6785 },
+				{ label: "Cargo & Ballast System", value: 10855 },
+				{ label: "Pipes & Valves", value: 2715 },
+				{ label: "Navigation Equipment", value: 4070 },
+				{ label: "Access Equipment", value: 2715 },
+				{ label: "Spares Transportation", value: 13570 },
+			],
+			total: 135715,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 63795 },
+				{ label: "ME System Oil", value: 2290 },
+				{ label: "Aux Engine Oil", value: 6805 },
+				{ label: "Hydraulic Oils", value: 7100 },
+				{ label: "Other Oils", value: 4455 },
+			],
+			total: 84445,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 23160 },
+				{ label: "Boiler", value: 2440 },
+				{ label: "Generators", value: 21945 },
+				{ label: "ER Auxiliaries", value: 8535 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6095 },
+				{ label: "Electrical Including Rewinds", value: 8535 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6095 },
+				{ label: "Deck Machinery Inc. Cranes", value: 8535 },
+				{ label: "Navigation Equipment", value: 10975 },
+				{ label: "Access Equipment", value: 8535 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 17065 },
+			],
+			total: 121915,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 173130 }],
+			total: 173130,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 100105 },
+						{ label: "Launches & other transport", value: 13805 },
+						{ label: "Flag state inspection, certification & other charges", value: 6905 },
+						{ label: "Classification charges", value: 6905 },
+						{ label: "PSC charges", value: 2420 },
+						{ label: "Third party services", value: 3455 },
+						{ label: "Consulting fees", value: 19225 },
+						{ label: "Procurement costs", value: 22785 },
+						{ label: "Communications, printing, IT & postage", value: 17260 },
+						{ label: "Vetting", value: 31070 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 13805 },
+						{ label: "Masters entertainment", value: 3455 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3455 },
+						{ label: "Training", value: 1385 },
+						{ label: "Survey & calibration of equipment", value: 13805 },
+						{ label: "Incinerator servicing & maintenance", value: 2070 },
+						{ label: "OWS servicing & maintenance", value: 4830 },
+						{ label: "OCM servicing & maintenance", value: 1385 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1725 },
+						{ label: "Waste & garbage disposal", value: 13805 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 223935 + 17260 + 47640,
+			total: 288835 + 223935 + 17260, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2173266,
+		perDay: 5960,
+		perDayExDryDock: 5705,
+		totalExDryDockAnnual: 2000137,
+		avgUpperRangePerDay: 6675,
+		avgLowerRangePerDay: 4160,
+	},
+};
+
+// Dataset for 50-70k cbm LPG vessel
+const vessel50_70k = {
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 3",
+		globalFleetNo: 110,
+		globalFleetCbm: 773411,
+		avgAgeYrs: 15.6,
+		youngestVesselYrs: "<0.1",
+		oldestVesselYrs: 32.6,
+		avgScrapAgeYrs: 26.9,
+		avgSizeCbm: 7031,
+		avgLDT: 3662,
+		avgBHP: 5578,
+		avgGT: 6114,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", values: [330, 350, 380, 440, 460] },
+			{ name: "Stores", values: [380, 430, 430, 430, 440] },
+			{ name: "Spares", values: [350, 370, 390, 410, 390] },
+			{ name: "Lubricating Oils", values: [250, 260, 260, 270, 270] },
+			{ name: "Repair & Maintenance", values: [320, 340, 350, 380, 380] },
+			{ name: "Dry-Docking", values: [0, 490, 520, 560, 650] },
+			{ name: "Management & Administration", values: [830, 830, 830, 870, 870] },
+		],
+		totals: [5330, 5940, 6220, 6610, 6900],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 105, 108, 112, 116, 120, 125, 130, 135, 140, 145],
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", data: [330, 350, 380, 440, 460] },
+			{ name: "Stores, spares & lubricating oils", data: [980, 1060, 1080, 1110, 1100] },
+			{ name: "Repairs & maintenance", data: [320, 340, 350, 380, 380] },
+			{ name: "Dry-docking", data: [0, 490, 520, 560, 650] },
+			{ name: "Management & administration", data: [830, 830, 830, 870, 870] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5330, 5940, 6220, 6610, 6900, 7200, 7500, 7800, 8100, 8400],
+		pctChange: [4.5, 11.5, 4.7, 6.3, 4.4, 4.3, 4.2, 4.1, 3.8, 3.7],
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 16 },
+				{ label: "Crew wages & overtime", value: 913640 },
+				{ label: "Crew victualling", value: 59280 },
+				{ label: "Crew travel", value: 53330 },
+				{ label: "Miscellaneous costs", value: 91360 },
+			],
+			total: 1117610,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 52200 },
+				{ label: "Protection & Indemnity", value: 76970 },
+				{ label: "War Risk", value: 4110 },
+				{ label: "FD&D", value: 5600 },
+				{ label: "COFR", value: 1090 },
+			],
+			total: 139970,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 46000 },
+				{ label: "Safety Items/Protective Equipment", value: 41240 },
+				{ label: "Chemicals & Gases", value: 14280 },
+				{ label: "Medical", value: 6340 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17330 },
+				{ label: "Maintenance Paint", value: 25380 },
+				{ label: "Tools & Hardware", value: 4760 },
+			],
+			total: 155330,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 36930 },
+				{ label: "Generator Engines", value: 24150 },
+				{ label: "Boilers", value: 8520 },
+				{ label: "ER Auxiliary Machinery", value: 24150 },
+				{ label: "Deck Machinery", value: 5680 },
+				{ label: "Electrical", value: 7100 },
+				{ label: "Cargo & Ballast System", value: 11360 },
+				{ label: "Pipes & Valves", value: 2840 },
+				{ label: "Navigation Equipment", value: 4260 },
+				{ label: "Access Equipment", value: 2840 },
+				{ label: "Spares Transportation", value: 14200 },
+			],
+			total: 142030,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 72320 },
+				{ label: "ME System Oil", value: 2670 },
+				{ label: "Aux Engine Oil", value: 7720 },
+				{ label: "Hydraulic Oils", value: 7720 },
+				{ label: "Other Oils", value: 4860 },
+			],
+			total: 95290,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 24560 },
+				{ label: "Boiler", value: 2590 },
+				{ label: "Generators", value: 23270 },
+				{ label: "ER Auxiliaries", value: 9050 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6460 },
+				{ label: "Electrical Including Rewinds", value: 9050 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6460 },
+				{ label: "Deck Machinery Inc. Cranes", value: 9050 },
+				{ label: "Navigation Equipment", value: 11640 },
+				{ label: "Access Equipment", value: 9050 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 18100 },
+			],
+			total: 129280,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 179370 }],
+			total: 179370,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 105520 },
+						{ label: "Launches & other transport", value: 14550 },
+						{ label: "Flag state inspection, certification & other charges", value: 7280 },
+						{ label: "Classification charges", value: 7280 },
+						{ label: "PSC charges", value: 2550 },
+						{ label: "Third party services", value: 3640 },
+						{ label: "Consulting fees", value: 19710 },
+						{ label: "Procurement costs", value: 24020 },
+						{ label: "Communications, printing, IT & postage", value: 18190 },
+						{ label: "Vetting", value: 32750 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 14550 },
+						{ label: "Masters entertainment", value: 3640 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3640 },
+						{ label: "Training", value: 1460 },
+						{ label: "Survey & calibration of equipment", value: 14550 },
+						{ label: "Incinerator servicing & maintenance", value: 2180 },
+						{ label: "OWS servicing & maintenance", value: 5090 },
+						{ label: "OCM servicing & maintenance", value: 1460 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1820 },
+						{ label: "Waste & garbage disposal", value: 14550 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 235490 + 18190 + 49930,
+			total: 303610 + 235490 + 18190, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2262490,
+		perDay: 6220,
+		perDayExDryDock: 5710,
+		totalExDryDockAnnual: 2083120,
+		avgUpperRangePerDay: 7200,
+		avgLowerRangePerDay: 4380,
+	},
+};
+
+// Dataset for 70-80k cbm LPG vessel (Estimation)
+const vessel70_80k = {
+	isEstimate: true,
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 4",
+		globalFleetNo: null,
+		globalFleetCbm: null,
+		avgAgeYrs: null,
+		youngestVesselYrs: null,
+		oldestVesselYrs: null,
+		avgScrapAgeYrs: null,
+		avgSizeCbm: 9530,
+		avgLDT: 5139,
+		avgBHP: 6828,
+		avgGT: 9158,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", values: [315, 335, 365, 425, 445] },
+			{ name: "Stores", values: [370, 415, 415, 420, 425] },
+			{ name: "Spares", values: [335, 355, 370, 390, 370] },
+			{ name: "Lubricating Oils", values: [225, 230, 230, 240, 240] },
+			{ name: "Repair & Maintenance", values: [300, 320, 330, 360, 360] },
+			{ name: "Dry-Docking", values: [0, 460, 490, 525, 610] },
+			{ name: "Management & Administration", values: [790, 790, 790, 830, 830] },
+		],
+		totals: [5090, 5660, 5960, 6375, 6680],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 103, 106, 109, 113, 117, 121, 126, 131, 136, 141], // estimasi
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", data: [315, 335, 365, 425, 445] },
+			{ name: "Stores, spares & lubricating oils", data: [930, 1000, 1015, 1050, 1035] },
+			{ name: "Repairs & maintenance", data: [300, 320, 330, 360, 360] },
+			{ name: "Dry-docking", data: [0, 460, 490, 525, 610] },
+			{ name: "Management & administration", data: [790, 790, 790, 830, 830] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5090, 5660, 5960, 6375, 6680, 6900, 7150, 7400, 7650, 7900], // estimasi tren naik
+		pctChange: [4.5, 11.2, 5.3, 7.0, 4.8, 3.3, 3.6, 3.5, 3.4, 3.3], // estimasi
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 14 },
+				{ label: "Crew wages & overtime", value: 889558 },
+				{ label: "Crew victualling", value: 51868 },
+				{ label: "Crew travel", value: 53771 },
+				{ label: "Miscellaneous costs", value: 88954 },
+			],
+			total: 1084151,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 50210 },
+				{ label: "Protection & Indemnity", value: 74035 },
+				{ label: "War Risk", value: 3955 },
+				{ label: "FD&D", value: 5385 },
+				{ label: "COFR", value: 1050 },
+			],
+			total: 134635,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 44355 },
+				{ label: "Safety Items/Protective Equipment", value: 39765 },
+				{ label: "Chemicals & Gases", value: 13770 },
+				{ label: "Medical", value: 6115 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17370 },
+				{ label: "Maintenance Paint", value: 24475 },
+				{ label: "Tools & Hardware", value: 4590 },
+			],
+			total: 150440,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 35285 },
+				{ label: "Generator Engines", value: 23075 },
+				{ label: "Boilers", value: 8140 },
+				{ label: "ER Auxiliary Machinery", value: 23075 },
+				{ label: "Deck Machinery", value: 5430 },
+				{ label: "Electrical", value: 6785 },
+				{ label: "Cargo & Ballast System", value: 10855 },
+				{ label: "Pipes & Valves", value: 2715 },
+				{ label: "Navigation Equipment", value: 4070 },
+				{ label: "Access Equipment", value: 2715 },
+				{ label: "Spares Transportation", value: 13570 },
+			],
+			total: 135715,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 63795 },
+				{ label: "ME System Oil", value: 2290 },
+				{ label: "Aux Engine Oil", value: 6805 },
+				{ label: "Hydraulic Oils", value: 7100 },
+				{ label: "Other Oils", value: 4455 },
+			],
+			total: 84445,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 23160 },
+				{ label: "Boiler", value: 2440 },
+				{ label: "Generators", value: 21945 },
+				{ label: "ER Auxiliaries", value: 8535 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6095 },
+				{ label: "Electrical Including Rewinds", value: 8535 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6095 },
+				{ label: "Deck Machinery Inc. Cranes", value: 8535 },
+				{ label: "Navigation Equipment", value: 10975 },
+				{ label: "Access Equipment", value: 8535 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 17065 },
+			],
+			total: 121915,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 173130 }],
+			total: 173130,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 100105 },
+						{ label: "Launches & other transport", value: 13805 },
+						{ label: "Flag state inspection, certification & other charges", value: 6905 },
+						{ label: "Classification charges", value: 6905 },
+						{ label: "PSC charges", value: 2420 },
+						{ label: "Third party services", value: 3455 },
+						{ label: "Consulting fees", value: 19225 },
+						{ label: "Procurement costs", value: 22785 },
+						{ label: "Communications, printing, IT & postage", value: 17260 },
+						{ label: "Vetting", value: 31070 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 13805 },
+						{ label: "Masters entertainment", value: 3455 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3455 },
+						{ label: "Training", value: 1385 },
+						{ label: "Survey & calibration of equipment", value: 13805 },
+						{ label: "Incinerator servicing & maintenance", value: 2070 },
+						{ label: "OWS servicing & maintenance", value: 4830 },
+						{ label: "OCM servicing & maintenance", value: 1385 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1725 },
+						{ label: "Waste & garbage disposal", value: 13805 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 223935 + 17260 + 47640,
+			total: 288835 + 223935 + 17260, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2173266,
+		perDay: 5960,
+		perDayExDryDock: 5705,
+		totalExDryDockAnnual: 2000137,
+		avgUpperRangePerDay: 6675,
+		avgLowerRangePerDay: 4160,
+	},
+};
+
+// Dataset for 80k cbm LPG vessel
+const vessel80k = {
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 3",
+		globalFleetNo: 110,
+		globalFleetCbm: 773411,
+		avgAgeYrs: 15.6,
+		youngestVesselYrs: "<0.1",
+		oldestVesselYrs: 32.6,
+		avgScrapAgeYrs: 26.9,
+		avgSizeCbm: 7031,
+		avgLDT: 3662,
+		avgBHP: 5578,
+		avgGT: 6114,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", values: [330, 350, 380, 440, 460] },
+			{ name: "Stores", values: [380, 430, 430, 430, 440] },
+			{ name: "Spares", values: [350, 370, 390, 410, 390] },
+			{ name: "Lubricating Oils", values: [250, 260, 260, 270, 270] },
+			{ name: "Repair & Maintenance", values: [320, 340, 350, 380, 380] },
+			{ name: "Dry-Docking", values: [0, 490, 520, 560, 650] },
+			{ name: "Management & Administration", values: [830, 830, 830, 870, 870] },
+		],
+		totals: [5330, 5940, 6220, 6610, 6900],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 105, 108, 112, 116, 120, 125, 130, 135, 140, 145],
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2870, 2870, 3060, 3250, 3440] },
+			{ name: "Insurance", data: [330, 350, 380, 440, 460] },
+			{ name: "Stores, spares & lubricating oils", data: [980, 1060, 1080, 1110, 1100] },
+			{ name: "Repairs & maintenance", data: [320, 340, 350, 380, 380] },
+			{ name: "Dry-docking", data: [0, 490, 520, 560, 650] },
+			{ name: "Management & administration", data: [830, 830, 830, 870, 870] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5330, 5940, 6220, 6610, 6900, 7200, 7500, 7800, 8100, 8400],
+		pctChange: [4.5, 11.5, 4.7, 6.3, 4.4, 4.3, 4.2, 4.1, 3.8, 3.7],
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 16 },
+				{ label: "Crew wages & overtime", value: 913640 },
+				{ label: "Crew victualling", value: 59280 },
+				{ label: "Crew travel", value: 53330 },
+				{ label: "Miscellaneous costs", value: 91360 },
+			],
+			total: 1117610,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 52200 },
+				{ label: "Protection & Indemnity", value: 76970 },
+				{ label: "War Risk", value: 4110 },
+				{ label: "FD&D", value: 5600 },
+				{ label: "COFR", value: 1090 },
+			],
+			total: 139970,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 46000 },
+				{ label: "Safety Items/Protective Equipment", value: 41240 },
+				{ label: "Chemicals & Gases", value: 14280 },
+				{ label: "Medical", value: 6340 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17330 },
+				{ label: "Maintenance Paint", value: 25380 },
+				{ label: "Tools & Hardware", value: 4760 },
+			],
+			total: 155330,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 36930 },
+				{ label: "Generator Engines", value: 24150 },
+				{ label: "Boilers", value: 8520 },
+				{ label: "ER Auxiliary Machinery", value: 24150 },
+				{ label: "Deck Machinery", value: 5680 },
+				{ label: "Electrical", value: 7100 },
+				{ label: "Cargo & Ballast System", value: 11360 },
+				{ label: "Pipes & Valves", value: 2840 },
+				{ label: "Navigation Equipment", value: 4260 },
+				{ label: "Access Equipment", value: 2840 },
+				{ label: "Spares Transportation", value: 14200 },
+			],
+			total: 142030,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 72320 },
+				{ label: "ME System Oil", value: 2670 },
+				{ label: "Aux Engine Oil", value: 7720 },
+				{ label: "Hydraulic Oils", value: 7720 },
+				{ label: "Other Oils", value: 4860 },
+			],
+			total: 95290,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 24560 },
+				{ label: "Boiler", value: 2590 },
+				{ label: "Generators", value: 23270 },
+				{ label: "ER Auxiliaries", value: 9050 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6460 },
+				{ label: "Electrical Including Rewinds", value: 9050 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6460 },
+				{ label: "Deck Machinery Inc. Cranes", value: 9050 },
+				{ label: "Navigation Equipment", value: 11640 },
+				{ label: "Access Equipment", value: 9050 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 18100 },
+			],
+			total: 129280,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 179370 }],
+			total: 179370,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 105520 },
+						{ label: "Launches & other transport", value: 14550 },
+						{ label: "Flag state inspection, certification & other charges", value: 7280 },
+						{ label: "Classification charges", value: 7280 },
+						{ label: "PSC charges", value: 2550 },
+						{ label: "Third party services", value: 3640 },
+						{ label: "Consulting fees", value: 19710 },
+						{ label: "Procurement costs", value: 24020 },
+						{ label: "Communications, printing, IT & postage", value: 18190 },
+						{ label: "Vetting", value: 32750 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 14550 },
+						{ label: "Masters entertainment", value: 3640 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3640 },
+						{ label: "Training", value: 1460 },
+						{ label: "Survey & calibration of equipment", value: 14550 },
+						{ label: "Incinerator servicing & maintenance", value: 2180 },
+						{ label: "OWS servicing & maintenance", value: 5090 },
+						{ label: "OCM servicing & maintenance", value: 1460 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1820 },
+						{ label: "Waste & garbage disposal", value: 14550 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 235490 + 18190 + 49930,
+			total: 303610 + 235490 + 18190, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2262490,
+		perDay: 6220,
+		perDayExDryDock: 5710,
+		totalExDryDockAnnual: 2083120,
+		avgUpperRangePerDay: 7200,
+		avgLowerRangePerDay: 4380,
+	},
+};
+
+// Dataset for 70-80k cbm LPG vessel (Estimation)
+const vessel80_135k = {
+	isEstimate: true,
+	profile: {
+		type: "LPG",
+		sectorCbm: "Small Semi-Refrigerated 4",
+		globalFleetNo: null,
+		globalFleetCbm: null,
+		avgAgeYrs: null,
+		youngestVesselYrs: null,
+		oldestVesselYrs: null,
+		avgScrapAgeYrs: null,
+		avgSizeCbm: 9530,
+		avgLDT: 5139,
+		avgBHP: 6828,
+		avgGT: 9158,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", values: [315, 335, 365, 425, 445] },
+			{ name: "Stores", values: [370, 415, 415, 420, 425] },
+			{ name: "Spares", values: [335, 355, 370, 390, 370] },
+			{ name: "Lubricating Oils", values: [225, 230, 230, 240, 240] },
+			{ name: "Repair & Maintenance", values: [300, 320, 330, 360, 360] },
+			{ name: "Dry-Docking", values: [0, 460, 490, 525, 610] },
+			{ name: "Management & Administration", values: [790, 790, 790, 830, 830] },
+		],
+		totals: [5090, 5660, 5960, 6375, 6680],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 103, 106, 109, 113, 117, 121, 126, 131, 136, 141], // estimasi
+	},
+	categoriesYoY: {
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [2755, 2755, 2970, 3185, 3400] },
+			{ name: "Insurance", data: [315, 335, 365, 425, 445] },
+			{ name: "Stores, spares & lubricating oils", data: [930, 1000, 1015, 1050, 1035] },
+			{ name: "Repairs & maintenance", data: [300, 320, 330, 360, 360] },
+			{ name: "Dry-docking", data: [0, 460, 490, 525, 610] },
+			{ name: "Management & administration", data: [790, 790, 790, 830, 830] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [5090, 5660, 5960, 6375, 6680, 6900, 7150, 7400, 7650, 7900], // estimasi tren naik
+		pctChange: [4.5, 11.2, 5.3, 7.0, 4.8, 3.3, 3.6, 3.5, 3.4, 3.3], // estimasi
+	},
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 14 },
+				{ label: "Crew wages & overtime", value: 889558 },
+				{ label: "Crew victualling", value: 51868 },
+				{ label: "Crew travel", value: 53771 },
+				{ label: "Miscellaneous costs", value: 88954 },
+			],
+			total: 1084151,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 50210 },
+				{ label: "Protection & Indemnity", value: 74035 },
+				{ label: "War Risk", value: 3955 },
+				{ label: "FD&D", value: 5385 },
+				{ label: "COFR", value: 1050 },
+			],
+			total: 134635,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & Cabin Stores", value: 44355 },
+				{ label: "Safety Items/Protective Equipment", value: 39765 },
+				{ label: "Chemicals & Gases", value: 13770 },
+				{ label: "Medical", value: 6115 },
+				{ label: "Mooring Wires & Ropes & Hoses", value: 17370 },
+				{ label: "Maintenance Paint", value: 24475 },
+				{ label: "Tools & Hardware", value: 4590 },
+			],
+			total: 150440,
+		},
+		spares: {
+			items: [
+				{ label: "Main Propulsion Unit", value: 35285 },
+				{ label: "Generator Engines", value: 23075 },
+				{ label: "Boilers", value: 8140 },
+				{ label: "ER Auxiliary Machinery", value: 23075 },
+				{ label: "Deck Machinery", value: 5430 },
+				{ label: "Electrical", value: 6785 },
+				{ label: "Cargo & Ballast System", value: 10855 },
+				{ label: "Pipes & Valves", value: 2715 },
+				{ label: "Navigation Equipment", value: 4070 },
+				{ label: "Access Equipment", value: 2715 },
+				{ label: "Spares Transportation", value: 13570 },
+			],
+			total: 135715,
+		},
+		luboils: {
+			items: [
+				{ label: "ME Cylinder Oil", value: 63795 },
+				{ label: "ME System Oil", value: 2290 },
+				{ label: "Aux Engine Oil", value: 6805 },
+				{ label: "Hydraulic Oils", value: 7100 },
+				{ label: "Other Oils", value: 4455 },
+			],
+			total: 84445,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Main Engine Inc. Re-Conditioning", value: 23160 },
+				{ label: "Boiler", value: 2440 },
+				{ label: "Generators", value: 21945 },
+				{ label: "ER Auxiliaries", value: 8535 },
+				{ label: "Cargo & Ballast System Inc. Calibration", value: 6095 },
+				{ label: "Electrical Including Rewinds", value: 8535 },
+				{ label: "Pipes & Valves & Hydraulic Systems", value: 6095 },
+				{ label: "Deck Machinery Inc. Cranes", value: 8535 },
+				{ label: "Navigation Equipment", value: 10975 },
+				{ label: "Access Equipment", value: 8535 },
+				{ label: "LSA & FFE (Life Saving Appliances & Fire Fighting Equipment)", value: 17065 },
+			],
+			total: 121915,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 173130 }],
+			total: 173130,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 100105 },
+						{ label: "Launches & other transport", value: 13805 },
+						{ label: "Flag state inspection, certification & other charges", value: 6905 },
+						{ label: "Classification charges", value: 6905 },
+						{ label: "PSC charges", value: 2420 },
+						{ label: "Third party services", value: 3455 },
+						{ label: "Consulting fees", value: 19225 },
+						{ label: "Procurement costs", value: 22785 },
+						{ label: "Communications, printing, IT & postage", value: 17260 },
+						{ label: "Vetting", value: 31070 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 13805 },
+						{ label: "Masters entertainment", value: 3455 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 3455 },
+						{ label: "Training", value: 1385 },
+						{ label: "Survey & calibration of equipment", value: 13805 },
+						{ label: "Incinerator servicing & maintenance", value: 2070 },
+						{ label: "OWS servicing & maintenance", value: 4830 },
+						{ label: "OCM servicing & maintenance", value: 1385 },
+						{ label: "Enviro-logger servicing & maintenance", value: 1725 },
+						{ label: "Waste & garbage disposal", value: 13805 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			subCosts: 223935 + 17260 + 47640,
+			total: 288835 + 223935 + 17260, // Safety total + Fees sub-costs + Owner sub-costs
+		},
+		grandTotal: 2173266,
+		perDay: 5960,
+		perDayExDryDock: 5705,
+		totalExDryDockAnnual: 2000137,
+		avgUpperRangePerDay: 6675,
+		avgLowerRangePerDay: 4160,
+	},
+};
+
+// Dataset for LNG Vessel OPEX – 150–170k CBM segment
+const vessel150170 = {
+	profile: {
+		type: "LNG - Steam",
+		sectorCbm: "135-150,000 cbm",
+		globalFleetNo: 160,
+		globalFleetCbm: 22784013,
+		avgAgeYrs: 20.0,
+		youngestVesselYrs: 9.9,
+		oldestVesselYrs: 34.7,
+		avgScrapAgeYrs: null, // n/a
+		avgSizeCbm: 142400,
+		avgLDT: 31347,
+		avgBHP: 36652,
+		avgGT: 103745,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [6780, 6520, 6260, 6780, 7310] },
+			{ name: "Insurance", values: [1060, 1120, 1060, 1240, 1390] },
+			{ name: "Stores", values: [920, 1020, 1000, 1020, 1070] },
+			{ name: "Spares", values: [1280, 1350, 1350, 1420, 1490] },
+			{ name: "Lubricating oils", values: [180, 180, 180, 180, 190] },
+			{ name: "Repair & maintenance", values: [620, 660, 630, 690, 750] },
+			{ name: "Dry-docking", values: [0, 1580, 1650, 1800, 2100] },
+			{ name: "Management & administration", values: [1860, 1860, 1820, 1860, 1960] },
+		],
+		totals: [12700, 14290, 13950, 14990, 16260],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 103, 105, 108, 112, 116, 120, 122.5, 125, 128.5, 132.5],
+	},
+	categoriesYoY: {
+		// 2020-2024 trend per main head (daily)
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [6500, 6600, 6700, 6900, 7000] },
+			{ name: "Insurance", data: [900, 925, 950, 975, 1000] },
+			{ name: "Stores, spares & lubricating oils", data: [2300, 2350, 2400, 2450, 2500] },
+			{ name: "Repairs & maintenance", data: [400, 450, 500, 500, 500] },
+			{ name: "Dry-docking", data: [1500, 1600, 1700, 1800, 1900] },
+			{ name: "Management & administration", data: [1500, 1600, 1700, 1800, 1900] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [13350, 13650, 14050, 14550, 15050, 15500, 15900, 16250, 16650, 17050],
+		pctChange: [
+			4.402909205, 2.247191011, 2.93040293, 3.558718861, 3.436426117,
+			2.990033223, 2.580645161, 2.201257862, 2.461538462, 2.402402402,
+		],
+	},
+	// 2024 annual costs for a 15-yr old vessel
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 26 },
+				{ label: "Crew wages & overtime", value: 2066110 },
+				{ label: "Crew Victualling", value: 117870 },
+				{ label: "Crew Travel", value: 85800 },
+				{ label: "Miscellaneous Costs", value: 206610 },
+			],
+			total: 2476390,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 188860 },
+				{ label: "Protection & Indemnity", value: 233620 },
+				{ label: "War Risk", value: 11600 },
+				{ label: "FD&D", value: 15850 },
+				{ label: "COFR", value: 3150 },
+			],
+			total: 453080,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & cabin stores", value: 98380 },
+				{ label: "Safety items/protective equipment", value: 73220 },
+				{ label: "Chemicals & gases", value: 17560 },
+				{ label: "Medical", value: 15000 },
+				{ label: "Mooring wires & ropes & hoses", value: 41260 },
+				{ label: "Maintenance paint", value: 60020 },
+				{ label: "Tools & hardware", value: 11250 },
+				{ label: "Transportation costs", value: 21150 },
+				{ label: "Others", value: 33110 },
+			],
+			total: 373620,
+		},
+		spares: {
+			items: [
+				{ label: "Main propulsion unit", value: 47880 },
+				{ label: "Generator engines", value: 27210 },
+				{ label: "Boilers", value: 152230 },
+				{ label: "ER auxiliary machinery", value: 43530 },
+				{ label: "Deck machinery", value: 54130 },
+				{ label: "Electrical", value: 43530 },
+				{ label: "Cargo & ballast system", value: 54410 },
+				{ label: "Pipes & valves & hydraulic systems", value: 48970 },
+				{ label: "Navigation equipment", value: 21080 },
+				{ label: "Access equipment", value: 14050 },
+				{ label: "Spares transportation", value: 27210 },
+			],
+			total: 517730,
+		},
+		luboils: {
+			items: [
+				{ label: "ME system oil", value: 46340 },
+				{ label: "Aux engine oil", value: 6820 },
+				{ label: "Hydraulic oils", value: 3040 },
+				{ label: "Others", value: 10600 },
+			],
+			total: 66800,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Boiler", value: 50180 },
+				{ label: "Generators", value: 29160 },
+				{ label: "ER auxiliaries", value: 24090 },
+				{ label: "Cargo & ballast system inc. calibration", value: 15050 },
+				{ label: "Electrical rewinding", value: 30110 },
+				{ label: "Pipes & valves & hydraulic systems", value: 15050 },
+				{ label: "Deck machinery inc. cranes", value: 20070 },
+				{ label: "Navigation equipment", value: 21080 },
+				{ label: "Access equipment", value: 14050 },
+				{ label: "LSA & FFE (Life saving appliances & fire fighting equipment)", value: 25090 },
+			],
+			total: 239860,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 655480 }],
+			total: 655480,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 246240 },
+						{ label: "Launches & other transport", value: 33960 },
+						{ label: "Flag state inspection, certification & other charges", value: 16980 },
+						{ label: "Classification charges", value: 16980 },
+						{ label: "PSC charges", value: 0 },
+						{ label: "Third party services", value: 22080 },
+						{ label: "Consulting fees", value: 22080 },
+						{ label: "Procurement costs", value: 56040 },
+						{ label: "Communications, printing, IT & postage", value: 46200 },
+						{ label: "Vetting", value: 76420 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 33960 },
+						{ label: "Masters entertainment", value: 42450 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 2930 },
+						{ label: "Training", value: 5130 },
+						{ label: "Survey & calibration of equipment", value: 33960 },
+						{ label: "Incinerator servicing & maintenance", value: 13590 },
+						{ label: "OWS servicing & maintenance", value: 11890 },
+						{ label: "OCM servicing & maintenance", value: 11390 },
+						{ label: "Envirologger servicing & maintenance", value: 11390 },
+						{ label: "Waste & garbage disposal", value: 33960 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			// add missing sub-costs row as per image
+			subCosts: 112090,
+			// Keep dataset total consistent with the grand total
+			total: 680120,
+		},
+		grandTotal: 5463080,
+		perDay: 14990,
+		perDayExDryDock: 13170,
+		// add missing summary values
+		totalExDryDockAnnual: 4807600,
+		avgUpperRangePerDay: 14420,
+		avgLowerRangePerDay: 12870,
+	},
+};
+
+// Dataset for LNG Vessel OPEX – 170–180k CBM segment
+const vessel170180 = {
+	profile: {
+		type: "LNG - Steam",
+		sectorCbm: "170-180,000 cbm",
+		globalFleetNo: 160,
+		globalFleetCbm: 22784013,
+		avgAgeYrs: 20.0,
+		youngestVesselYrs: 9.9,
+		oldestVesselYrs: 34.7,
+		avgScrapAgeYrs: null, // n/a
+		avgSizeCbm: 142400,
+		avgLDT: 31347,
+		avgBHP: 36652,
+		avgGT: 103745,
+		profileYear: 2024,
+	},
+	byAgeDaily: {
+		labels: ["Newbuild", "5-yr old", "10-yr old", "15-yr old", "20-yr old"],
+		items: [
+			{ name: "Manning", values: [6780, 6520, 6260, 6780, 7310] },
+			{ name: "Insurance", values: [1060, 1120, 1060, 1240, 1390] },
+			{ name: "Stores", values: [920, 1020, 1000, 1020, 1070] },
+			{ name: "Spares", values: [1280, 1350, 1350, 1420, 1490] },
+			{ name: "Lubricating oils", values: [180, 180, 180, 180, 190] },
+			{ name: "Repair & maintenance", values: [620, 660, 630, 690, 750] },
+			{ name: "Dry-docking", values: [0, 1580, 1650, 1800, 2100] },
+			{ name: "Management & administration", values: [1860, 1860, 1820, 1860, 1960] },
+		],
+		totals: [12700, 14290, 13950, 14990, 16260],
+	},
+	index: {
+		labels: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		values: [100, 103, 105, 108, 112, 116, 120, 122.5, 125, 128.5, 132.5],
+	},
+	categoriesYoY: {
+		// 2020-2024 trend per main head (daily)
+		years: [2020, 2021, 2022, 2023, 2024],
+		series: [
+			{ name: "Manning", data: [6500, 6600, 6700, 6900, 7000] },
+			{ name: "Insurance", data: [900, 925, 950, 975, 1000] },
+			{ name: "Stores, spares & lubricating oils", data: [2300, 2350, 2400, 2450, 2500] },
+			{ name: "Repairs & maintenance", data: [400, 450, 500, 500, 500] },
+			{ name: "Dry-docking", data: [1500, 1600, 1700, 1800, 1900] },
+			{ name: "Management & administration", data: [1500, 1600, 1700, 1800, 1900] },
+		],
+	},
+	totalYoY: {
+		years: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029],
+		totals: [13350, 13650, 14050, 14550, 15050, 15500, 15900, 16250, 16650, 17050],
+		pctChange: [
+			4.402909205, 2.247191011, 2.93040293, 3.558718861, 3.436426117,
+			2.990033223, 2.580645161, 2.201257862, 2.461538462, 2.402402402,
+		],
+	},
+	// 2024 annual costs for a 15-yr old vessel
+	annual2024: {
+		manning: {
+			items: [
+				{ label: "Officer/rating numbers", value: 26 },
+				{ label: "Crew wages & overtime", value: 2066110 },
+				{ label: "Crew Victualling", value: 117870 },
+				{ label: "Crew Travel", value: 85800 },
+				{ label: "Miscellaneous Costs", value: 206610 },
+			],
+			total: 2476390,
+		},
+		insurance: {
+			items: [
+				{ label: "Hull & Machinery", value: 188860 },
+				{ label: "Protection & Indemnity", value: 233620 },
+				{ label: "War Risk", value: 11600 },
+				{ label: "FD&D", value: 15850 },
+				{ label: "COFR", value: 3150 },
+			],
+			total: 453080,
+		},
+		stores: {
+			items: [
+				{ label: "Deck & cabin stores", value: 98380 },
+				{ label: "Safety items/protective equipment", value: 73220 },
+				{ label: "Chemicals & gases", value: 17560 },
+				{ label: "Medical", value: 15000 },
+				{ label: "Mooring wires & ropes & hoses", value: 41260 },
+				{ label: "Maintenance paint", value: 60020 },
+				{ label: "Tools & hardware", value: 11250 },
+				{ label: "Transportation costs", value: 21150 },
+				{ label: "Others", value: 33110 },
+			],
+			total: 373620,
+		},
+		spares: {
+			items: [
+				{ label: "Main propulsion unit", value: 47880 },
+				{ label: "Generator engines", value: 27210 },
+				{ label: "Boilers", value: 152230 },
+				{ label: "ER auxiliary machinery", value: 43530 },
+				{ label: "Deck machinery", value: 54130 },
+				{ label: "Electrical", value: 43530 },
+				{ label: "Cargo & ballast system", value: 54410 },
+				{ label: "Pipes & valves & hydraulic systems", value: 48970 },
+				{ label: "Navigation equipment", value: 21080 },
+				{ label: "Access equipment", value: 14050 },
+				{ label: "Spares transportation", value: 27210 },
+			],
+			total: 517730,
+		},
+		luboils: {
+			items: [
+				{ label: "ME system oil", value: 46340 },
+				{ label: "Aux engine oil", value: 6820 },
+				{ label: "Hydraulic oils", value: 3040 },
+				{ label: "Others", value: 10600 },
+			],
+			total: 66800,
+		},
+		repairMaintenance: {
+			items: [
+				{ label: "Boiler", value: 50180 },
+				{ label: "Generators", value: 29160 },
+				{ label: "ER auxiliaries", value: 24090 },
+				{ label: "Cargo & ballast system inc. calibration", value: 15050 },
+				{ label: "Electrical rewinding", value: 30110 },
+				{ label: "Pipes & valves & hydraulic systems", value: 15050 },
+				{ label: "Deck machinery inc. cranes", value: 20070 },
+				{ label: "Navigation equipment", value: 21080 },
+				{ label: "Access equipment", value: 14050 },
+				{ label: "LSA & FFE (Life saving appliances & fire fighting equipment)", value: 25090 },
+			],
+			total: 239860,
+		},
+		intermediateSurvey: {
+			items: [{ label: "Intermediate/Special survey", value: 655480 }],
+			total: 655480,
+		},
+		managementAdmin: {
+			groups: [
+				{
+					name: "Fees & Services",
+					items: [
+						{ label: "Management fee", value: 246240 },
+						{ label: "Launches & other transport", value: 33960 },
+						{ label: "Flag state inspection, certification & other charges", value: 16980 },
+						{ label: "Classification charges", value: 16980 },
+						{ label: "PSC charges", value: 0 },
+						{ label: "Third party services", value: 22080 },
+						{ label: "Consulting fees", value: 22080 },
+						{ label: "Procurement costs", value: 56040 },
+						{ label: "Communications, printing, IT & postage", value: 46200 },
+						{ label: "Vetting", value: 76420 },
+					],
+				},
+				{
+					name: "Owner's Costs",
+					items: [
+						{ label: "Owners disbursement", value: 33960 },
+						{ label: "Masters entertainment", value: 42450 },
+					],
+				},
+				{
+					name: "Safety & Environmental Compliance",
+					items: [
+						{ label: "Internal auditing & inspection", value: 2930 },
+						{ label: "Training", value: 5130 },
+						{ label: "Survey & calibration of equipment", value: 33960 },
+						{ label: "Incinerator servicing & maintenance", value: 13590 },
+						{ label: "OWS servicing & maintenance", value: 11890 },
+						{ label: "OCM servicing & maintenance", value: 11390 },
+						{ label: "Envirologger servicing & maintenance", value: 11390 },
+						{ label: "Waste & garbage disposal", value: 33960 },
+						{ label: "BWTS servicing & maintenance", value: 5180 },
+					],
+				},
+			],
+			// add missing sub-costs row as per image
+			subCosts: 112090,
+			// Keep dataset total consistent with the grand total
+			total: 680120,
+		},
+		grandTotal: 5463080,
+		perDay: 14990,
+		perDayExDryDock: 13170,
+		// add missing summary values
+		totalExDryDockAnnual: 4807600,
+		avgUpperRangePerDay: 14420,
+		avgLowerRangePerDay: 12870,
+	},
+};
+
 // Helper: create a scaled copy of the base dataset for other infrastructures
 const scaleDataset = (base, factor, profileOverrides = {}) => {
 	// Deep clone
@@ -871,11 +2883,21 @@ const initialState = {
 			desc: "Specialized cryogenic ship transporting LNG between terminals.",
 			tabs: [
 				{ id: "3-5k", label: "3-5K CBM", datasetKey: "v3_5k" },
-				{ id: "5-6k", label: "5-6K CBM (Est.)", datasetKey: "v5_6k" }, // Estimasi
+				{ id: "5-6k", label: "5-6K CBM", datasetKey: "v5_6k" }, // Estimasi
 				{ id: "6-8k", label: "6-8K CBM", datasetKey: "v6_8k" },
+				{ id: "8-12k", label: "8-12K CBM", datasetKey: "v8_12k" }, // Estimasi
+				{ id: "12-15k", label: "12-15K CBM", datasetKey: "v12_15k" },
+				{ id: "15-20k", label: "15-30K CBM", datasetKey: "v15_30k" }, // Estimasi
+				{ id: "20-30k", label: "30-40K CBM", datasetKey: "v30_40k" },
+				{ id: "30-40k", label: "40-50K CBM", datasetKey: "v40_50k" }, // Estimasi
+				{ id: "30-70k", label: "50-70K CBM", datasetKey: "v50_70k" },
+				{ id: "70k", label: "70-80K CBM", datasetKey: "v70_80k" }, // Estimasi
+				{ id: "80k", label: "80K CBM", datasetKey: "v80k" },
+				{ id: "70-80k", label: "80-135K CBM ", datasetKey: "v80_135k" }, // Estimasi
 				{ id: "135-150k", label: "135-150K CBM", datasetKey: "v135150" },
-				{ id: "150-170k", label: "150-170K CBM", datasetKey: "v150170", disabled: true },
-				{ id: "170-180k", label: "170-180K CBM", datasetKey: "v170180", disabled: true },
+				{ id: "150-170k", label: "150-170K CBM", datasetKey: "v150170" },
+				{ id: "170-180k", label: "170-180K CBM", datasetKey: "v170180" },
+				// { id: "170-180k", label: "170-180K CBM", datasetKey: "v170180", disabled: true },
 			],
 		},
 		{
@@ -908,6 +2930,17 @@ const initialState = {
 		v3_5k: vessel3_5k,
 		v5_6k: vessel5_6k,
 		v6_8k: vessel6_8k,
+		v8_12k: vessel8_12k,
+		v12_15k: vessel12_15k,
+		v15_30k: vessel15_30k,
+		v30_40k: vessel30_40k,
+		v40_50k: vessel40_50k,
+		v50_70k: vessel50_70k,
+		v70_80k: vessel70_80k,
+		v80k: vessel80k,
+		v80_135k: vessel80_135k,
+		v150170: vessel150170,
+		v170180: vessel170180,
 		onshore: dsOnshore,
 		offshore: dsOffshore,
 		fsru: dsFSRU,
