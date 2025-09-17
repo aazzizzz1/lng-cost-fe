@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchProvinces } from "../../Provider/administratorSlice";
-import { fetchRecommendedCosts, createProject } from "../../Provider/Project/ProjectSlice";
+import { fetchRecommendedCosts, createProject, fetchUniqueInfrastrukturProyek } from "../../Provider/Project/ProjectSlice";
 import { setItems } from "../../Provider/Project/detailCreateProjectConstructionSlice";
 
 // Mapping satuan berdasarkan jenis project
@@ -18,34 +18,47 @@ const satuanByJenis = {
   "Onshore Regasification Unit (ORU)": "m³ / MMSCFD",
 };
 
-const jenisOptions = [
-  { value: "LNGBV", label: "LNG Bunkering Vessel" },
-  { value: "FSRU", label: "Floating Storage Regasification Unit (FSRU)" },
-  { value: "LNGC", label: "LNG Carrier (LNGC)" },
-  { value: "LNG Trucking", label: "LNG Trucking" },
-  { value: "Onshore LNG Plant", label: "Onshore LNG Plant" },
-  { value: "Offshore LNG Plant", label: "Offshore LNG Plant" },
-  { value: "Onshore Receiving Facility (ORF)", label: "Onshore Receiving Facility" },
-  { value: "OTS", label: "Offshore Terminal System" },
-  { value: "Onshore Regasification Unit (ORU)", label: "Onshore Regasification Unit" },
-];
-
 const CreateProjectModal = ({ isOpen, onClose }) => {
   const [name, setName] = useState("");
-  const [infrastruktur, setInfrastruktur] = useState("Onshore LNG Plant");
+  // Infrastruktur default akan di-set setelah data uniqueInfrastrukturProyek didapat
+  const [infrastruktur, setInfrastruktur] = useState("");
   const [kategori, setKategori] = useState("");
   const [volume, setVolume] = useState("");
   const [lokasi, setLokasi] = useState("");
   const [tahun, setTahun] = useState(new Date().getFullYear());
   const [inflasi, setInflasi] = useState(5.0);
+  const [proyek, setProyek] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const provinces = useSelector((state) => state.administrator.provinces);
 
-  // Fetch provinces on mount
+  // Ambil unique infrastruktur & proyek dari redux
+  const uniqueInfrastrukturProyek = useSelector(
+    (state) => state.projects.uniqueInfrastrukturProyek
+  );
+
+  // Fetch provinces & unique infrastruktur/proyek on mount
   useEffect(() => {
     dispatch(fetchProvinces());
+    dispatch(fetchUniqueInfrastrukturProyek());
   }, [dispatch]);
+
+  // Set default infrastruktur jika belum ada
+  useEffect(() => {
+    const infraKeys = Object.keys(uniqueInfrastrukturProyek || {});
+    if (!infrastruktur && infraKeys.length > 0) {
+      setInfrastruktur(infraKeys[0]);
+    }
+  }, [uniqueInfrastrukturProyek, infrastruktur]);
+
+  // Jenis options diambil dari backend
+  const jenisOptions = Object.keys(uniqueInfrastrukturProyek || {}).map((key) => ({
+    value: key,
+    label: key,
+  }));
+
+  // Proyek referensi yang tersedia untuk infrastruktur terpilih
+  const availableProyek = uniqueInfrastrukturProyek?.[infrastruktur] || [];
 
   // Auto set kategori FSRU & LNGC berdasarkan volume
   React.useEffect(() => {
@@ -96,6 +109,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
       tahun: Number(tahun),
       kategori,
       inflasi: Number(inflasi),
+      proyek, // NEW: tambahkan proyek ke payload
     };
 
     try {
@@ -177,7 +191,10 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                  </label>
                  <select
                    value={infrastruktur}
-                   onChange={(e) => setInfrastruktur(e.target.value)}
+                   onChange={(e) => {
+                     setInfrastruktur(e.target.value);
+                     setProyek(""); // reset proyek jika infrastruktur berubah
+                   }}
                    className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                  >
                    {jenisOptions.map((opt) => (
@@ -260,6 +277,24 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                    className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                  />
                </div>
+               {/* Dropdown proyek referensi jika tersedia */}
+               {availableProyek.length > 0 && (
+                 <div>
+                   <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                     Proyek (Referensi)
+                   </label>
+                   <select
+                     value={proyek}
+                     onChange={(e) => setProyek(e.target.value)}
+                     className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                   >
+                     <option value="">Pilih Proyek Referensi</option>
+                     {availableProyek.map((p, idx) => (
+                       <option key={idx} value={p}>{p}</option>
+                     ))}
+                   </select>
+                 </div>
+               )}
              </div>
              <div className="gap-2 flex flex-row mt-4">
               <button

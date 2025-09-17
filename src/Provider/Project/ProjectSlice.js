@@ -1,6 +1,21 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+
+export const fetchUniqueInfrastrukturProyek = createAsyncThunk(
+  'projects/fetchUniqueInfrastrukturProyek',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API}/unit-prices/unique-infrastruktur-proyek`,
+        { headers: getAuthHeaders() }
+      );
+      return response.data?.data || {};
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const initialState = {
   projects: [],
@@ -8,6 +23,7 @@ const initialState = {
   selectedProjectDetails: null,
   loadingRecommendedCosts: false,
   detailCache: {}, // NEW: cache project details by id
+  uniqueInfrastrukturProyek: {}, // NEW: hasil fetch unique infrastruktur & proyek
 };
 
 const projectSlice = createSlice({
@@ -40,6 +56,15 @@ const projectSlice = createSlice({
       }
       delete state.detailCache[action.payload]; // NEW: remove from cache
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUniqueInfrastrukturProyek.fulfilled, (state, action) => {
+        state.uniqueInfrastrukturProyek = action.payload;
+      })
+      .addCase(fetchUniqueInfrastrukturProyek.rejected, (state, action) => {
+        state.uniqueInfrastrukturProyek = {};
+      });
   },
 });
 
