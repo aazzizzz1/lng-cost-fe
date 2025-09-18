@@ -281,7 +281,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                {availableProyek.length > 0 && (
                  <div>
                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                     Proyek (Referensi)
+                     Proyek Technology (Referensi)
                    </label>
                    <select
                      value={proyek}
