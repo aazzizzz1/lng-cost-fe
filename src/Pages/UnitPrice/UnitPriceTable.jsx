@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Spinner from '../../Components/Spinner/Spinner';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUnitPrice } from '../../Provider/HargaSatuan/unitPriceSlice';
 
 // Kolom yang ingin ditampilkan
 const columns = [
-  { key: "workcode", label: "Workcode" }, // NEW
+  { key: "workcode", label: "Workcode" },
   { key: "uraian", label: "Uraian" },
   { key: "satuan", label: "Satuan" },
   { key: "qty", label: "Qty" },
@@ -20,12 +22,56 @@ const columns = [
   { key: "tipe", label: "Tipe" },
 ];
 
+const numericKeys = new Set(["qty", "hargaSatuan", "totalHarga", "tahun", "volume"]);
+
 const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange, onSortChange }) => {
   const { page, limit, total, totalPages } = pagination;
+  const dispatch = useDispatch();
+  const { updateLoading, updatingId } = useSelector((s) => s.unitPrice);
+
+  const [editingId, setEditingId] = useState(null);
+  const [edited, setEdited] = useState({});
 
   const handleSort = (key) => {
-    if (onSortChange) {
-      onSortChange(key);
+    if (onSortChange) onSortChange(key);
+  };
+
+  const startEdit = (row) => {
+    setEditingId(row.id);
+    setEdited(
+      columns.reduce((acc, c) => {
+        acc[c.key] = row[c.key] ?? '';
+        return acc;
+      }, {})
+    );
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEdited({});
+  };
+
+  const onChangeField = (key, value) => {
+    setEdited((prev) => ({
+      ...prev,
+      [key]: numericKeys.has(key) ? (value === '' ? '' : Number(value)) : value,
+    }));
+  };
+
+  const saveEdit = async (row) => {
+    // Build payload from current edited values
+    const payload = columns.reduce((acc, c) => {
+      const v = edited[c.key];
+      acc[c.key] = v === '' ? null : v;
+      return acc;
+    }, {});
+    // If totalHarga is null/undefined, let backend or reducer compute
+    try {
+      await dispatch(updateUnitPrice({ id: row.id, data: payload })).unwrap();
+      setEditingId(null);
+      setEdited({});
+    } catch {
+      // keep edit mode; optionally show toast
     }
   };
 
@@ -56,12 +102,14 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                       </span>
                     </th>
                   ))}
+                  {/* Actions column on the far right */}
+                  <th scope="col" className="px-6 py-4 sticky top-0 z-10 bg-inherit font-semibold">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {!data || data.length === 0 ? (
                   <tr>
-                    <td colSpan={columns.length + 1} className="text-center py-10 text-gray-500 dark:text-gray-400">
+                    <td colSpan={columns.length + 2} className="text-center py-10 text-gray-500 dark:text-gray-400">
                       Tidak ada data.
                     </td>
                   </tr>
@@ -76,13 +124,50 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                       </td>
                       {columns.map((col) => (
                         <td key={col.key} className="px-6 py-4 whitespace-nowrap">
-                          {col.key === "hargaSatuan" || col.key === "totalHarga"
-                            ? row[col.key]
-                              ? `Rp${Number(row[col.key]).toLocaleString()}`
-                              : ""
-                            : row[col.key]}
+                          {editingId === row.id ? (
+                            <input
+                              type={numericKeys.has(col.key) ? 'number' : 'text'}
+                              step={numericKeys.has(col.key) ? 'any' : undefined}
+                              value={edited[col.key] ?? ''}
+                              onChange={(e) => onChangeField(col.key, e.target.value)}
+                              className="w-40 px-2 py-1 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700"
+                            />
+                          ) : (
+                            col.key === "hargaSatuan" || col.key === "totalHarga"
+                              ? row[col.key]
+                                ? `Rp${Number(row[col.key]).toLocaleString()}`
+                                : ""
+                              : row[col.key]
+                          )}
                         </td>
                       ))}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {editingId === row.id ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => saveEdit(row)}
+                              disabled={updateLoading && updatingId === row.id}
+                              className="px-3 py-1 text-xs rounded bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              disabled={updateLoading && updatingId === row.id}
+                              className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => startEdit(row)}
+                            className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            Edit
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))
                 )}

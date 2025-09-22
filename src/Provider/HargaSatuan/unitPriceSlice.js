@@ -154,6 +154,22 @@ export const uploadUnitPriceExcel = createAsyncThunk(
   }
 );
 
+// Async thunk to update a unit price by id
+export const updateUnitPrice = createAsyncThunk(
+  'unitPrice/updateUnitPrice',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${api}/unit-prices/${id}`, data, {
+        headers: getAuthHeaders(),
+      });
+      const updated = response.data?.data || { id, ...data };
+      return updated;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   uniqueFields: {
     tipe: [],
@@ -215,6 +231,10 @@ const unitPriceSlice = createSlice({
     // Tambahkan state upload
     uploadLoading: false,
     uploadResult: null,
+    // update state
+    updateLoading: false,
+    updateError: null,
+    updatingId: null,
   },
   reducers: {
     setFilters: (state, action) => {
@@ -372,6 +392,38 @@ const unitPriceSlice = createSlice({
       .addCase(uploadUnitPriceExcel.rejected, (state, action) => {
         state.uploadLoading = false;
         state.uploadResult = action.payload;
+      })
+      // updateUnitPrice cases
+      .addCase(updateUnitPrice.pending, (state, action) => {
+        state.updateLoading = true;
+        state.updateError = null;
+        state.updatingId = action.meta?.arg?.id ?? null;
+      })
+      .addCase(updateUnitPrice.fulfilled, (state, action) => {
+        state.updateLoading = false;
+        state.updatingId = null;
+        const updated = action.payload;
+        const idx = state.transport.data.findIndex((r) => r.id === updated.id);
+        if (idx !== -1) {
+          state.transport.data[idx] = {
+            ...state.transport.data[idx],
+            ...updated,
+          };
+          const item = state.transport.data[idx];
+          // Only auto-calc totalHarga if API didn't provide it
+          if (
+            (updated.totalHarga === undefined || updated.totalHarga === null) &&
+            item.qty != null &&
+            item.hargaSatuan != null
+          ) {
+            item.totalHarga = Number(item.qty) * Number(item.hargaSatuan);
+          }
+        }
+      })
+      .addCase(updateUnitPrice.rejected, (state, action) => {
+        state.updateLoading = false;
+        state.updatingId = null;
+        state.updateError = action.payload;
       });
   },
 });
