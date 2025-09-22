@@ -15,6 +15,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
   const search = modal.search || "";
 
   const [selectedType, setSelectedType] = useState("");
+  const [selectedRow, setSelectedRow] = useState(null); // NEW: Track selected row for composing prices modal
 
   useEffect(() => {
     dispatch(fetchTypes());
@@ -27,15 +28,23 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
   }, [dispatch, selectedType, search]);
 
   const modalColumns = [
-    { key: "workcode", label: "Workcode" }, // NEW
+    { key: "workcode", label: "Workcode" },
+    { key: "recommendedPrice", label: "Harga Rekomendasi" },
     { key: "uraian", label: "Uraian" },
     { key: "spesifikasi", label: "Spesifikasi" },
-    { key: "satuan", label: "Satuan" },
-    { key: "hargaSatuan", label: "Harga Satuan" },
     { key: "lokasi", label: "Lokasi" },
     { key: "proyek", label: "Proyek" },
     { key: "tahun", label: "Tahun" },
   ];
+
+  // Helper untuk ambil nilai dengan fallback ke recommendedItem
+  const getCellValue = (row, key) => {
+    if (key === "recommendedPrice") return row.recommendedPrice ?? "-";
+    if (key === "spesifikasi") {
+      return row.spesifikasi || row.specification || row.recommendedItem?.specification || row.recommendedItem?.spesifikasi || "-";
+    }
+    return row[key] ?? row.recommendedItem?.[key] ?? "-";
+  };
 
   const getCCI = (nama) => {
     const prov = provinces.find((p) => p.name === nama);
@@ -51,7 +60,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
     })();
     const tahunItem = row.tahun || tahunProject;
     const lokasiItem = row.lokasi || lokasiProject;
-    const hargaSatuanItem = row.hargaSatuan || 0;
+    const hargaSatuanItem = row.recommendedPrice ?? row.hargaSatuan ?? 0; // <-- pakai recommendedPrice jika ada
 
     // Step 1: Update harga ke tahun project
     const n = Number(tahunProject) - Number(tahunItem);
@@ -193,10 +202,42 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
     dispatch(closeModal());
   };
 
+  // Tambahkan ikon untuk tombol komposisi
+  const CompositionIcon = ({ className = "w-4 h-4" }) => (
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" className={className}>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2a4 4 0 014-4h6M9 17H7a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4h-2" />
+    </svg>
+  );
+
+  // Helper: pilih dari baris komposisi menggunakan logika existing
+  const handleSelectFromComposition = (parentRow, comp) => {
+    // Tutup panel komposisi dulu agar tidak flicker
+    setSelectedRow(null);
+
+    // Bentuk row kompatibel dengan handleSelectFromModal
+    const composedRow = {
+      ...parentRow,
+      // override dengan data komponen
+      workcode: comp.workcode ?? parentRow.workcode,
+      uraian: comp.uraian ?? parentRow.uraian,
+      spesifikasi: comp.spesifikasi ?? comp.specification ?? parentRow.spesifikasi ?? parentRow.specification,
+      specification: comp.specification ?? comp.spesifikasi ?? parentRow.specification ?? parentRow.spesifikasi,
+      satuan: comp.satuan ?? parentRow.satuan,
+      tahun: comp.tahun ?? parentRow.tahun,
+      lokasi: comp.lokasi ?? parentRow.lokasi,
+      // pakai harga komponen sebagai recommended
+      recommendedPrice: comp.hargaSatuan ?? parentRow.recommendedPrice ?? parentRow.hargaSatuan ?? 0,
+      hargaSatuan: comp.hargaSatuan ?? parentRow.hargaSatuan ?? 0,
+    };
+
+    handleSelectFromModal(composedRow);
+  };
+
   if (!modal.open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 transition-colors">
-      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-2xl w-full p-4 transition-all duration-200">
+      {/* Main Modal */}
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-4xl w-full p-6 transition-all duration-200">
         <div className="flex justify-between items-center mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
           <div className="font-bold text-lg text-gray-900 dark:text-white">
             Pilih Harga Satuan
@@ -230,7 +271,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
             onChange={(e) => dispatch(setModalSearch(e.target.value))}
           />
         </div>
-        <div className="overflow-x-auto max-h-80 rounded">
+        <div className="overflow-x-auto max-h-[32rem] rounded">
           <table className="w-full text-sm border-separate border-spacing-0">
             <thead>
               <tr className="bg-gray-100 dark:bg-gray-800">
@@ -267,7 +308,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
               ) : (
                 data.map((row, idx) => (
                   <tr
-                    key={row.id || idx}
+                    key={row.workcode || idx}
                     className="hover:bg-primary-50 dark:hover:bg-gray-800 transition"
                   >
                     {modalColumns.map((col) => (
@@ -275,10 +316,10 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
                         key={col.key}
                         className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100"
                       >
-                        {row[col.key]}
+                        {getCellValue(row, col.key)}
                       </td>
                     ))}
-                    <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800">
+                    <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 flex gap-2">
                       <button
                         type="button"
                         className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1 rounded text-xs font-semibold shadow-sm transition"
@@ -286,6 +327,17 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
                       >
                         Pilih
                       </button>
+                      {Array.isArray(row.composingPrices) && row.composingPrices.length > 0 && (
+                        <button
+                          type="button"
+                          className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-100 px-2 py-1 rounded text-xs font-semibold flex items-center gap-1 transition"
+                          title="Lihat Komposisi Harga Satuan"
+                          onClick={() => setSelectedRow(row)}
+                        >
+                          <CompositionIcon className="w-4 h-4" />
+                          Komposisi
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -294,6 +346,79 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
           </table>
         </div>
       </div>
+
+      {/* Composing Prices Drawer (responsive) */}
+      {selectedRow && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* backdrop click closes drawer */}
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedRow(null)} />
+          <div className="relative h-full w-full sm:w-[24rem] md:w-[32rem] lg:w-[48rem] bg-white dark:bg-gray-900 shadow-2xl border-l border-gray-200 dark:border-gray-700 p-4 sm:rounded-none">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <div className="font-bold text-lg text-gray-900 dark:text-white">Komposisi Harga Satuan</div>
+              <button
+                className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-2xl px-2 transition"
+                onClick={() => setSelectedRow(null)}
+                aria-label="Tutup"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="overflow-auto max-h-[calc(100vh-6rem)] rounded">
+              <table className="w-full text-sm border-separate border-spacing-0">
+                <thead>
+                  <tr className="bg-gray-100 dark:bg-gray-800">
+                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold">Workcode</th>
+                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold">Uraian</th>
+                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold">Spesifikasi</th>
+                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold">Satuan</th>
+                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-semibold">Harga Satuan</th>
+                    <th className="px-2 py-2 border-b border-gray-200 dark:border-gray-700" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {(selectedRow.composingPrices && selectedRow.composingPrices.length > 0) ? (
+                    selectedRow.composingPrices.map((price, idx) => (
+                      <tr key={idx} className="hover:bg-primary-50 dark:hover:bg-gray-800 transition">
+                        <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100">
+                          {price.workcode ?? '-'}
+                        </td>
+                        <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100">
+                          {price.uraian ?? '-'}
+                        </td>
+                        <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100">
+                          {price.spesifikasi || price.specification || '-'}
+                        </td>
+                        <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-gray-900 dark:text-gray-100">
+                          {price.satuan ?? '-'}
+                        </td>
+                        <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-right text-gray-900 dark:text-gray-100">
+                          {Number(price.hargaSatuan || 0).toLocaleString()}
+                        </td>
+                        <td className="px-2 py-2 border-b border-gray-100 dark:border-gray-800 text-right">
+                          <button
+                            type="button"
+                            className="bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded text-xs font-semibold shadow-sm transition"
+                            onClick={() => handleSelectFromComposition(selectedRow, price)}
+                          >
+                            Pilih
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={6} className="text-center text-gray-400 dark:text-gray-500 py-6">
+                        Tidak ada komposisi.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

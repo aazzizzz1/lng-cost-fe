@@ -194,8 +194,8 @@ export const fetchUnitPriceDataForModal = createAsyncThunk(
   async ({ tipe = '', search = '' } = {}, { rejectWithValue }) => {
     try {
       const params = { tipe, search };
-      const response = await axios.get(`${api}/unit-prices`, { params });
-      return response.data;
+      const response = await axios.get(`${api}/unit-prices/best-prices`, { params });
+      return response.data; // Adjust response to include recommended and composing prices
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -274,7 +274,51 @@ const unitPriceSlice = createSlice({
         state.modalError = null;
       })
       .addCase(fetchUnitPriceDataForModal.fulfilled, (state, action) => {
-        state.transport.data = action.payload.data; // Store modal-specific data
+        // Normalisasi agar setiap item punya recommendedPrice & composingPrices (selalu array)
+        const rows = (action.payload?.recommendations || action.payload?.data || []).map((r) => {
+          const item = r.recommendedItem ?? {};
+          const composingRaw = r.composingPrices ?? r.components ?? r.composing ?? r.detail ?? [];
+          const composingPrices = Array.isArray(composingRaw)
+            ? composingRaw.map((cp) => ({
+                ...cp,
+                // pastikan totalHarga tersedia
+                totalHarga:
+                  cp?.totalHarga ??
+                  ((Number(cp?.qty) || 0) * (Number(cp?.hargaSatuan) || 0)),
+              }))
+            : [];
+
+          return {
+            ...r,
+            recommendedPrice:
+              r.recommendedPrice ??
+              r.hargaRekomendasi ??
+              r.bestPrice ??
+              r.hargaSatuan ??
+              r.price ??
+              null,
+            composingPrices,
+
+            // Flatten beberapa field penting dari recommendedItem bila kosong di level atas
+            workcode: r.workcode ?? item.workcode ?? '',
+            uraian: r.uraian ?? item.uraian ?? '',
+            spesifikasi: r.spesifikasi ?? r.specification ?? item.spesifikasi ?? item.specification ?? '',
+            specification: r.specification ?? r.spesifikasi ?? item.specification ?? item.spesifikasi ?? '',
+            qty: r.qty ?? item.qty ?? 0,
+            satuan: r.satuan ?? item.satuan ?? '',
+            tahun: r.tahun ?? item.tahun ?? null,
+            lokasi: r.lokasi ?? item.lokasi ?? '',
+            proyek: r.proyek ?? item.proyek ?? '',
+            volume: r.volume ?? item.volume ?? 0,
+            satuanVolume: r.satuanVolume ?? item.satuanVolume ?? '',
+            kelompok: r.kelompok ?? item.kelompok ?? '',
+            kelompokDetail: r.kelompokDetail ?? item.kelompokDetail ?? '',
+            tipe: r.tipe ?? item.tipe ?? '',
+            infrastruktur: r.infrastruktur ?? item.infrastruktur ?? '',
+          };
+        });
+
+        state.transport.data = rows;
         state.modalLoading = false;
       })
       .addCase(fetchUnitPriceDataForModal.rejected, (state, action) => {
