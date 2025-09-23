@@ -170,6 +170,21 @@ export const updateUnitPrice = createAsyncThunk(
   }
 );
 
+// NEW: delete a unit price by id
+export const deleteUnitPrice = createAsyncThunk(
+  'unitPrice/deleteUnitPrice',
+  async (id, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${api}/unit-prices/${id}`, {
+        headers: getAuthHeaders(),
+      });
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   uniqueFields: {
     tipe: [],
@@ -177,10 +192,10 @@ const initialState = {
     kelompok: [],
   },
   loading: false,
-  modalLoading: false, // Add modal-specific loading state
-  loadingRecommended: false, // Add loading state for recommended data
+  modalLoading: false,
+  loadingRecommended: false,
   error: null,
-  modalError: null, // Add modal-specific error state
+  modalError: null,
 };
 
 const transportInitialState = {
@@ -199,7 +214,7 @@ const transportInitialState = {
     search: '',
     sort: '',
     order: '',
-    volume: '', // added volume filter
+    volume: '',
   },
   loading: false,
   error: null,
@@ -228,13 +243,14 @@ const unitPriceSlice = createSlice({
     recommendedPrices: [],
     deleteLoading: false,
     deleteResult: null,
-    // Tambahkan state upload
     uploadLoading: false,
     uploadResult: null,
-    // update state
     updateLoading: false,
     updateError: null,
     updatingId: null,
+    // NEW: per-row delete state
+    rowDeleteLoading: false,
+    rowDeletingId: null,
   },
   reducers: {
     setFilters: (state, action) => {
@@ -424,6 +440,31 @@ const unitPriceSlice = createSlice({
         state.updateLoading = false;
         state.updatingId = null;
         state.updateError = action.payload;
+      })
+      // NEW: deleteUnitPrice cases
+      .addCase(deleteUnitPrice.pending, (state, action) => {
+        state.rowDeleteLoading = true;
+        state.rowDeletingId = action.meta?.arg ?? null;
+      })
+      .addCase(deleteUnitPrice.fulfilled, (state, action) => {
+        state.rowDeleteLoading = false;
+        const removedId = action.payload;
+        state.transport.data = state.transport.data.filter((r) => String(r.id) !== String(removedId));
+        state.rowDeletingId = null;
+        // adjust pagination locally
+        const p = state.transport.pagination;
+        const newTotal = Math.max(0, Number(p.total || 0) - 1);
+        const newTotalPages = Math.max(1, Math.ceil(newTotal / (p.limit || 10)));
+        state.transport.pagination = {
+          ...p,
+          total: newTotal,
+          totalPages: newTotalPages,
+        };
+      })
+      .addCase(deleteUnitPrice.rejected, (state, action) => {
+        state.rowDeleteLoading = false;
+        state.rowDeletingId = null;
+        state.transport.error = action.payload;
       });
   },
 });

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Spinner from '../../Components/Spinner/Spinner';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUnitPrice } from '../../Provider/HargaSatuan/unitPriceSlice';
+import { updateUnitPrice, deleteUnitPrice } from '../../Provider/HargaSatuan/unitPriceSlice';
 
 // Kolom yang ingin ditampilkan
 const columns = [
@@ -27,7 +27,7 @@ const numericKeys = new Set(["qty", "hargaSatuan", "totalHarga", "tahun", "volum
 const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange, onSortChange }) => {
   const { page, limit, total, totalPages } = pagination;
   const dispatch = useDispatch();
-  const { updateLoading, updatingId } = useSelector((s) => s.unitPrice);
+  const { updateLoading, updatingId, rowDeleteLoading, rowDeletingId } = useSelector((s) => s.unitPrice);
 
   const [editingId, setEditingId] = useState(null);
   const [edited, setEdited] = useState({});
@@ -72,6 +72,21 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
       setEdited({});
     } catch {
       // keep edit mode; optionally show toast
+    }
+  };
+
+  // NEW: delete handler
+  const handleDelete = async (row) => {
+    if (!row?.id) return;
+    if (!window.confirm('Hapus item ini? Tindakan tidak dapat dibatalkan.')) return;
+    try {
+      await dispatch(deleteUnitPrice(row.id)).unwrap();
+      if (editingId === row.id) {
+        setEditingId(null);
+        setEdited({});
+      }
+    } catch {
+      // optional: show toast
     }
   };
 
@@ -160,12 +175,21 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                             </button>
                           </div>
                         ) : (
-                          <button
-                            onClick={() => startEdit(row)}
-                            className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          >
-                            Edit
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => startEdit(row)}
+                              className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(row)}
+                              disabled={rowDeleteLoading && rowDeletingId === row.id}
+                              className="px-3 py-1 text-xs rounded bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
