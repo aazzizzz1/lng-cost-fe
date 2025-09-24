@@ -8,7 +8,7 @@ import { toggleHargaKonstruksi } from "../Provider/GlobalSlice"; // renamed impo
 const ConstructionPriceSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { uniqueInfrastruktur = {}, loading } = useSelector((state) => state.constractionCost);
+  const { uniqueInfrastruktur = {}, uniqueLoading } = useSelector((state) => state.constractionCost); // ganti: tambah uniqueLoading
   const { isHargaKonstruksiOpen } = useSelector((state) => state.global); // renamed state key
   const [openSections, setOpenSections] = useState({});
   const [openInfra, setOpenInfra] = useState({});
@@ -81,14 +81,14 @@ const ConstructionPriceSidebar = () => {
           />
         </svg>
       </button>
-      {isHargaKonstruksiOpen && ( // updated
+      {isHargaKonstruksiOpen && (
         <ul className="py-2 space-y-2">
-          {loading && (
+          {uniqueLoading && ( // ganti dari loading
             <li className="flex justify-center items-center py-4">
               <Spinner />
             </li>
           )}
-          {!loading &&
+          {!uniqueLoading &&
             Object.entries(uniqueInfrastruktur).map(([tipe, infraObj]) => (
               <li key={tipe}>
                 {/* Level 1: Tipe */}
@@ -150,17 +150,24 @@ const ConstructionPriceSidebar = () => {
                         </button>
                         {openInfra[`${tipe}-${infraKey}`] && (
                           <ul className="ml-12 space-y-1">
-                            {volumes.map((v, idx) => (
-                              <li key={idx}>
-                                <button
-                                  type="button"
-                                  className="flex items-center p-2 w-full text-[11px] font-medium text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                                  onClick={() => handleSelectVolume(tipe, infraKey, v.volume)} // pass volume
-                                >
-                                  {v.volume}
-                                </button>
-                              </li>
-                            ))}
+                            {volumes.map((v, idx) => {
+                              const unit =
+                                v?.satuanVolume || v?.satuan || v?.unit || "";
+                              const label = unit
+                                ? `${v.volume} ${unit}`
+                                : `${v.volume}`;
+                              return (
+                                <li key={idx}>
+                                  <button
+                                    type="button"
+                                    className="flex items-center p-2 w-full text-[11px] font-medium text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                                    onClick={() => handleSelectVolume(tipe, infraKey, v.volume)}
+                                  >
+                                    {label}
+                                  </button>
+                                </li>
+                              );
+                            })}
                           </ul>
                         )}
                       </li>

@@ -192,6 +192,7 @@ const initialState = {
     kelompok: [],
   },
   loading: false,
+  uniqueLoading: false, // NEW: khusus fetchUniqueFields
   modalLoading: false,
   loadingRecommended: false,
   error: null,
@@ -262,16 +263,17 @@ const unitPriceSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // REPLACED: fetchUniqueFields now uses uniqueLoading
       .addCase(fetchUniqueFields.pending, (state) => {
-        state.loading = true;
+        state.uniqueLoading = true;
         state.error = null;
       })
       .addCase(fetchUniqueFields.fulfilled, (state, action) => {
-        state.loading = false;
+        state.uniqueLoading = false;
         state.uniqueFields = action.payload;
       })
       .addCase(fetchUniqueFields.rejected, (state, action) => {
-        state.loading = false;
+        state.uniqueLoading = false;
         state.error = action.payload;
       })
       .addCase(fetchTypes.fulfilled, (state, action) => {

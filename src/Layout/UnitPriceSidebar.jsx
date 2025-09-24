@@ -8,7 +8,7 @@ const UnitPriceSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isHargaSatuanOpen } = useSelector((state) => state.global);
-  const { uniqueFields = {}, loading } = useSelector((state) => state.unitPrice || {});
+  const { uniqueFields = {}, uniqueLoading } = useSelector((state) => state.unitPrice || {});
   const [openTipe, setOpenTipe] = useState({});
   const [openInfra, setOpenInfra] = useState({});
 
@@ -76,7 +76,7 @@ const UnitPriceSidebar = () => {
       </button>
       {isHargaSatuanOpen && (
         <ul className="py-2 space-y-2">
-          {loading ? (
+          {uniqueLoading ? (
             <li className="flex justify-center items-center py-4">
               <div className="loader border-t-4 border-blue-500 rounded-full w-6 h-6 animate-spin"></div>
             </li>

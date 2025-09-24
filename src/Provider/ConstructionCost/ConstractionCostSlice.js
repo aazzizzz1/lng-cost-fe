@@ -78,7 +78,8 @@ const initialState = {
   costs: [],
   filterJenis: null,
   uniqueInfrastruktur: {},
-  loading: false,
+  loading: false,          // tetap untuk operasi data (filter/update/delete)
+  uniqueLoading: false,    // BARU: khusus fetch uniqueInfrastruktur
   error: null,
 };
 
@@ -103,15 +104,15 @@ const constractionCostSlice = createSlice({
     builder
       // Handle unique infrastructure fetching
       .addCase(fetchUniqueInfrastruktur.pending, (state) => {
-        state.loading = true;
+        state.uniqueLoading = true;
         state.error = null;
       })
       .addCase(fetchUniqueInfrastruktur.fulfilled, (state, action) => {
-        state.loading = false;
+        state.uniqueLoading = false;
         state.uniqueInfrastruktur = action.payload;
       })
       .addCase(fetchUniqueInfrastruktur.rejected, (state, action) => {
-        state.loading = false;
+        state.uniqueLoading = false;
         state.error = action.payload;
       })
       // Handle filtered construction costs fetching
