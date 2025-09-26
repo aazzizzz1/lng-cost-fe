@@ -4,23 +4,37 @@ import Cookies from 'js-cookie';
 
 const api = process.env.REACT_APP_API;
 
+export const fetchCurrentUser = createAsyncThunk(
+  'auth/fetchCurrentUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const accessToken = Cookies.get('accessToken');
+      const res = await axios.get(`${api}/auth/me`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      // support various response shapes
+      const user = res.data?.data?.user || res.data?.data || res.data?.user || res.data;
+      Cookies.set('user', JSON.stringify(user), { secure: true, sameSite: 'Strict' });
+      return user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch user');
+    }
+  }
+);
+
 // Async thunk for user registration
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async ({ name, username, password }, { rejectWithValue }) => {
+  async ({ username, email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${api}/users/register`, {
-        name,
+      const response = await axios.post(`${api}/auth/register`, {
         username,
+        email,
         password,
-        role: "user", // Set default role to "user"
-        position: ""
       });
-      const token = response.data.token;
-      Cookies.set('token', token);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || { message: 'Registration failed' });
     }
   }
 );
@@ -28,13 +42,17 @@ export const registerUser = createAsyncThunk(
 // Async thunk for user login
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
       const response = await axios.post(`${api}/auth/login`, { email, password });
-      const { accessToken, user } = response.data.data;
+      const { accessToken, user } = response.data.data || response.data;
       Cookies.set('accessToken', accessToken, { secure: true, sameSite: 'Strict' }); // Simpan accessToken di cookies
-      Cookies.set('user', JSON.stringify(user), { secure: true, sameSite: 'Strict' }); // Simpan user di cookies
-      return { accessToken, user };
+      if (user) {
+        Cookies.set('user', JSON.stringify(user), { secure: true, sameSite: 'Strict' }); // Simpan user di cookies
+      }
+      // Ensure fresh user (with role) is fetched post-login
+      dispatch(fetchCurrentUser());
+      return { accessToken, user: user || null };
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Login failed';
       return rejectWithValue(errorMessage); // Gunakan pesan error dari backend
@@ -105,13 +123,13 @@ export const validateAccessToken = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    accessToken: Cookies.get('accessToken') || null, // Retrieve accessToken from cookies
-    user: JSON.parse(Cookies.get('user') || '{}'), // Retrieve user from cookies
+    accessToken: Cookies.get('accessToken') || null,
+    user: JSON.parse(Cookies.get('user') || '{}'),
     loading: false,
     errorMessage: '',
     successMessage: '',
     inputSignUp: {
-      full_name: '',
+      email: '',
       username: '',
       password: '',
       confirm_password: '',
@@ -183,7 +201,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.errorMessage = action.payload.message || 'Registration failed';
+        state.errorMessage = action.payload?.message || 'Registration failed';
       })
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
@@ -192,7 +210,8 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.accessToken = action.payload.accessToken; // Save accessToken to state
-        state.user = action.payload.user; // Save user to state
+        // keep initial user if returned; fetchCurrentUser will overwrite
+        state.user = action.payload.user || state.user; // Save user to state
         state.successMessage = 'Login successful';
         window.location.href = '/dashboard'; // Redirect to dashboard
       })
@@ -202,6 +221,12 @@ const authSlice = createSlice({
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.accessToken = action.payload;
+      })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(fetchCurrentUser.rejected, (state, action) => {
+        state.errorMessage = action.payload || 'Failed to fetch user';
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.accessToken = null;

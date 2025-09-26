@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { GlobalProvider } from "../Provider/GlobalContext";
 import { useDispatch, useSelector } from "react-redux";
-import { refreshToken, validateAccessToken } from "../Provider/AuthSlice";
+import { refreshToken, validateAccessToken, fetchCurrentUser } from "../Provider/AuthSlice";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
 import SignUp from "../Pages/Auth/SignUp";
@@ -21,22 +21,33 @@ import EditProjectConstruction from "../Pages/Project/EditProjectConstruction"; 
 import OpexPages from "../Pages/Opex/OpexPages"; // NEW
 import LibraryPages from "../Pages/Library/LibraryPages"; // NEW
 import Preview from "../Pages/Library/Preview"; // NEW
+import UserManagement from "../Pages/Admin/UserManagement"; // NEW
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
-  const { accessToken } = useSelector((state) => state.auth);
+  const { accessToken, user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (accessToken) {
-      dispatch(validateAccessToken()).catch(() => {
-        window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
-      });
+      dispatch(validateAccessToken())
+        .then(() => {
+          if (!user?.role) {
+            dispatch(fetchCurrentUser());
+          }
+        })
+        .catch(() => {
+          window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
+        });
     } else {
-      dispatch(refreshToken()).catch(() => {
-        window.location.href = '/signin'; // Redirect ke signin jika refreshToken gagal
-      });
+      dispatch(refreshToken())
+        .then(() => {
+          dispatch(fetchCurrentUser());
+        })
+        .catch(() => {
+          window.location.href = '/signin'; // Redirect ke signin jika refreshToken gagal
+        });
     }
-  }, [accessToken, dispatch]);
+  }, [accessToken, user?.role, dispatch]); // include role to satisfy eslint
 
   return accessToken ? children : <Navigate to="/signin" />;
 };
@@ -158,6 +169,16 @@ const RouteComponents = () => {
               <LayoutPages>
                 <EditProjectConstruction />
               </LayoutPages>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <PrivateRoute>
+                <LayoutPages>
+                  <UserManagement />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
