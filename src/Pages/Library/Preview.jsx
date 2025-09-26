@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { fetchProjects, fetchProjectById } from "../../Provider/Project/ProjectSlice";
@@ -9,24 +9,6 @@ import { setActiveInfra, setActiveTab } from "../../Provider/Opex/OpexSlice";
 const Card = ({ children }) => (
   <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">{children}</div>
 );
-
-// Simple thumbnail placeholder
-const DrawingCard = ({ item }) => {
-  const thumb = item.url || "https://placehold.co/640x360/1f2937/fff?text=Technical+Drawing";
-  return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden flex flex-col">
-      <img alt={item.title} src={thumb} className="w-full h-40 object-cover" />
-      <div className="p-3 flex-1 flex flex-col">
-        <div className="font-semibold text-gray-900 dark:text-white">{item.title}</div>
-        <div className="text-xs text-gray-500 dark:text-gray-400 mb-3">Image (PNG)</div>
-        <div className="mt-auto flex gap-2">
-          <a href={item.url} target="_blank" rel="noreferrer" className="flex-1 inline-flex justify-center items-center h-9 rounded-md bg-primary-700 text-white hover:bg-primary-800 text-sm">Open</a>
-          <a href={item.url} download className="inline-flex justify-center items-center h-9 px-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">Download</a>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Parse project volume -> number (cbm)
 const parseVol = (vol) => {
@@ -84,6 +66,54 @@ const Preview = () => {
   const resolved = useSelector(selectResolved);
   const currentVariant = useSelector(selectCurrentVariant);
 
+  // NEW: PDF export
+  const pdfRef = useRef(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const downloadPdf = async () => {
+    if (!pdfRef.current) return;
+    setPdfLoading(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const element = pdfRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: element.scrollWidth,
+      });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "pt", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pageWidth;
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      let heightLeft = pdfHeight;
+      let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - pdfHeight; // negative offset to clip next page
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${projectDetails?.name || "project"}-preview.pdf`);
+    } catch (e) {
+      console.error("PDF generation failed, falling back to print:", e);
+      window.print();
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
   // Ensure projects are loaded
   useEffect(() => {
     if (!projects?.length) dispatch(fetchProjects());
@@ -124,6 +154,7 @@ const Preview = () => {
     }
   }, [dispatch, resolved, projects, id, projectDetails]);
 
+  // Parameters for table
   const parameterRows = useMemo(() => {
     if (!currentVariant) return [];
     const md = currentVariant.params["Main Dimension"] || {};
@@ -135,24 +166,69 @@ const Preview = () => {
     ];
   }, [currentVariant]);
 
+  // NEW: Bring full Project Detail (grouped construction costs) into Preview
+  const groupedCostsTree = useMemo(() => {
+    if (!projectDetails || !Array.isArray(projectDetails.constructionCosts)) return [];
+    const groups = {};
+    projectDetails.constructionCosts.forEach((item) => {
+      const g = item.kelompok || "Lainnya";
+      const sg = item.kelompokDetail || "Lainnya";
+      if (!groups[g]) groups[g] = {};
+      if (!groups[g][sg]) groups[g][sg] = [];
+      groups[g][sg].push(item);
+    });
+    return Object.keys(groups)
+      .sort((a, b) => a.localeCompare(b))
+      .map((group) => ({
+        group,
+        subgroups: Object.keys(groups[group])
+          .sort((a, b) => a.localeCompare(b))
+          .map((subgroup) => ({ subgroup, items: groups[group][subgroup] })),
+      }));
+  }, [projectDetails]);
+
+  const costColumns = [
+    { key: 'workcode', label: 'Workcode' },
+    { key: 'uraian', label: 'Uraian' },
+    { key: 'specification', label: 'Specification' },
+    { key: 'qty', label: 'Qty', className: 'text-right' },
+    { key: 'satuan', label: 'Satuan' },
+    { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', isCurrency: true },
+    { key: 'totalHarga', label: 'Total Harga', className: 'text-right', isCurrency: true },
+    { key: 'aaceClass', label: 'AACE Class' },
+  ];
+
+  const formatCurrency = (value) => (value ? `Rp${Number(value).toLocaleString()}` : '-');
+
   const totalHarga = projectDetails?.totalConstructionCost?.toLocaleString?.()
     ?? (projectDetails?.harga?.toLocaleString?.() ?? "-");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" ref={pdfRef}>
       <div className="flex items-center justify-between">
         <div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">Project Library Preview</div>
           <div className="text-sm text-gray-600 dark:text-gray-300">Project: {projectDetails?.name || "-"}</div>
         </div>
-        <Link
-          to="/library"
-          className="inline-flex items-center h-9 px-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-        >
-          Back to Library
-        </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={downloadPdf}
+            disabled={pdfLoading}
+            className="inline-flex items-center h-9 px-3 rounded-md bg-primary-700 hover:bg-primary-800 text-white text-sm disabled:opacity-60"
+            title="Download semua konten dalam 1 PDF"
+          >
+            {pdfLoading ? "Generating..." : "Download PDF"}
+          </button>
+          <Link
+            to="/library"
+            className="inline-flex items-center h-9 px-3 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+          >
+            Back to Library
+          </Link>
+        </div>
       </div>
 
+      {/* Resolved info */}
       {currentVariant ? (
         <Card>
           <div className="text-sm text-gray-700 dark:text-gray-200">
@@ -165,61 +241,65 @@ const Preview = () => {
         </Card>
       )}
 
+      {/* Combined: Technical Parameters + Drawing (responsive, no cropping) */}
       {currentVariant && (
         <Card>
-          <div className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Parameters</div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-xs">
-              <thead>
-                <tr className="text-left text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                  <th className="py-2 pr-3 font-semibold">No.</th>
-                  <th className="py-2 pr-3 font-semibold">Parameter</th>
-                  <th className="py-2 pr-3 font-semibold">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {parameterRows.flatMap((row, idx) => [
-                  <tr key={`${row.group}-${idx}`} className="bg-gray-50 dark:bg-gray-700/40">
-                    <td className="py-2 px-3 align-top font-semibold">{idx + 1}.</td>
-                    <td className="py-2 px-3 align-top font-semibold">{row.group}</td>
-                    <td className="py-2 px-3">
-                      <div className="space-y-1">
-                        {row.items.map((it) => (
-                          <div key={it.k} className="flex gap-3">
-                            <div className="w-56 text-gray-600 dark:text-gray-300">- {it.k}</div>
-                            <div className="font-semibold text-gray-900 dark:text-white">{it.v}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>,
-                ])}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
+          <div className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Technical Specification & Drawing</div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Parameters */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs">
+                <thead>
+                  <tr className="text-left text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                    <th className="py-2 pr-3 font-semibold">No.</th>
+                    <th className="py-2 pr-3 font-semibold">Parameter</th>
+                    <th className="py-2 pr-3 font-semibold">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {parameterRows.flatMap((row, idx) => [
+                    <tr key={`${row.group}-${idx}`} className="bg-gray-50 dark:bg-gray-700/40">
+                      <td className="py-2 px-3 align-top font-semibold">{idx + 1}.</td>
+                      <td className="py-2 px-3 align-top font-semibold">{row.group}</td>
+                      <td className="py-2 px-3">
+                        <div className="space-y-1">
+                          {row.items.map((it) => (
+                            <div key={it.k} className="flex gap-3">
+                              <div className="w-56 text-gray-600 dark:text-gray-300">- {it.k}</div>
+                              <div className="font-semibold text-gray-900 dark:text-white">{it.v}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+                    </tr>,
+                  ])}
+                </tbody>
+              </table>
+            </div>
 
-      {currentVariant && (
-        <Card>
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-semibold text-gray-900 dark:text-white">Technical Drawings</div>
-            <div>
-              <a
-                href={currentVariant.drawings?.[0]?.url || "#"}
-                className="inline-flex items-center gap-2 rounded-md bg-primary-700 hover:bg-primary-800 text-white text-sm px-3 py-2"
-                download
-              >
-                Download Image
-              </a>
+            {/* Drawing(s) with dynamic sizing */}
+            <div className="space-y-4">
+              {(currentVariant.drawings || []).map((d) => (
+                <figure key={d.key} className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3">
+                  <div className="w-full">
+                    <img
+                      alt={d.title}
+                      src={d.url || "https://placehold.co/1200x800/1f2937/fff?text=Technical+Drawing"}
+                      className="w-full h-auto object-contain"
+                      style={{ maxHeight: 800 }}
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-xs text-gray-600 dark:text-gray-300">
+                    {d.title}
+                  </figcaption>
+                </figure>
+              ))}
             </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-4 mt-4">
-            {(currentVariant.drawings || []).map((d) => <DrawingCard key={d.key} item={d} />)}
-          </div>
         </Card>
       )}
 
+      {/* CAPEX summary */}
       {projectDetails && (
         <Card>
           <div className="text-lg font-semibold text-gray-900 dark:text-white mb-2">CAPEX — Project Construction Cost (Summary)</div>
@@ -244,6 +324,71 @@ const Preview = () => {
         </Card>
       )}
 
+      {/* Project Detail (full) */}
+      {projectDetails && (
+        <Card>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-lg font-semibold text-gray-900 dark:text-white">Project Detail</div>
+          </div>
+
+          <div className="mb-4 flex flex-wrap gap-2 text-xs">
+            <span className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">{projectDetails.infrastruktur}</span>
+            <span className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Tahun {projectDetails.tahun}</span>
+            <span className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Lokasi: {projectDetails.lokasi}</span>
+            <span className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Inflasi: {projectDetails.inflasi ?? "-"}</span>
+            <span className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Kategori: {projectDetails.kategori}</span>
+            <span className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Volume: {projectDetails.volume}</span>
+          </div>
+
+          {Array.isArray(projectDetails.constructionCosts) && projectDetails.constructionCosts.length > 0 ? (
+            // CHANGED: dynamic height; horizontal scroll only
+            <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-gray-800">
+              <table className="w-full text-sm text-left table-auto">
+                <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+                  <tr>
+                    {costColumns.map((col) => (
+                      <th key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>{col.label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {groupedCostsTree.map((g) => (
+                    <React.Fragment key={g.group}>
+                      <tr className="bg-gray-100 dark:bg-gray-800">
+                        <td colSpan={costColumns.length} className="font-semibold text-gray-800 dark:text-gray-100 py-2 px-3">
+                          {g.group}
+                        </td>
+                      </tr>
+                      {g.subgroups.map((sg) => (
+                        <React.Fragment key={sg.subgroup}>
+                          <tr className="bg-gray-50 dark:bg-gray-900">
+                            <td colSpan={costColumns.length} className="font-semibold text-gray-700 dark:text-gray-200 py-2 pl-5 pr-3">
+                              {sg.subgroup}
+                            </td>
+                          </tr>
+                          {sg.items.map((cost, idx) => (
+                            <tr key={`${g.group}-${sg.subgroup}-${idx}`} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                              {costColumns.map((col) => (
+                                <td key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>
+                                  {col.isCurrency ? formatCurrency(cost[col.key]) : (cost[col.key] ?? '-')}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </React.Fragment>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-gray-400 dark:text-gray-300">Tidak ada construction cost.</div>
+          )}
+        </Card>
+      )}
+
+      {/* OPEX */}
       <Card>
         <div className="text-lg font-semibold text-gray-900 dark:text-white mb-2">OPEX</div>
         <OpexChart />

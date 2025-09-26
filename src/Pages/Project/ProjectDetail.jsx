@@ -14,14 +14,25 @@ const ProjectDetail = () => {
     }
   }, [dispatch, id, project]);
 
-  // Kelompokkan constructionCosts berdasarkan 'kelompok'
-  const grouped = useMemo(() => {
-    if (!project || !Array.isArray(project.constructionCosts)) return {};
-    return project.constructionCosts.reduce((acc, item) => {
-      if (!acc[item.kelompok]) acc[item.kelompok] = [];
-      acc[item.kelompok].push(item);
-      return acc;
-    }, {});
+  // Kelompokkan constructionCosts berdasarkan 'kelompok' dan 'kelompokDetail'
+  const groupedTree = useMemo(() => {
+    if (!project || !Array.isArray(project.constructionCosts)) return [];
+    const groups = {};
+    project.constructionCosts.forEach((item) => {
+      const g = item.kelompok || "Lainnya";
+      const sg = item.kelompokDetail || "Lainnya";
+      if (!groups[g]) groups[g] = {};
+      if (!groups[g][sg]) groups[g][sg] = [];
+      groups[g][sg].push(item);
+    });
+    return Object.keys(groups)
+      .sort((a, b) => a.localeCompare(b))
+      .map((group) => ({
+        group,
+        subgroups: Object.keys(groups[group])
+          .sort((a, b) => a.localeCompare(b))
+          .map((subgroup) => ({ subgroup, items: groups[group][subgroup] })),
+      }));
   }, [project]);
 
   // Kolom tabel
@@ -81,7 +92,8 @@ const ProjectDetail = () => {
       {Array.isArray(project.constructionCosts) && project.constructionCosts.length > 0 ? (
          <div>
           <div className="font-semibold mb-3 text-gray-900 dark:text-white">Construction Costs</div>
-          <div className="max-h-96 overflow-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
+          {/* CHANGED: dynamic height; horizontal scroll only */}
+          <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
             <table className="w-full text-sm text-left table-auto">
               <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
                 <tr>
@@ -91,22 +103,31 @@ const ProjectDetail = () => {
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(grouped).map(([kelompok, items]) => (
-                  <React.Fragment key={kelompok}>
+                {groupedTree.map((g) => (
+                  <React.Fragment key={g.group}>
                     <tr className="bg-gray-100 dark:bg-gray-800">
                       <td colSpan={columns.length} className="font-semibold text-gray-800 dark:text-gray-100 py-2 px-3">
-                        {kelompok}
+                        {g.group}
                       </td>
                     </tr>
-                    {items.map((cost, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-900">
-                        {columns.map((col) => (
-                          <td key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>
-                            {col.isCurrency ? formatCurrency(cost[col.key]) : cost[col.key] ?? '-'
-                            }
+                    {g.subgroups.map((sg) => (
+                      <React.Fragment key={sg.subgroup}>
+                        <tr className="bg-gray-50 dark:bg-gray-900">
+                          <td colSpan={columns.length} className="font-semibold text-gray-700 dark:text-gray-200 py-2 pl-5 pr-3">
+                            {sg.subgroup}
                           </td>
+                        </tr>
+                        {sg.items.map((cost, idx) => (
+                          <tr key={`${g.group}-${sg.subgroup}-${idx}`} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                            {columns.map((col) => (
+                              <td key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>
+                                {col.isCurrency ? formatCurrency(cost[col.key]) : cost[col.key] ?? '-'
+                                }
+                              </td>
+                            ))}
+                          </tr>
                         ))}
-                      </tr>
+                      </React.Fragment>
                     ))}
                   </React.Fragment>
                 ))}
