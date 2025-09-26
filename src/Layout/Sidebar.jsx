@@ -6,7 +6,7 @@ import {
 } from "../Provider/GlobalSlice";
 import ConstructionPriceSidebar from "./ConstructionPriceSidebar";
 import UnitPriceSidebar from "./UnitPriceSidebar";
-import BottomNavSidebar from "./BottomNavSidebar";
+// import BottomNavSidebar from "./BottomNavSidebar";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -197,6 +197,32 @@ const Sidebar = () => {
               </span>
             </Link>
           </li>
+          <Link to="/library">
+            <li
+              className={
+                isActive("/library")
+                  ? "border-l-4 border-blue-600 bg-blue-50 dark:bg-blue-900/10"
+                  : ""
+              }
+            >
+              <a
+                href="#as"
+                className="flex items-center p-2 text-base font-medium text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+              >
+                <svg
+                  className={`w-6 h-6 ${
+                    isActive("/library") ? "text-blue-600" : "text-gray-800 dark:text-white"
+                  }`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path strokeWidth="2" d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V5a2 2 0 0 1 2-2h12M4 19.5A2.5 2.5 0 0 1 6.5 17H20M20 3v14" />
+                </svg>
+                <span className="ml-3">Library Preview</span>
+              </a>
+            </li>
+          </Link>
         </ul>
         <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
           <li>
@@ -275,7 +301,7 @@ const Sidebar = () => {
         </ul>
       </div>
       {/* Bottom Navbar */}
-      <BottomNavSidebar />
+      {/* <BottomNavSidebar /> */}
     </aside>
   );
 };

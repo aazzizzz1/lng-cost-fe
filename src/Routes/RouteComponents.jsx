@@ -19,6 +19,8 @@ import TransportPages from "../Pages/UnitPrice/UnitPricePages";
 import ProjectDetail from "../Pages/Project/ProjectDetail";
 import EditProjectConstruction from "../Pages/Project/EditProjectConstruction"; // + import
 import OpexPages from "../Pages/Opex/OpexPages"; // NEW
+import LibraryPages from "../Pages/Library/LibraryPages"; // NEW
+import Preview from "../Pages/Library/Preview"; // NEW
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -123,6 +125,22 @@ const RouteComponents = () => {
             element={
               <LayoutPages>
                 <OpexPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/library"
+            element={
+              <LayoutPages>
+                <LibraryPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/library/:id"
+            element={
+              <LayoutPages>
+                <Preview />
               </LayoutPages>
             }
           />
