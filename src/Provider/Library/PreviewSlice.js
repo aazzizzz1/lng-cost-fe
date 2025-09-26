@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
+import html2canvas from "html2canvas"; // NEW
+import { jsPDF } from "jspdf"; // NEW
 
 // Resolve LNGBV images from src (support a couple of common filename variants)
 let IMG_LNGBV_5K, IMG_LNGBV_10K, IMG_LNGBV_15K;
@@ -173,6 +175,151 @@ export const resolveVariant = (project) => {
     return { group: "LNGBV", variant: "15k" }; // prefer closest available asset
   return { group: null, variant: null };
 };
+
+// NEW: helper to group costs (kelompok -> kelompokDetail)
+function groupCostsTree(constructionCosts = []) {
+  const groups = {};
+  constructionCosts.forEach((item) => {
+    const g = item.kelompok || "Lainnya";
+    const sg = item.kelompokDetail || "Lainnya";
+    if (!groups[g]) groups[g] = {};
+    if (!groups[g][sg]) groups[g][sg] = [];
+    groups[g][sg].push(item);
+  });
+  return Object.keys(groups)
+    .sort((a, b) => a.localeCompare(b))
+    .map((group) => ({
+      group,
+      subgroups: Object.keys(groups[group])
+        .sort((a, b) => a.localeCompare(b))
+        .map((subgroup) => ({ subgroup, items: groups[group][subgroup] })),
+    }));
+}
+
+// NEW: export entire preview area into one multi-page PDF
+export async function generatePreviewPdf(element, filename = "preview.pdf") {
+  if (!element) throw new Error("Missing element ref for PDF");
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    logging: false,
+    backgroundColor: "#ffffff",
+    windowWidth: element.scrollWidth,
+  });
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jsPDF("p", "pt", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
+  // Use image properties for aspect ratio
+  const imgProps = pdf.getImageProperties(imgData);
+  const pdfWidth = pageWidth;
+  const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+  let heightLeft = pdfHeight;
+  let position = 0;
+  pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - pdfHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+    heightLeft -= pageHeight;
+  }
+
+  pdf.save(filename);
+}
+
+// NEW: build and download recap-like Excel (TSV in .xls)
+export function generatePreviewExcel({ projectDetails, currentVariant, resolved, title = "Project Library Preview" }) {
+  const rows = [];
+  const pd = projectDetails || {};
+  const totalHarga = pd?.totalConstructionCost ?? pd?.harga ?? 0;
+
+  // Title + Summary
+  rows.push([title]);
+  rows.push([]);
+  rows.push(["Project", pd.name || ""]);
+  rows.push(["Infrastructure", pd.infrastruktur || ""]);
+  rows.push(["Location", pd.lokasi || ""]);
+  rows.push(["Year", pd.tahun || ""]);
+  rows.push(["Estimated Total (IDR)", totalHarga]);
+  rows.push(["Resolved", `${resolved?.group || "-"} — ${currentVariant?.label || "-"}`]);
+  rows.push([]);
+
+  // Parameters
+  if (currentVariant) {
+    rows.push(["Parameters"]);
+    const md = currentVariant.params?.["Main Dimension"] || {};
+    const ct = currentVariant.params?.["Cargo Tank"] || {};
+    rows.push(["Main Dimension"]);
+    rows.push(["", "LOA (Length Over All)", md.LOA || ""]);
+    rows.push(["", "Breadth", md.Breadth || ""]);
+    rows.push(["", "Deadweight", md.Deadweight || ""]);
+    rows.push(["Cargo Tank"]);
+    rows.push(["", "Type of Cargo Tank", ct["Type of Cargo Tank"] || ""]);
+    rows.push(["", "Gas Capacities", ct["Gas Capacities"] || ""]);
+    rows.push(["Propeller Type", currentVariant.params?.["Propeller Type"] || ""]);
+    rows.push([]);
+  }
+
+  // Drawings
+  if (currentVariant?.drawings?.length) {
+    rows.push(["Technical Drawings"]);
+    rows.push(["Title", "URL"]);
+    currentVariant.drawings.forEach((d) => {
+      rows.push([d.title || "-", d.url || "-"]);
+    });
+    rows.push([]);
+  }
+
+  // Construction Costs (grouped)
+  const tree = groupCostsTree(pd.constructionCosts || []);
+  if (tree.length) {
+    rows.push(["Construction Costs"]);
+    rows.push(["Workcode", "Uraian", "Specification", "Qty", "Satuan", "Harga Satuan", "Total Harga", "AACE Class", "Kelompok", "Kelompok Detail"]);
+    tree.forEach((g) => {
+      rows.push([]);
+      rows.push([g.group.toUpperCase()]);
+      g.subgroups.forEach((sg) => {
+        rows.push([sg.subgroup]);
+        sg.items.forEach((it) => {
+          rows.push([
+            it.workcode || "",
+            it.uraian || "",
+            it.specification || "",
+            it.qty ?? "",
+            it.satuan || "",
+            it.hargaSatuan ?? "",
+            it.totalHarga ?? "",
+            it.aaceClass ?? "",
+            it.kelompok || "",
+            it.kelompokDetail || "",
+          ]);
+        });
+      });
+    });
+    rows.push([]);
+    rows.push(["TOTAL", "", "", "", "", "", (pd.totalConstructionCost ?? 0)]);
+    rows.push(["PPN 11%", "", "", "", "", "", (pd.ppn ?? 0)]);
+    rows.push(["GRAND TOTAL TERMASUK PPN", "", "", "", "", "", (pd.totalEstimation ?? (pd.totalConstructionCost ?? 0) + (pd.ppn ?? 0))]);
+  }
+
+  // Download as .xls (TSV)
+  const tsv = rows.map((r) => r.map((c) => (c === null || c === undefined ? "" : String(c))).join("\t")).join("\n");
+  const blob = new Blob([tsv], { type: "text/tab-separated-values;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${(pd.name || "project").replace(/\s+/g, "_")}_preview.xls`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
 
 const previewSlice = createSlice({
   name: "libraryPreview",

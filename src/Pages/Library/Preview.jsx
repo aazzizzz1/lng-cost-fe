@@ -5,6 +5,7 @@ import { fetchProjects, fetchProjectById } from "../../Provider/Project/ProjectS
 import { resolveFromProject, selectCurrentVariant, selectResolved } from "../../Provider/Library/PreviewSlice";
 import OpexChart from "../Opex/OpexChart";
 import { setActiveInfra, setActiveTab } from "../../Provider/Opex/OpexSlice";
+import { generatePreviewPdf, generatePreviewExcel } from "../../Provider/Library/PreviewSlice"; // NEW
 
 const Card = ({ children }) => (
   <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">{children}</div>
@@ -69,49 +70,27 @@ const Preview = () => {
   // NEW: PDF export
   const pdfRef = useRef(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+
   const downloadPdf = async () => {
     if (!pdfRef.current) return;
     setPdfLoading(true);
     try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf"),
-      ]);
-      const element = pdfRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        windowWidth: element.scrollWidth,
-      });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pageWidth;
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      let heightLeft = pdfHeight;
-      let position = 0;
-      pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - pdfHeight; // negative offset to clip next page
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(`${projectDetails?.name || "project"}-preview.pdf`);
+      await generatePreviewPdf(pdfRef.current, `${projectDetails?.name || "project"}-preview.pdf`); // CHANGED: use slice helper
     } catch (e) {
       console.error("PDF generation failed, falling back to print:", e);
       window.print();
     } finally {
       setPdfLoading(false);
     }
+  };
+
+  const downloadExcel = () => { // NEW
+    generatePreviewExcel({
+      projectDetails,
+      currentVariant,
+      resolved,
+      title: "Project Library Preview",
+    });
   };
 
   // Ensure projects are loaded
@@ -205,12 +184,12 @@ const Preview = () => {
 
   return (
     <div className="space-y-6" ref={pdfRef}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-html2canvas-ignore> {/* NEW */}
         <div>
           <div className="text-xl font-bold text-gray-900 dark:text-white">Project Library Preview</div>
           <div className="text-sm text-gray-600 dark:text-gray-300">Project: {projectDetails?.name || "-"}</div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 print:hidden">
           <button
             onClick={downloadPdf}
             disabled={pdfLoading}
@@ -218,6 +197,13 @@ const Preview = () => {
             title="Download semua konten dalam 1 PDF"
           >
             {pdfLoading ? "Generating..." : "Download PDF"}
+          </button>
+          <button
+            onClick={downloadExcel}
+            className="inline-flex items-center h-9 px-3 rounded-md bg-green-600 hover:bg-green-700 text-white text-sm"
+            title="Download Excel (TSV .xls)"
+          >
+            Download Excel
           </button>
           <Link
             to="/library"
@@ -248,7 +234,7 @@ const Preview = () => {
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Parameters */}
             <div className="overflow-x-auto">
-              <table className="min-w-full text-xs">
+              <table className="min-w-full text-xs text-gray-700 dark:text-gray-200">
                 <thead>
                   <tr className="text-left text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
                     <th className="py-2 pr-3 font-semibold">No.</th>
@@ -259,8 +245,8 @@ const Preview = () => {
                 <tbody>
                   {parameterRows.flatMap((row, idx) => [
                     <tr key={`${row.group}-${idx}`} className="bg-gray-50 dark:bg-gray-700/40">
-                      <td className="py-2 px-3 align-top font-semibold">{idx + 1}.</td>
-                      <td className="py-2 px-3 align-top font-semibold">{row.group}</td>
+                      <td className="py-2 px-3 align-top font-semibold text-gray-900 dark:text-gray-100">{idx + 1}.</td>
+                      <td className="py-2 px-3 align-top font-semibold text-gray-900 dark:text-gray-100">{row.group}</td>
                       <td className="py-2 px-3">
                         <div className="space-y-1">
                           {row.items.map((it) => (
@@ -341,13 +327,17 @@ const Preview = () => {
           </div>
 
           {Array.isArray(projectDetails.constructionCosts) && projectDetails.constructionCosts.length > 0 ? (
-            // CHANGED: dynamic height; horizontal scroll only
             <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-gray-800">
-              <table className="w-full text-sm text-left table-auto">
-                <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300 sticky top-0">
                   <tr>
                     {costColumns.map((col) => (
-                      <th key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>{col.label}</th>
+                      <th
+                        key={col.key}
+                        className={`px-3 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 ${col.className || ''}`}
+                      >
+                        {col.label}
+                      </th>
                     ))}
                   </tr>
                 </thead>
@@ -367,9 +357,12 @@ const Preview = () => {
                             </td>
                           </tr>
                           {sg.items.map((cost, idx) => (
-                            <tr key={`${g.group}-${sg.subgroup}-${idx}`} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                            <tr key={`${g.group}-${sg.subgroup}-${idx}`} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
                               {costColumns.map((col) => (
-                                <td key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>
+                                <td
+                                  key={col.key}
+                                  className={`px-3 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 ${col.className || ''}`}
+                                >
                                   {col.isCurrency ? formatCurrency(cost[col.key]) : (cost[col.key] ?? '-')}
                                 </td>
                               ))}

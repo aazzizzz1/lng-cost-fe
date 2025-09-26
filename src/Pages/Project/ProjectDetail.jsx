@@ -90,15 +90,20 @@ const ProjectDetail = () => {
         </div>
       </div>
       {Array.isArray(project.constructionCosts) && project.constructionCosts.length > 0 ? (
-         <div>
+        <div>
           <div className="font-semibold mb-3 text-gray-900 dark:text-white">Construction Costs</div>
-          {/* CHANGED: dynamic height; horizontal scroll only */}
           <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
-            <table className="w-full text-sm text-left table-auto">
-              <thead className="bg-gray-50 dark:bg-gray-800 sticky top-0">
+            {/* CHANGED: Flowbite-like table + dark text/borders */}
+            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300 sticky top-0">
                 <tr>
                   {columns.map((col) => (
-                    <th key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>{col.label}</th>
+                    <th
+                      key={col.key}
+                      className={`px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 ${col.className || ''}`}
+                    >
+                      {col.label}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -118,11 +123,13 @@ const ProjectDetail = () => {
                           </td>
                         </tr>
                         {sg.items.map((cost, idx) => (
-                          <tr key={`${g.group}-${sg.subgroup}-${idx}`} className="hover:bg-gray-50 dark:hover:bg-gray-900">
+                          <tr key={`${g.group}-${sg.subgroup}-${idx}`} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
                             {columns.map((col) => (
-                              <td key={col.key} className={`px-3 py-2 border-b ${col.className || ''}`}>
-                                {col.isCurrency ? formatCurrency(cost[col.key]) : cost[col.key] ?? '-'
-                                }
+                              <td
+                                key={col.key}
+                                className={`px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 ${col.className || ''}`}
+                              >
+                                {col.isCurrency ? formatCurrency(cost[col.key]) : (cost[col.key] ?? '-')}
                               </td>
                             ))}
                           </tr>
@@ -134,12 +141,12 @@ const ProjectDetail = () => {
               </tbody>
             </table>
           </div>
-         </div>
-       ) : (
-         <div className="text-gray-400 dark:text-gray-300">Tidak ada construction cost.</div>
-       )}
-     </div>
-   )
- }
- 
- export default ProjectDetail
+        </div>
+      ) : (
+        <div className="text-gray-400 dark:text-gray-300">Tidak ada construction cost.</div>
+      )}
+    </div>
+  )
+}
+
+export default ProjectDetail
