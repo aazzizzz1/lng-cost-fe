@@ -1,6 +1,8 @@
-import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { GlobalProvider } from "../Provider/GlobalContext";
+import { useDispatch, useSelector } from "react-redux";
+import { refreshToken, validateAccessToken, fetchCurrentUser } from "../Provider/AuthSlice";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
 import SignUp from "../Pages/Auth/SignUp";
@@ -8,18 +10,47 @@ import LayoutPages from "../Layout/LayoutPages";
 import DashboardPages from "../Pages/Home/DashboardPages";
 import ProjectPages from "../Pages/Project/ProjectPages";
 import ManageDataPages from "../Pages/ManageData/ManageDataPages";
-import JasaPages from "../Pages/UnitPrice/Jasa/JasaPages";
-import MaterialKonstruksiPages from "../Pages/UnitPrice/MaterialKonstruksi/MaterialKonstruksiPages";
-import TableMaterial from "../Pages/UnitPrice/MaterialKonstruksi/TableMaterial";
 import ConstractionCostPages from "../Pages/ConstructionCost/ConstractionCostPages";
 import DetailCreateProjectConstruction from "../Pages/Project/DetailCreateProjectConstruction";
 import RecapitulationPages from "../Pages/Recapitulation/RecapitulationPages";
 import RabPages from "../Pages/RancanganAnggaranBelanja/RabPages";
-import MaterialAndPackagePages from "../Pages/UnitPrice/MaterialAndPackage/MaterialAndPackagePages";
 import AdministratorPages from "../Pages/Admin/AdministratorPages";
-import TransportPages from "../Pages/UnitPrice/Transport/TransportPages";
-import LiquifactionPlantPages from "../Pages/UnitPrice/LiquifactionPlant/LiquifactionPlantPages";
-import ReceivingTerimnalPages from "../Pages/UnitPrice/ReceivingTerminal/ReceivingTerimnalPages";
+import TransportPages from "../Pages/UnitPrice/UnitPricePages";
+import ProjectDetail from "../Pages/Project/ProjectDetail";
+import EditProjectConstruction from "../Pages/Project/EditProjectConstruction"; // + import
+import OpexPages from "../Pages/Opex/OpexPages"; // NEW
+import LibraryPages from "../Pages/Library/LibraryPages"; // NEW
+import Preview from "../Pages/Library/Preview"; // NEW
+import UserManagement from "../Pages/Admin/UserManagement"; // NEW
+
+const PrivateRoute = ({ children }) => {
+  const dispatch = useDispatch();
+  const { accessToken, user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (accessToken) {
+      dispatch(validateAccessToken())
+        .then(() => {
+          if (!user?.role) {
+            dispatch(fetchCurrentUser());
+          }
+        })
+        .catch(() => {
+          window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
+        });
+    } else {
+      dispatch(refreshToken())
+        .then(() => {
+          dispatch(fetchCurrentUser());
+        })
+        .catch(() => {
+          window.location.href = '/signin'; // Redirect ke signin jika refreshToken gagal
+        });
+    }
+  }, [accessToken, user?.role, dispatch]); // include role to satisfy eslint
+
+  return accessToken ? children : <Navigate to="/signin" />;
+};
 
 const RouteComponents = () => {
   return (
@@ -29,9 +60,11 @@ const RouteComponents = () => {
           <Route
             path="/dashboard"
             element={
-              <LayoutPages>
-                <DashboardPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <DashboardPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
@@ -67,30 +100,6 @@ const RouteComponents = () => {
             }
           />
           <Route
-            path="/jasa"
-            element={
-              <LayoutPages>
-                <JasaPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/material-konstruksi"
-            element={
-              <LayoutPages>
-                <MaterialKonstruksiPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/material-konstruksi/tabel"
-            element={
-              <LayoutPages>
-                <TableMaterial />
-              </LayoutPages>
-            }
-          />
-          <Route
             path="/construction-cost"
             element={
               <LayoutPages>
@@ -107,34 +116,10 @@ const RouteComponents = () => {
             }
           />
           <Route
-            path="/material-package"
-            element={
-              <LayoutPages>
-                <MaterialAndPackagePages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/transport"
+            path="/unitprice"
             element={
               <LayoutPages>
                 <TransportPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/liquifaction-plant"
-            element={
-              <LayoutPages>
-                <LiquifactionPlantPages />
-              </LayoutPages>
-            }
-          />
-          <Route
-            path="/receiving-terminal"
-            element={
-              <LayoutPages>
-                <ReceivingTerimnalPages />
               </LayoutPages>
             }
           />
@@ -144,6 +129,56 @@ const RouteComponents = () => {
               <LayoutPages>
                 <AdministratorPages />
               </LayoutPages>
+            }
+          />
+          <Route
+            path="/opex"
+            element={
+              <LayoutPages>
+                <OpexPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/library"
+            element={
+              <LayoutPages>
+                <LibraryPages />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/library/:id"
+            element={
+              <LayoutPages>
+                <Preview />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/project/:id/detail"
+            element={
+              <LayoutPages>
+                <ProjectDetail />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/project/:id/edit"
+            element={
+              <LayoutPages>
+                <EditProjectConstruction />
+              </LayoutPages>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <PrivateRoute>
+                <LayoutPages>
+                  <UserManagement />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route

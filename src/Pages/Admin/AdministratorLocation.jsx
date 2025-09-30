@@ -1,18 +1,17 @@
-import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { updateProvinceCCI } from '../../Provider/administratorSlice'
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProvinceCCI } from '../../Provider/administratorSlice';
 
 const AdministratorLocation = () => {
-  const provinces = useSelector(state => state.administrator.provinces)
-  const dispatch = useDispatch()
+  const provinces = useSelector((state) => state.administrator.provinces);
+  const dispatch = useDispatch();
 
   const handleChange = (code, value) => {
-    // Pastikan value selalu dikirim ke slice
-    const cci = parseFloat(value)
+    const cci = parseFloat(value);
     if (!isNaN(cci)) {
-      dispatch(updateProvinceCCI({ code, cci }))
+      dispatch(updateProvinceCCI({ code, cci }));
     }
-  }
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -25,7 +24,7 @@ const AdministratorLocation = () => {
           </tr>
         </thead>
         <tbody>
-          {provinces.map(prov => (
+          {provinces.map((prov) => (
             <tr key={prov.code}>
               <td className="border px-2 py-1">{prov.code}</td>
               <td className="border px-2 py-1">{prov.name}</td>
@@ -34,7 +33,7 @@ const AdministratorLocation = () => {
                   type="number"
                   className="w-24 px-1 py-0.5 border rounded"
                   value={prov.cci}
-                  onChange={e => handleChange(prov.code, e.target.value)}
+                  onChange={(e) => handleChange(prov.code, e.target.value)}
                   step="0.01"
                 />
               </td>
@@ -43,7 +42,7 @@ const AdministratorLocation = () => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default AdministratorLocation
+export default AdministratorLocation;

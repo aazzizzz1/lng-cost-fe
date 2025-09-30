@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ManageData from './ManageData';
 
 class ErrorBoundary extends Component{
   constructor(props) {
@@ -25,15 +26,7 @@ class ErrorBoundary extends Component{
 const ManageDataPages = () => {
   return (
     <ErrorBoundary>
-      <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
-        <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          Management and Configuration Project
-        </p>
-        <p className="text-xl text-gray-600 dark:text-white mb-2">
-          Management and Configuration Project Detail
-        </p>
-        
-      </div>
+      <ManageData />
     </ErrorBoundary>
   )
 }

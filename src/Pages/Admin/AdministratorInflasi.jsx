@@ -1,19 +1,19 @@
-import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { updateInflasi } from '../../Provider/administratorSlice'
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateInflasi } from '../../Provider/administratorSlice';
 
 const AdministratorInflasi = () => {
-  const inflasi = useSelector(state => state.administrator.inflasi)
-  const dispatch = useDispatch()
-  const currentYear = new Date().getFullYear()
-  const current = inflasi.find(i => i.year === currentYear) || { year: currentYear, value: 0 }
+  const inflasi = useSelector((state) => state.administrator.inflasi);
+  const dispatch = useDispatch();
+  const currentYear = new Date().getFullYear();
+  const current = inflasi.find((i) => i.year === currentYear) || { year: currentYear, value: 0 };
 
   const handleChange = (value) => {
-    const val = parseFloat(value)
+    const val = parseFloat(value);
     if (!isNaN(val)) {
-      dispatch(updateInflasi({ year: currentYear, value: val }))
+      dispatch(updateInflasi({ year: currentYear, value: val }));
     }
-  }
+  };
 
   return (
     <div className="max-w-md mx-auto">
@@ -32,7 +32,7 @@ const AdministratorInflasi = () => {
                 type="number"
                 className="w-24 px-1 py-0.5 border rounded"
                 value={current.value}
-                onChange={e => handleChange(e.target.value)}
+                onChange={(e) => handleChange(e.target.value)}
                 step="0.01"
               />
             </td>
@@ -40,7 +40,7 @@ const AdministratorInflasi = () => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default AdministratorInflasi
+export default AdministratorInflasi;

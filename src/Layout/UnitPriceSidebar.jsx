@@ -1,91 +1,47 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
-import {
-  toggleHargaSatuan,
-} from "../Provider/GlobalSlice";
-
-// DropdownMenu with nested items support
-function DropdownMenu({ title, items }) {
-  const [open, setOpen] = useState(false);
-  const location = useLocation();
-
-  // Helper to check if a path is active
-  const isActive = (path) => location.pathname + location.search === path;
-
-  return (
-    <>
-      <button
-        type="button"
-        className="flex items-center p-2 pl-8 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-        onClick={() => setOpen(!open)}
-      >
-        <span className="text-sm flex-1 ml-3 text-left whitespace-nowrap">
-          {title}
-        </span>
-        <svg
-          aria-hidden="true"
-          className={`w-4 h-4 ml-auto transition-transform ${open ? "rotate-180" : ""}`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-        >
-          <path d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      {open && (
-        <ul className="py-2 space-y-2 ml-4">
-          {items.map((item) =>
-            item.items ? (
-              // Nested dropdown
-              <li key={item.label}>
-                <DropdownMenu title={item.label} items={item.items} />
-              </li>
-            ) : item.link ? (
-              <Link to={item.link} key={item.label}>
-                <li
-                  className={
-                    isActive(item.link)
-                      ? "border-l-4 border-blue-600 bg-blue-50 dark:bg-blue-900/10"
-                      : ""
-                  }
-                >
-                  <span
-                    className={`text-xs flex items-center p-2 w-full font-medium rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8 ${
-                      isActive(item.link) ? "text-blue-600" : "text-gray-900"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                </li>
-              </Link>
-            ) : (
-              <li key={item.label}>
-                <span className="flex items-center p-2 w-full text-xs font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700 ml-8">
-                  {item.label}
-                </span>
-              </li>
-            )
-          )}
-        </ul>
-      )}
-    </>
-  );
-}
+import { fetchUniqueFields } from "../Provider/HargaSatuan/unitPriceSlice";
+import { toggleHargaSatuan } from "../Provider/GlobalSlice";
+import { useNavigate } from "react-router-dom";
 
 const UnitPriceSidebar = () => {
   const dispatch = useDispatch();
-  const {
-    isHargaSatuanOpen,
-  } = useSelector((state) => state.global);
+  const navigate = useNavigate();
+  const { isHargaSatuanOpen } = useSelector((state) => state.global);
+  const { uniqueFields = {}, uniqueLoading } = useSelector((state) => state.unitPrice || {});
+  const [openTipe, setOpenTipe] = useState({});
+  const [openInfra, setOpenInfra] = useState({});
+
+  const handleToggleHargaSatuan = () => {
+    dispatch(toggleHargaSatuan());
+    if (!isHargaSatuanOpen) {
+      dispatch(fetchUniqueFields()); // Fetch unique fields when opening the sidebar
+    }
+  };
+
+  const toggleTipe = (tipe) => {
+    setOpenTipe((prev) => ({ ...prev, [tipe]: !prev[tipe] }));
+  };
+
+  const toggleInfra = (infra) => {
+    setOpenInfra((prev) => ({ ...prev, [infra]: !prev[infra] }));
+  };
+
+  const handleNavigateWithParams = (tipe, infra, kelompok) => {
+    const queryParams = new URLSearchParams({
+      tipe: tipe || "",
+      infrastruktur: infra || "",
+      kelompok: kelompok || "",
+    }).toString();
+    navigate(`/unitprice?${queryParams}`);
+  };
 
   return (
     <li>
       <button
         type="button"
         className="flex items-center p-2 w-full text-base font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-        onClick={() => dispatch(toggleHargaSatuan())}
+        onClick={handleToggleHargaSatuan}
       >
         <svg
           className="w-6 h-6 text-gray-800 dark:text-white"
@@ -120,271 +76,77 @@ const UnitPriceSidebar = () => {
       </button>
       {isHargaSatuanOpen && (
         <ul className="py-2 space-y-2">
-          {/* LNG Plant Dropdown */}
-          <li>
-            <DropdownMenu
-              title="Liquifection Plant"
-              items={[
-                {
-                  label: "Onshore LNG Plant",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/liquifaction-plant?tab=onshore&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "Offshore LNG Plant",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/liquifaction-plant?tab=offshore&kategori=Testing",
-                    },
-                  ],
-                },
-              ]}
-            />
-          </li>
-          {/* Transportasi Dropdown */}
-          <li>
-            <DropdownMenu
-              title="Transportasi"
-              items={[
-                {
-                  label: "LNG Carier (LNGC)",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/transport?tab=lngc&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/transport?tab=lngc&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/transport?tab=lngc&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/transport?tab=lngc&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/transport?tab=lngc&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "LNG Barge",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/transport?tab=lngbarge&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/transport?tab=lngbarge&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/transport?tab=lngbarge&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/transport?tab=lngbarge&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/transport?tab=lngbarge&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "LNG Trucking",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/transport?tab=lngtrucking&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/transport?tab=lngtrucking&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/transport?tab=lngtrucking&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/transport?tab=lngtrucking&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/transport?tab=lngtrucking&kategori=Testing",
-                    },
-                  ],
-                },
-              ]}
-            />
-          </li>
-          {/* Receiving Terminal Dropdown */}
-          <li>
-            <DropdownMenu
-              title="Receiving Terminal"
-              items={[
-                {
-                  label: "FSRU",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=fsru&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=fsru&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=fsru&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=fsru&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=fsru&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "ORF",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=orf&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=orf&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=orf&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=orf&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=orf&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "OTS",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=ots&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=ots&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=ots&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=ots&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=ots&kategori=Testing",
-                    },
-                  ],
-                },
-                {
-                  label: "ORU",
-                  items: [
-                    {
-                      label: "Material Konstruksi",
-                      link: "/receiving-terminal?tab=oru&kategori=Material Konstruksi",
-                    },
-                    {
-                      label: "Peralatan",
-                      link: "/receiving-terminal?tab=oru&kategori=Peralatan",
-                    },
-                    {
-                      label: "Upah",
-                      link: "/receiving-terminal?tab=oru&kategori=Upah",
-                    },
-                    {
-                      label: "Jasa",
-                      link: "/receiving-terminal?tab=oru&kategori=Jasa",
-                    },
-                    {
-                      label: "Testing",
-                      link: "/receiving-terminal?tab=oru&kategori=Testing",
-                    },
-                  ],
-                },
-              ]}
-            />
-          </li>
-          {/* Material & Package Dropdown */}
-          <li>
-            <DropdownMenu
-              title="Material & Package"
-              items={[
-                {
-                  label: "Material",
-                  link: "/material-package?tab=material",
-                },
-                {
-                  label: "Package",
-                  link: "/material-package?tab=package",
-                },
-              ]}
-            />
-          </li>
+          {uniqueLoading ? (
+            <li className="flex justify-center items-center py-4">
+              <div className="loader border-t-4 border-blue-500 rounded-full w-6 h-6 animate-spin"></div>
+            </li>
+          ) : (
+            Object.keys(uniqueFields).map((tipe) => (
+              <li key={tipe}>
+                <button
+                  type="button"
+                  className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                  onClick={() => toggleTipe(tipe)}
+                >
+                  <span className="flex-1 text-left whitespace-nowrap ml-3">{tipe}</span>
+                  <svg
+                    aria-hidden="true"
+                    className={`w-4 h-4 transform transition-transform ${openTipe[tipe] ? "rotate-180" : ""}`}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                {openTipe[tipe] && (
+                  <ul className="py-2 space-y-2 pl-4">
+                    {Object.keys(uniqueFields[tipe] || {}).map((infra) => (
+                      <li key={infra}>
+                        <button
+                          type="button"
+                          className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                          onClick={() => toggleInfra(infra)}
+                        >
+                          <span className="flex-1 text-left whitespace-nowrap ml-3">{infra}</span>
+                          <svg
+                            aria-hidden="true"
+                            className={`w-4 h-4 transform transition-transform ${openInfra[infra] ? "rotate-180" : ""}`}
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                        {openInfra[infra] && (
+                          <ul className="py-2 space-y-2 pl-4">
+                            {(uniqueFields[tipe][infra] || []).map((kelompok) => (
+                              <li key={kelompok}>
+                                <button
+                                  type="button"
+                                  className="flex items-center p-2 pl-8 w-full text-sm font-medium text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                                  onClick={() => handleNavigateWithParams(tipe, infra, kelompok)}
+                                >
+                                  <span className="flex-1 text-left whitespace-nowrap ml-3">{kelompok}</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))
+          )}
         </ul>
       )}
     </li>

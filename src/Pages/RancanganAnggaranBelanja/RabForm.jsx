@@ -1,15 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import ModalSelectUnitPriceRab from './ModalSelectUnitPriceRab'
 import CreateRabModal from './CreateRabModal'
 import { setRabData, addRabItem, setRabItems, clearRab } from '../../Provider/RabSlice'
+import { fetchProvinces } from '../../Provider/administratorSlice'; // Import fetchProvinces
+import { fetchTypes } from '../../Provider/HargaSatuan/unitPriceSlice'; // Import fetchTypes
 
 const RabForm = () => {
   const dispatch = useDispatch();
   const items = useSelector(state => state.rab.items);
   const rabData = useSelector(state => state.rab.rabData);
+  const infrastructureTypes = useSelector(state => state.unitPrice.types || []); // Fetch infrastructure types
   const [modalSelectOpen, setModalSelectOpen] = React.useState(false);
   const [rabModalOpen, setRabModalOpen] = React.useState(!rabData);
+
+  useEffect(() => {
+    dispatch(fetchProvinces()); // Fetch provinces (CCI data) on mount
+    dispatch(fetchTypes()); // Fetch infrastructure types on mount
+  }, [dispatch]);
 
   // Handler tambah item dari harga satuan
   const handleAddFromUnitPrice = (item) => {
@@ -102,12 +110,20 @@ const RabForm = () => {
               <div className="font-semibold text-gray-900 dark:text-white">{rabData.lokasi}</div>
             </div>
             <div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">Jenis</div>
-              <div className="font-semibold text-gray-900 dark:text-white">{rabData.jenis}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Infrastruktur</div>
+              <div className="font-semibold text-gray-900 dark:text-white">
+                {rabData.jenis || infrastructureTypes.join(', ')}
+              </div>
             </div>
             <div>
               <div className="text-xs text-gray-500 dark:text-gray-400">Volume</div>
               <div className="font-semibold text-gray-900 dark:text-white">{rabData.volume}</div>
+            </div>
+            <div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Total Harga</div>
+              <div className="font-semibold text-gray-900 dark:text-white">
+                Rp{items.reduce((total, item) => total + (item.qty * item.hargaSatuan || 0), 0).toLocaleString()}
+              </div>
             </div>
           </div>
         </div>

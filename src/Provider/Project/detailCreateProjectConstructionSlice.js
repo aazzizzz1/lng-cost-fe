@@ -1,7 +1,9 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 // Fungsi default item
 export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe, isCategory = false) => ({
+  id: undefined, // NEW: keep DB id when available
   kode,
   uraian,
   satuan: "",
@@ -15,6 +17,12 @@ export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe,
   tipe,
   isCategory,
   aaceClass: 5, // Default AACE class is 5
+  workcode: "", // NEW
+  specification: "", // ensure present
+  accuracyLow: 0,
+  accuracyHigh: 0,
+  satuanVolume: "",
+  kelompokDetail: "",
 });
 
 // Initial state
@@ -25,8 +33,22 @@ const initialState = {
     type: null,
     itemIdx: null,
     search: "",
-  }
+  },
+  loadingRecommendedCosts: false, // Add loading state
 };
+
+export const fetchRecommendedConstructionCosts = createAsyncThunk(
+  'detailCreateProjectConstruction/fetchRecommendedConstructionCosts',
+  async (projectData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/projects/recommend', projectData);
+      return response.data.data; // Return the recommended construction costs
+    } catch (error) {
+      console.error('Error fetching recommended construction costs:', error);
+      return rejectWithValue(error.response?.data || 'Failed to fetch construction costs');
+    }
+  }
+);
 
 // Slice kosong, hanya untuk namespace jika ingin menambah reducer terkait detail construction project
 const detailCreateProjectConstructionSlice = createSlice({
@@ -83,7 +105,42 @@ const detailCreateProjectConstructionSlice = createSlice({
     setModalSearch: (state, action) => {
       state.modal.search = action.payload;
     },
-  }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchRecommendedConstructionCosts.pending, (state) => {
+        state.loadingRecommendedCosts = true; // Set loading to true
+      })
+      .addCase(fetchRecommendedConstructionCosts.fulfilled, (state, action) => {
+        state.loadingRecommendedCosts = false;
+        state.items = action.payload.map((item) => ({
+          id: item.id ?? undefined,            // NEW: preserve id if provided
+          kode: item.workcode || item.id,      // prefer workcode for display
+          workcode: item.workcode || "", // NEW
+          uraian: item.uraian,
+          specification: item.specification || "",
+          satuan: item.satuan || "",
+          qty: Number(item.qty) || 0,
+          hargaSatuan: Number(item.hargaSatuan) || 0,
+          totalHarga: Number(item.totalHarga) || 0,
+          kelompok: item.kelompok || "",
+          tahun: Number(item.tahun) || new Date().getFullYear(),
+          proyek: item.proyek || "",
+          lokasi: item.lokasi || "",
+          tipe: item.tipe || "",
+          isCategory: false,
+          aaceClass: Number(item.aaceClass) || 0,
+          accuracyLow: Number.isFinite(item.accuracyLow) ? item.accuracyLow : 0,
+          accuracyHigh: Number.isFinite(item.accuracyHigh) ? item.accuracyHigh : 0,
+          satuanVolume: item.satuanVolume || "",
+          kelompokDetail: item.kelompokDetail || "",
+        }));
+      })
+      .addCase(fetchRecommendedConstructionCosts.rejected, (state) => {
+        state.loadingRecommendedCosts = false; // Set loading to false
+        console.error('Failed to fetch recommended construction costs');
+      });
+  },
 });
 
 export const {
@@ -93,10 +150,10 @@ export const {
   deleteItem,
   openModal,
   closeModal,
-  setModalSearch
+  setModalSearch,
 } = detailCreateProjectConstructionSlice.actions;
 
-export const selectItems = state => state.detailCreateProjectConstruction.items;
-export const selectModal = state => state.detailCreateProjectConstruction.modal;
+export const selectItems = (state) => state.detailCreateProjectConstruction.items;
+export const selectModal = (state) => state.detailCreateProjectConstruction.modal;
 
 export default detailCreateProjectConstructionSlice.reducer;

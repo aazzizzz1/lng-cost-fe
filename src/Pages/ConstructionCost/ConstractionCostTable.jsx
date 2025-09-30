@@ -1,80 +1,215 @@
-import React, { useMemo } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useMemo, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import Spinner from '../../Components/Spinner/Spinner';
+import { updateConstructionCost, deleteConstructionCost } from '../../Provider/ConstructionCost/ConstractionCostSlice';
 
 // Helper for currency formatting
 const formatCurrency = (value) =>
-  value ? `Rp${Number(value).toLocaleString()}` : '';
+  value === 0 ? 'Rp0' : value ? `Rp${Number(value).toLocaleString()}` : '';
 
+// DB-aligned columns
 const columns = [
   { key: 'no', label: 'No', className: 'text-center', width: 50 },
-  { key: 'uraian', label: 'Uraian', width: 200 },
-  { key: 'satuan', label: 'Satuan', width: 70 },
-  { key: 'qty', label: 'Qty', className: 'text-right', width: 60 },
+  { key: 'workcode', label: 'Workcode', width: 120 },
+  { key: 'uraian', label: 'Uraian', width: 220 },
+  { key: 'specification', label: 'Specification', width: 240 },
+  { key: 'qty', label: 'Qty', className: 'text-right', width: 80 },
+  { key: 'satuan', label: 'Satuan', width: 80 },
   { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', width: 120, isCurrency: true },
-  { key: 'totalHarga', label: 'Total Harga', className: 'text-right', width: 120, isCurrency: true },
-  { key: 'aaceClass', label: 'AACE Class', width: 80 },
-  { key: 'accuracy', label: 'Accuracy %', width: 90 },
-  { key: 'kelompok', label: 'Kelompok', width: 120 },
-  { key: 'tahun', label: 'Tahun', width: 70 },
-  { key: 'infrastruktur', label: 'Infrastruktur', width: 120 },
-  { key: 'volume', label: 'Volume', className: 'text-right', width: 80 },
-  { key: 'satuanVolume', label: 'Satuan Volume', width: 100 },
-  { key: 'kapasitasRegasifikasi', label: 'Kapasitas Regasifikasi', className: 'text-right', width: 120 },
-  { key: 'satuanKapasitas', label: 'Satuan Kapasitas', width: 110 },
-  { key: 'proyek', label: 'Proyek', width: 120 },
-  { key: 'lokasi', label: 'Lokasi', width: 100 },
-  { key: 'tipe', label: 'Tipe', width: 80 },
+  { key: 'totalHarga', label: 'Total Harga', className: 'text-right', width: 140, isCurrency: true },
+  { key: 'aaceClass', label: 'AACE Class', width: 90 },
+  { key: 'accuracyLow', label: 'Accuracy Low', width: 110 },
+  { key: 'accuracyHigh', label: 'Accuracy High', width: 110 },
+  { key: 'tahun', label: 'Tahun', width: 80 },
+  { key: 'infrastruktur', label: 'Infrastruktur', width: 140 },
+  { key: 'volume', label: 'Volume', className: 'text-right', width: 100 },
+  { key: 'satuanVolume', label: 'Satuan Volume', width: 120 },
+  { key: 'kelompok', label: 'Kelompok', width: 140 },
+  { key: 'kelompokDetail', label: 'Kelompok Detail', width: 160 },
+  { key: 'lokasi', label: 'Lokasi', width: 120 },
+  { key: 'tipe', label: 'Tipe', width: 120 },
 ];
 
+const numericKeys = new Set([
+  'qty',
+  'hargaSatuan',
+  'totalHarga',
+  'aaceClass',
+  'accuracyLow',
+  'accuracyHigh',
+  'tahun',
+  'volume',
+]);
+
 const ConstractionCostTable = () => {
-  const { costs, filterJenis } = useSelector((state) => state.constractionCost);
+  const dispatch = useDispatch();
+  const { costs, loading } = useSelector((state) => state.constractionCost);
 
-  // Filter data sesuai jenis project DAN nama proyek jika filterJenis berupa object
-  const filteredCosts = useMemo(() => {
-    if (!filterJenis) return costs;
-    if (typeof filterJenis === "object" && filterJenis !== null) {
-      return costs.filter(
-        (item) =>
-          item.tipe === filterJenis.tipe &&
-          item.proyek === filterJenis.proyek
-      );
+  // Local edit state
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState({});
+
+  const startEdit = (row) => {
+    setEditingId(row.id);
+    setForm({
+      // pick all DB fields
+      workcode: row.workcode || '',
+      uraian: row.uraian || '',
+      specification: row.specification || '',
+      qty: Number(row.qty ?? 0),
+      satuan: row.satuan || '',
+      hargaSatuan: Number(row.hargaSatuan ?? 0),
+      totalHarga: Number(row.totalHarga ?? (Number(row.qty || 0) * Number(row.hargaSatuan || 0))),
+      aaceClass: Number(row.aaceClass ?? 5),
+      accuracyLow: Number(row.accuracyLow ?? 0),
+      accuracyHigh: Number(row.accuracyHigh ?? 0),
+      tahun: Number(row.tahun ?? new Date().getFullYear()),
+      infrastruktur: row.infrastruktur || '',
+      volume: Number(row.volume ?? 0),
+      satuanVolume: row.satuanVolume || '',
+      kelompok: row.kelompok || '',
+      kelompokDetail: row.kelompokDetail || '',
+      lokasi: row.lokasi || '',
+      tipe: row.tipe || '',
+    });
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm({});
+  };
+  const onChangeField = (key, value) => {
+    const v = numericKeys.has(key) ? (value === '' ? '' : Number(value)) : value;
+    setForm((prev) => {
+      const next = { ...prev, [key]: v };
+      // auto-calc totalHarga if qty or hargaSatuan changes
+      if (key === 'qty' || key === 'hargaSatuan') {
+        const qty = Number(next.qty || 0);
+        const harga = Number(next.hargaSatuan || 0);
+        next.totalHarga = qty * harga;
+      }
+      return next;
+    });
+  };
+  const saveEdit = async () => {
+    if (!editingId) return;
+    const payload = {
+      ...form,
+      // ensure numeric fields are numbers
+      qty: Number(form.qty || 0),
+      hargaSatuan: Number(form.hargaSatuan || 0),
+      totalHarga: Number(form.totalHarga || 0),
+      aaceClass: Number(form.aaceClass || 0),
+      accuracyLow: Number(form.accuracyLow || 0),
+      accuracyHigh: Number(form.accuracyHigh || 0),
+      tahun: Number(form.tahun || new Date().getFullYear()),
+      volume: Number(form.volume || 0),
+    };
+    dispatch(updateConstructionCost({ id: editingId, data: payload })).then(() => {
+      cancelEdit();
+    });
+  };
+  const handleDelete = (row) => {
+    if (!row?.id) return;
+    if (window.confirm('Hapus construction cost ini? Tindakan tidak dapat dibatalkan.')) {
+      dispatch(deleteConstructionCost(row.id));
     }
-    // fallback lama: filter hanya tipe
-    return costs.filter((item) => item.tipe === filterJenis);
-  }, [costs, filterJenis]);
+  };
 
-  // Kelompokkan data berdasarkan 'kelompok'
+  // Group data -> kelompok -> kelompokDetail
   const grouped = useMemo(() => {
-    return filteredCosts.reduce((acc, item) => {
-      if (!acc[item.kelompok]) acc[item.kelompok] = [];
-      acc[item.kelompok].push(item);
+    return (costs || []).reduce((acc, item) => {
+      const g = item.kelompok || 'Lainnya';
+      const sg = item.kelompokDetail || 'Lainnya';
+      if (!acc[g]) acc[g] = {};
+      if (!acc[g][sg]) acc[g][sg] = [];
+      acc[g][sg].push(item);
       return acc;
     }, {});
-  }, [filteredCosts]);
+  }, [costs]);
 
-  // Prepare data untuk table (flat, tapi dengan baris judul kelompok)
-  let tableRows = [];
-  let rowNo = 1;
-  Object.entries(grouped).forEach(([kelompok, items]) => {
-    tableRows.push({ isGroupHeader: true, kelompok });
-    items.forEach((item) => {
-      tableRows.push({
-        ...item,
-        no: rowNo++,
-        accuracy: `${item.accuracyLow}% ~ ${item.accuracyHigh}%`,
-        isGroupHeader: false,
+  // Flatten with group headers
+  const tableRows = useMemo(() => {
+    let rows = [];
+    let rowNo = 1;
+    Object.keys(grouped)
+      .sort((a, b) => a.localeCompare(b))
+      .forEach((kelompok) => {
+        rows.push({ isGroupHeader: true, kelompok });
+        Object.keys(grouped[kelompok])
+          .sort((a, b) => a.localeCompare(b))
+          .forEach((kelompokDetail) => {
+            rows.push({ isSubgroupHeader: true, kelompok, kelompokDetail });
+            grouped[kelompok][kelompokDetail].forEach((item) => {
+              rows.push({
+                ...item,
+                no: rowNo++,
+                isGroupHeader: false,
+                isSubgroupHeader: false,
+              });
+            });
+          });
       });
-    });
-  });
+    return rows;
+  }, [grouped]);
 
   // Summary
   const summary = useMemo(() => {
-    const totalHargaPekerjaan = filteredCosts.reduce((sum, item) => sum + (Number(item.totalHarga) || 0), 0);
+    const totalHargaPekerjaan = (costs || []).reduce((sum, item) => sum + (Number(item.totalHarga) || 0), 0);
     const ppn = totalHargaPekerjaan * 0.11;
     const asuransi = totalHargaPekerjaan * 0.0025;
     const totalPerkiraan = totalHargaPekerjaan + ppn + asuransi;
     return { totalHargaPekerjaan, ppn, asuransi, totalPerkiraan };
-  }, [filteredCosts]);
+  }, [costs]);
+
+  // Render helpers for edit inputs
+  const renderCell = (row, col) => {
+    const isEditing = editingId === row.id;
+    if (!isEditing) {
+      if (col.isCurrency) return formatCurrency(row[col.key]);
+      return row[col.key] ?? '';
+    }
+
+    // Edit mode: inputs for all fields
+    const commonCls = 'w-full bg-transparent border px-2 py-1 rounded dark:bg-gray-900 dark:border-gray-700';
+    if (col.key === 'specification') {
+      return (
+        <textarea
+          rows={2}
+          className={`${commonCls}`}
+          value={form.specification}
+          onChange={(e) => onChangeField('specification', e.target.value)}
+        />
+      );
+    }
+    if (col.key === 'totalHarga') {
+      return (
+        <input
+          type="number"
+          className={`${commonCls} text-right`}
+          value={form.totalHarga}
+          onChange={(e) => onChangeField('totalHarga', e.target.value)}
+        />
+      );
+    }
+    if (numericKeys.has(col.key)) {
+      return (
+        <input
+          type="number"
+          step="any"
+          className={`${commonCls} ${col.className?.includes('text-right') ? 'text-right' : ''}`}
+          value={form[col.key]}
+          onChange={(e) => onChangeField(col.key, e.target.value)}
+        />
+      );
+    }
+    return (
+      <input
+        className={commonCls}
+        value={form[col.key]}
+        onChange={(e) => onChangeField(col.key, e.target.value)}
+      />
+    );
+  };
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -86,77 +221,138 @@ const ConstractionCostTable = () => {
         </div>
         <div className="flex flex-col">
           <div className="flex-1 overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  {columns.map((col) => (
-                    <th
-                      key={col.key}
-                      className={`px-4 py-3 font-semibold border-b border-gray-200 dark:border-gray-700 ${col.className || ''}`}
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {tableRows.length === 0 && (
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <Spinner />
+              </div>
+            ) : (
+              <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                   <tr>
-                    <td colSpan={columns.length} className="text-center py-4 text-gray-400 dark:text-gray-500">
-                      Tidak ada data.
-                    </td>
+                    {columns.map((col) => (
+                      <th
+                        key={col.key}
+                        className={`px-4 py-3 font-semibold border-b border-gray-200 dark:border-gray-700 ${col.className || ''}`}
+                        style={col.width ? { minWidth: col.width } : {}}
+                      >
+                        {col.label}
+                      </th>
+                    ))}
+                    <th className="px-4 py-3 font-semibold border-b border-gray-200 dark:border-gray-700 text-center">
+                      Aksi
+                    </th>
                   </tr>
-                )}
-                {tableRows.map((row, idx) =>
-                  row.isGroupHeader ? (
-                    <tr key={`group-${row.kelompok}-${idx}`}>
-                      <td colSpan={columns.length} className="bg-gray-100 dark:bg-gray-800 font-bold text-left text-base border-b border-gray-200 dark:border-gray-700 py-2 pl-2">
-                        {row.kelompok}
+                </thead>
+                <tbody>
+                  {tableRows.length === 0 && (
+                    <tr>
+                      <td colSpan={columns.length + 1} className="text-center py-4 text-gray-400 dark:text-gray-500">
+                        Tidak ada data.
                       </td>
                     </tr>
-                  ) : (
-                    <tr key={row.id || idx} className="border-b dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700">
-                      {columns.map((col) => (
-                        <td
-                          key={col.key}
-                          className={`px-4 py-3 ${col.className || ''}`}
-                        >
-                          {col.isCurrency
-                            ? formatCurrency(row[col.key])
-                            : row[col.key] ?? ''}
+                  )}
+                  {tableRows.map((row, idx) => {
+                    if (row.isGroupHeader) {
+                      return (
+                        <tr key={`group-${row.kelompok}-${idx}`}>
+                          <td
+                            colSpan={columns.length + 1}
+                            className="bg-gray-100 dark:bg-gray-800 font-bold text-left text-base border-b border-gray-200 dark:border-gray-700 py-2 pl-2 uppercase"
+                          >
+                            {row.kelompok}
+                          </td>
+                        </tr>
+                      );
+                    }
+                    if (row.isSubgroupHeader) {
+                      return (
+                        <tr key={`subgroup-${row.kelompok}-${row.kelompokDetail}-${idx}`}>
+                          <td
+                            colSpan={columns.length + 1}
+                            className="bg-gray-50 dark:bg-gray-700 font-semibold text-left border-b border-gray-200 dark:border-gray-700 py-2 pl-4"
+                          >
+                            {row.kelompokDetail}
+                          </td>
+                        </tr>
+                      );
+                    }
+                    return (
+                      <tr key={row.id || idx} className="border-b dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-gray-700">
+                        {columns.map((col) => (
+                          <td key={col.key} className={`px-4 py-3 ${col.className || ''}`}>
+                            {renderCell(row, col)}
+                          </td>
+                        ))}
+                        <td className="px-4 py-3">
+                          {editingId === row.id ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                className="px-3 py-1 rounded bg-primary-700 hover:bg-primary-800 text-white text-xs"
+                                onClick={saveEdit}
+                                disabled={loading}
+                              >
+                                Simpan
+                              </button>
+                              <button
+                                className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 text-xs dark:bg-gray-600 dark:text-white"
+                                onClick={cancelEdit}
+                                disabled={loading}
+                              >
+                                Batal
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center gap-2">
+                              <button
+                                className="px-3 py-1 rounded bg-primary-700 hover:bg-primary-800 text-white text-xs"
+                                onClick={() => startEdit(row)}
+                                disabled={loading}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="px-3 py-1 rounded bg-rose-600 hover:bg-rose-700 text-white text-xs"
+                                onClick={() => handleDelete(row)}
+                                disabled={loading}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
                         </td>
-                      ))}
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
           </div>
-          {/* Summary moved below the table */}
-          <div className="w-full p-4 bg-gray-100 dark:bg-gray-700 mt-4 rounded">
-            <div className="flex flex-col gap-2 text-sm text-gray-900 dark:text-white">
-              <div>
-                <span className="font-semibold">Total Harga Pekerjaan: </span>
-                {formatCurrency(summary.totalHargaPekerjaan)}
-              </div>
-              <div>
-                <span className="font-semibold">PPN 11%: </span>
-                {formatCurrency(summary.ppn)}
-              </div>
-              <div>
-                <span className="font-semibold">Asuransi 2,5‰: </span>
-                {formatCurrency(summary.asuransi)}
-              </div>
-              <div>
-                <span className="font-semibold">Total Perkiraan Harga Pekerjaan: </span>
-                {formatCurrency(summary.totalPerkiraan)}
+          {!loading && (
+            <div className="w-full p-4 bg-gray-100 dark:bg-gray-700 mt-4 rounded">
+              <div className="flex flex-col gap-2 text-sm text-gray-900 dark:text-white">
+                <div>
+                  <span className="font-semibold">Total Harga Pekerjaan: </span>
+                  {formatCurrency(summary.totalHargaPekerjaan)}
+                </div>
+                <div>
+                  <span className="font-semibold">PPN 11%: </span>
+                  {formatCurrency(summary.ppn)}
+                </div>
+                <div>
+                  <span className="font-semibold">Asuransi 2,5‰: </span>
+                  {formatCurrency(summary.asuransi)}
+                </div>
+                <div>
+                  <span className="font-semibold">Total Perkiraan Harga Pekerjaan: </span>
+                  {formatCurrency(summary.totalPerkiraan)}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default ConstractionCostTable
+export default ConstractionCostTable;

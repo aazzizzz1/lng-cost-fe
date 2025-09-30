@@ -1,4 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { useLocation } from 'react-router-dom'
+import { fetchFilteredConstructionCosts, setFilterJenis } from '../../Provider/ConstructionCost/ConstractionCostSlice'
 import ConstractionCostTable from './ConstractionCostTable'
 
 class ErrorBoundary extends Component{
@@ -24,6 +27,21 @@ class ErrorBoundary extends Component{
 }
 
 const ConstractionCostPages = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tipe = params.get('tipe') || undefined;
+    const infrastruktur = params.get('infrastruktur') || undefined;
+    const volume = params.get('volume') || undefined;
+
+    if (tipe || infrastruktur || volume) {
+      dispatch(setFilterJenis({ tipe: tipe || null, proyek: infrastruktur || null, volume: volume || null }));
+      dispatch(fetchFilteredConstructionCosts({ tipe, infrastruktur, volume }));
+    }
+  }, [location.search, dispatch]);
+
   return (
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
