@@ -150,7 +150,7 @@ const ManageData = () => {
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col gap-6 border border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-semibold text-green-700 dark:text-green-300 mb-2 flex items-center gap-2">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-              Capacity Factor
+              Calculator
             </h2>
             {/* Informasi format Excel Capacity Factor */}
             <div className="bg-gradient-to-r from-green-50 via-green-100 to-green-50 dark:from-green-900 dark:via-green-800 dark:to-green-900 border border-green-300 dark:border-green-700 rounded-lg p-4 text-sm text-green-900 dark:text-green-100 mb-2 shadow-sm">
@@ -182,7 +182,7 @@ const ManageData = () => {
                 onClick={() => setShowDelCFModal(true)} /* CHANGED */
                 disabled={cfDeleteLoading}
               >
-                {cfDeleteLoading ? "Deleting..." : "Delete All Capacity Factor"}
+                {cfDeleteLoading ? "Deleting..." : "Delete All Calculator Data"}
               </button>
               {cfDeleteResult && (
                 // ...existing code...
@@ -196,7 +196,7 @@ const ManageData = () => {
             </div>
             <form onSubmit={handleUploadCfExcel} className="flex flex-col gap-3">
               <label className="block text-gray-700 dark:text-white font-semibold">
-                Upload Capacity Factor Excel
+                Upload Calculator Excel
               </label>
               <input
                 type="file"
@@ -244,8 +244,8 @@ const ManageData = () => {
       />
       <DeleteModal
         isOpen={showDelCFModal}
-        title="Delete All Capacity Factor Data"
-        message="All Capacity Factor (Total Cost) records will be permanently removed. Are you sure you want to continue?"
+        title="Delete All Calculator Data"
+        message="All Calculator Data records will be permanently removed. Are you sure you want to continue?"
         confirmText="Yes, delete all"
         cancelText="Cancel"
         loading={cfDeleteLoading}
