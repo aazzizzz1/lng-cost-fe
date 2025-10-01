@@ -30,10 +30,14 @@ const PrivateRoute = ({ children }) => {
 
   useEffect(() => {
     let mounted = true;
-    dispatch(validateAccessToken())
-      .finally(() => { if (mounted) setChecking(false); });
+    if (!user) {
+      dispatch(validateAccessToken())
+        .finally(() => { if (mounted) setChecking(false); });
+    } else {
+      setChecking(false);
+    }
     return () => { mounted = false; };
-  }, [dispatch]);
+  }, [dispatch, user]);
 
   if (checking) return null; // ...optional loader...
   return user ? children : <Navigate to="/signin" />;

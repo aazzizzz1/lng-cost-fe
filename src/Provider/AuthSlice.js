@@ -1,14 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const api = process.env.REACT_APP_API;
+// Create axios instance bound to env baseURL with credentials
+const http = axios.create({
+  baseURL: process.env.REACT_APP_API,
+  withCredentials: true,
+});
 
 // Fetch current user (reads accessToken from HttpOnly cookie on server)
 export const fetchCurrentUser = createAsyncThunk(
   'auth/fetchCurrentUser',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${api}/auth/me`);
+      const res = await http.get(`/auth/me`);
       const user = res.data?.data?.user || res.data?.data || res.data?.user || res.data;
       return user;
     } catch (error) {
@@ -22,7 +26,7 @@ export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async ({ username, email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${api}/auth/register`, {
+      const response = await http.post(`/auth/register`, {
         username,
         email,
         password,
@@ -39,7 +43,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await axios.post(`${api}/auth/login`, { email, password });
+      const response = await http.post(`/auth/login`, { email, password });
       const user = response.data?.data?.user || response.data?.user || null;
       // Ensure latest user/role
       dispatch(fetchCurrentUser());
@@ -56,7 +60,7 @@ export const refreshToken = createAsyncThunk(
   'auth/refreshToken',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${api}/auth/refresh-token`, {});
+      const response = await http.post(`/auth/refresh-token`, {});
       return response.data?.data || response.data;
     } catch (error) {
       return rejectWithValue('Failed to refresh token');
@@ -69,7 +73,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, { rejectWithValue }) => {
     try {
-      await axios.post(`${api}/auth/logout`, {});
+      await http.post(`/auth/logout`, {});
       window.location.href = '/signin';
       return true;
     } catch (error) {
@@ -78,7 +82,7 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
-// Validate session: try /auth/me, then refresh, else redirect
+// Validate session: try /auth/me, then refresh, else reject
 export const validateAccessToken = createAsyncThunk(
   'auth/validateAccessToken',
   async (_, { rejectWithValue, dispatch }) => {
@@ -91,7 +95,7 @@ export const validateAccessToken = createAsyncThunk(
         await dispatch(fetchCurrentUser()).unwrap();
         return { message: 'Token refreshed successfully' };
       } catch {
-        window.location.href = '/signin';
+        // Let route guard handle navigation
         return rejectWithValue('Session expired. Please log in again.');
       }
     }
