@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { GlobalProvider } from "../Provider/GlobalContext";
 import { useDispatch, useSelector } from "react-redux";
-import { refreshToken, validateAccessToken, fetchCurrentUser } from "../Provider/AuthSlice";
+import { validateAccessToken } from "../Provider/AuthSlice";
 import ErrorPage from "../Pages/Error/ErrorPage";
 import SignIn from "../Pages/Auth/SignIn";
 import SignUp from "../Pages/Auth/SignUp";
@@ -25,31 +25,18 @@ import UserManagement from "../Pages/Admin/UserManagement"; // NEW
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
-  const { accessToken, user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
+  const [checking, setChecking] = React.useState(true);
 
   useEffect(() => {
-    if (accessToken) {
-      dispatch(validateAccessToken())
-        .then(() => {
-          if (!user?.role) {
-            dispatch(fetchCurrentUser());
-          }
-        })
-        .catch(() => {
-          window.location.href = '/signin'; // Redirect ke signin jika accessToken tidak valid
-        });
-    } else {
-      dispatch(refreshToken())
-        .then(() => {
-          dispatch(fetchCurrentUser());
-        })
-        .catch(() => {
-          window.location.href = '/signin'; // Redirect ke signin jika refreshToken gagal
-        });
-    }
-  }, [accessToken, user?.role, dispatch]); // include role to satisfy eslint
+    let mounted = true;
+    dispatch(validateAccessToken())
+      .finally(() => { if (mounted) setChecking(false); });
+    return () => { mounted = false; };
+  }, [dispatch]);
 
-  return accessToken ? children : <Navigate to="/signin" />;
+  if (checking) return null; // ...optional loader...
+  return user ? children : <Navigate to="/signin" />;
 };
 
 const RouteComponents = () => {
