@@ -18,9 +18,9 @@ const satuanByJenis = {
 };
 
 const methodOptions = [
+  'Capacity Factor Method',
   'Linear Regression',
   'Log-log Regression',
-  'Capacity Factor Method',
 ];
 
 const ModalCapacityFactor = ({ isOpen, onClose }) => {
