@@ -6,12 +6,13 @@ const api = process.env.REACT_APP_API;
 
 const getAuthHeaders = () => {
   const token = Cookies.get('accessToken');
-  return { 
-    Authorization: `Bearer ${token}`,
-    'Cache-Control': 'no-cache', // Prevent caching
-    Pragma: 'no-cache',          // HTTP 1.0 backward compatibility
-    Expires: '0',                // Expire immediately
+  const headers = {
+    'Cache-Control': 'no-cache',
+    Pragma: 'no-cache',
+    Expires: '0',
   };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 };
 
 // Async thunk to fetch unique fields
@@ -69,7 +70,9 @@ export const fetchTypes = createAsyncThunk(
   'unitPrice/fetchTypes',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${api}/unit-prices/unique-fields`);
+      const response = await axios.get(`${api}/unit-prices/unique-fields`, {
+        headers: getAuthHeaders(),
+      });
       const groupedData = response.data.data;
       const types = Object.keys(groupedData); // Extract the most general group keys
       return types;
@@ -98,7 +101,9 @@ export const fetchSubTypeInfra = createAsyncThunk(
   'unitPrice/fetchSubTypeInfra',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${api}/unit-prices/unique-fields`);
+      const response = await axios.get(`${api}/unit-prices/unique-fields`, {
+        headers: getAuthHeaders(),
+      });
       const groupedData = response.data.data;
       const subTypes = Object.values(groupedData).flatMap(type => Object.keys(type)); // Extract all subtypes
       return subTypes;

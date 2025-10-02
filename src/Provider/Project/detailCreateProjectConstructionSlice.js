@@ -41,7 +41,11 @@ export const fetchRecommendedConstructionCosts = createAsyncThunk(
   'detailCreateProjectConstruction/fetchRecommendedConstructionCosts',
   async (projectData, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/projects/recommend', projectData);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API}/projects/recommend`,
+        projectData,
+        { withCredentials: true }
+      );
       return response.data.data; // Return the recommended construction costs
     } catch (error) {
       console.error('Error fetching recommended construction costs:', error);
