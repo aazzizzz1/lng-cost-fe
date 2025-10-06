@@ -31,6 +31,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
 
   const [editingId, setEditingId] = useState(null);
   const [edited, setEdited] = useState({});
+  const { user } = useSelector((state) => state.auth);
 
   const handleSort = (key) => {
     if (onSortChange) onSortChange(key);
@@ -118,7 +119,9 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                     </th>
                   ))}
                   {/* Actions column on the far right */}
-                  <th scope="col" className="px-6 py-4 sticky top-0 z-10 bg-inherit font-semibold">Aksi</th>
+                  {user.role === 'admin' && (
+                    <th scope="col" className="px-6 py-4 sticky top-0 z-10 bg-inherit font-semibold">Aksi</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -175,6 +178,8 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                             </button>
                           </div>
                         ) : (
+                          //user
+                          user?.role === 'admin' && (
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => startEdit(row)}
@@ -190,6 +195,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                               Delete
                             </button>
                           </div>
+                          )
                         )}
                       </td>
                     </tr>

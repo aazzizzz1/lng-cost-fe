@@ -138,7 +138,8 @@ const Sidebar = () => {
               </a>
             </li>
           </Link>
-          <Link to="/manage-data">
+          {user?.role === "admin" && (
+            <Link to="/manage-data">
             <li
               className={
                 isActive("/manage-data")
@@ -169,6 +170,8 @@ const Sidebar = () => {
               </a>
             </li>
           </Link>
+           )}
+          
           {/* Ganti blok <li> Harga Satuan beserta dropdown-nya dengan komponen UnitPriceSidebar */}
           <UnitPriceSidebar />
           {/* Ganti blok <li> Harga Konstruksi dengan komponen ConstructionPriceSidebar */}
@@ -303,7 +306,8 @@ const Sidebar = () => {
               </li>
             </Link>
           )}
-          <Link to="/administrator">
+          {user?.role === "admin" && (
+            <Link to="/administrator">
             <li
               className={
                 isActive("/administrator")
@@ -339,6 +343,7 @@ const Sidebar = () => {
               </a>
             </li>
           </Link>
+           )}
           <li>
             <a
               href="#askjd"

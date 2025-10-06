@@ -48,6 +48,7 @@ const ConstractionCostTable = () => {
   // Local edit state
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({});
+  const { user } = useSelector((state) => state.auth);
 
   const startEdit = (row) => {
     setEditingId(row.id);
@@ -238,9 +239,11 @@ const ConstractionCostTable = () => {
                         {col.label}
                       </th>
                     ))}
-                    <th className="px-4 py-3 font-semibold border-b border-gray-200 dark:border-gray-700 text-center">
-                      Aksi
-                    </th>
+                    {user.role === 'admin' && (
+                      <th className="px-4 py-3 font-semibold border-b border-gray-200 dark:border-gray-700 text-center">
+                        Aksi
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -283,6 +286,7 @@ const ConstractionCostTable = () => {
                             {renderCell(row, col)}
                           </td>
                         ))}
+                        {user.role === 'admin' && (
                         <td className="px-4 py-3">
                           {editingId === row.id ? (
                             <div className="flex items-center justify-center gap-2">
@@ -320,6 +324,7 @@ const ConstractionCostTable = () => {
                             </div>
                           )}
                         </td>
+                        )}
                       </tr>
                     );
                   })}
