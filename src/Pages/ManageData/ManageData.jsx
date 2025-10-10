@@ -87,7 +87,7 @@ const ManageData = () => {
                 <table className="min-w-max text-xs font-mono border border-blue-200 dark:border-blue-700 rounded">
                   <thead>
                     <tr>
-                      {["Work code","Item", "Specification", "Qty", "Satuan", "Cost", "Total Cost", "Group 1", "Group 1.1", "AACE Class", "Low", "High", "Year", "Infrastructure", "Volume", "Satuan", "Project", "Location", "Type"].map((col, idx) => (
+                      {["Work code","Item", "Specification", "Qty", "Satuan", "Cost", "Total Cost", "Group 1", "Group 1.1", "AACE Class", "Low", "High", "Year", "Infrastructure", "Volume", "Satuan Volume", "Project", "Location", "Type"].map((col, idx) => (
                         <th key={idx} className="px-2 py-1 bg-blue-100 dark:bg-blue-800 border-r border-blue-200 dark:border-blue-700 last:border-r-0 text-blue-700 dark:text-blue-100 font-semibold">
                           {col}
                         </th>

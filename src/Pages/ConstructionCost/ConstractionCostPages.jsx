@@ -35,10 +35,16 @@ const ConstractionCostPages = () => {
     const tipe = params.get('tipe') || undefined;
     const infrastruktur = params.get('infrastruktur') || undefined;
     const volume = params.get('volume') || undefined;
+    const projectId = params.get('projectId') || undefined; // NEW
 
-    if (tipe || infrastruktur || volume) {
-      dispatch(setFilterJenis({ tipe: tipe || null, proyek: infrastruktur || null, volume: volume || null }));
-      dispatch(fetchFilteredConstructionCosts({ tipe, infrastruktur, volume }));
+    if (tipe || infrastruktur || volume || projectId) {
+      dispatch(setFilterJenis({
+        tipe: tipe || null,
+        proyek: infrastruktur || null,
+        volume: volume || null,
+        projectId: projectId || null, // NEW
+      }));
+      dispatch(fetchFilteredConstructionCosts({ tipe, infrastruktur, volume, projectId })); // NEW
     }
   }, [location.search, dispatch]);
 

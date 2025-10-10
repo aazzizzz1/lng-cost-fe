@@ -36,9 +36,9 @@ const ConstructionPriceSidebar = () => {
     toggleInfra(`${tipe}-${infraKey}`); // hanya expand/collapse
   };
 
-  const handleSelectVolume = (tipe, infraKey, volume) => {
-    dispatch(setFilterJenis({ tipe, proyek: infraKey, volume }));
-    const qs = new URLSearchParams({ tipe, infrastruktur: infraKey, volume }).toString();
+  const handleSelectVolume = (tipe, infraKey, volume, projectId) => {
+    dispatch(setFilterJenis({ tipe, proyek: infraKey, volume, projectId })); // NEW include projectId
+    const qs = new URLSearchParams({ tipe, infrastruktur: infraKey, volume, projectId }).toString(); // NEW
     navigate(`/construction-cost?${qs}`);
   };
 
@@ -161,7 +161,7 @@ const ConstructionPriceSidebar = () => {
                                   <button
                                     type="button"
                                     className="flex items-center p-2 w-full text-[11px] font-medium text-gray-700 rounded-lg hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-                                    onClick={() => handleSelectVolume(tipe, infraKey, v.volume)}
+                                    onClick={() => handleSelectVolume(tipe, infraKey, v.volume, v.projectId)} // NEW
                                   >
                                     {label}
                                   </button>

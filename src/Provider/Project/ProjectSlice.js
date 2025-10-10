@@ -83,11 +83,12 @@ const getAuthHeaders = () => {
   return { Authorization: `Bearer ${token}` };
 };
 
-export const fetchProjects = () => async (dispatch) => {
+export const fetchProjects = () => async (dispatch, getState) => {
   try {
-    // UPDATED: use manual projects endpoint
-    // const response = await axios.get(`${process.env.REACT_APP_API}/projects`, {
-    const response = await axios.get(`${process.env.REACT_APP_API}/projects/manual`, {
+    const role = getState()?.auth?.user?.role;
+    const isAdmin = typeof role === 'string' && role.toLowerCase() === 'admin';
+    const endpoint = isAdmin ? `${process.env.REACT_APP_API}/projects` : `${process.env.REACT_APP_API}/projects/manual`;
+    const response = await axios.get(endpoint, {
       headers: getAuthHeaders(),
     });
     dispatch(setProjects(response.data.data));
