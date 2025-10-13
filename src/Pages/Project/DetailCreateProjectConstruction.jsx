@@ -51,6 +51,7 @@ const DetailCreateProjectConstruction = () => {
         tahun: project.tahun,
         kategori: project.kategori,
         inflasi: project?.inflasi ?? 5.0, // use project's inflasi if present, fallback to 5.0
+        satuan: satuanByJenis[project?.infrastruktur] || project?.satuan || "", // NEW: pass unit to API
       }));
     }
   }, [dispatch, project]);
@@ -64,7 +65,8 @@ const DetailCreateProjectConstruction = () => {
       volume: project?.volume || 6000,
       tahun: project?.tahun || 2025,
       kategori: project?.kategori || "MID SCALE LNG BV",
-      inflasi: project?.inflasi ?? 0, // NEW include inflasi
+      inflasi: project?.inflasi ?? 0,
+      satuan: satuanByJenis[project?.infrastruktur] || project?.satuan || "", // NEW: include top-level unit
       levelAACE: 3,
       harga: 5000000000,
       constructionCosts: recommendedCosts.map((cost) => ({

@@ -82,7 +82,6 @@ const ProjectTable = () => {
                 <tr>
                   <th scope="col" className="px-4 py-3">No</th>
                   <th scope="col" className="px-4 py-3">Nama Project</th>
-                  <th scope="col" className="px-4 py-3">Kategori</th>
                   <th scope="col" className="px-4 py-3">Lokasi</th>
                   <th scope="col" className="px-4 py-3">Tahun</th>
                   <th scope="col" className="px-4 py-3">AACE Level</th>
@@ -103,11 +102,12 @@ const ProjectTable = () => {
                   >
                     <td className="px-4 py-3">{index + 1}</td>
                     <td className="px-4 py-3">{project.name}</td>
-                    <td className="px-4 py-3">{project.kategori}</td>
                     <td className="px-4 py-3">{project.lokasi}</td>
                     <td className="px-4 py-3">{project.tahun}</td>
                     <td className="px-4 py-3">{project.levelAACE || "-"}</td>
-                    <td className="px-4 py-3">{project.volume || "-"}</td>
+                    <td className="px-4 py-3">
+                      {project.volume ? `${project.volume}${project.satuan ? ` ${project.satuan}` : ""}` : "-"}
+                    </td>
                     <td className="px-4 py-3">{project.infrastruktur}</td>
                     <td className="px-4 py-3">
                       {project.harga ? `Rp${project.harga.toLocaleString()}` : "-"}
