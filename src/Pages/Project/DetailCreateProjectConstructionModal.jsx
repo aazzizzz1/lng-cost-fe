@@ -198,6 +198,14 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
         value: row.kelompokDetail || "",
       })
     );
+    // NEW: stamp owning project id on the edited construction item
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "projectId",
+        value: Number(project?.id) || undefined,
+      })
+    );
 
     dispatch(closeModal());
   };

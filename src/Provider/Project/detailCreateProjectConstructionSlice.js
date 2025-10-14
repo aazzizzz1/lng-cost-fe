@@ -23,6 +23,7 @@ export const defaultItem = (kode, uraian, kelompok, tahun, proyek, lokasi, tipe,
   accuracyHigh: 0,
   satuanVolume: "",
   kelompokDetail: "",
+  projectId: undefined, // NEW
 });
 
 // Initial state

@@ -191,6 +191,7 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
         kelompokDetail: normalizeString(c.kelompokDetail),
         lokasi: normalizeString(c.lokasi ?? lokasiHeader, lokasiHeader),
         tipe: normalizeString(tipeHeader || c.tipe, tipeHeader),
+        projectId: Number(projectId), // NEW: bind each cost to current project id
       }));
 
       return {

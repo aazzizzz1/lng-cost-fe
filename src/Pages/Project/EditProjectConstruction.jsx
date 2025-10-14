@@ -99,6 +99,7 @@ const EditProjectConstruction = () => {
             tipe: c.tipe,
             proyek: project.name,
             isCategory: false,
+            projectId: project.id, // NEW: keep owning project id
           }))
         : [];
     dispatch(setItems(mapped));
@@ -152,6 +153,7 @@ const EditProjectConstruction = () => {
       tipe: kategori || project?.kategori || '',
       kelompok,
       isCategory: false,
+      projectId: Number(id), // NEW: bind to current project
     }));
   };
 
@@ -235,6 +237,7 @@ const EditProjectConstruction = () => {
           kelompokDetail: it.kelompokDetail || '',
           lokasi,
           tipe: kategori || '',
+          projectId: Number(id), // NEW: ensure each cost carries project id
         })),
       };
 
@@ -489,7 +492,14 @@ const EditProjectConstruction = () => {
       <DetailCreateProjectConstructionModal
         modal={modal}
         items={items}
-        project={{ name, infrastruktur, lokasi, tahun: Number(tahun), volume: Number(volume) }}
+        project={{
+          id: Number(id), // NEW: pass id so modal can stamp projectId
+          name,
+          infrastruktur,
+          lokasi,
+          tahun: Number(tahun),
+          volume: Number(volume)
+        }}
         provinces={provinces}
         inflasiList={inflasiList}
         onClose={handleCloseModal}
