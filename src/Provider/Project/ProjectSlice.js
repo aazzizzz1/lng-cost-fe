@@ -17,6 +17,23 @@ export const fetchUniqueInfrastrukturProyek = createAsyncThunk(
   }
 );
 
+// NEW: toggle project approval (true/false)
+export const updateProjectApproval = createAsyncThunk(
+  'projects/updateProjectApproval',
+  async ({ projectId, approval }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `${process.env.REACT_APP_API}/projects/${projectId}/approval`,
+        { approval },
+        { headers: getAuthHeaders() }
+      );
+      return res.data?.data; // { id, name, approval }
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   projects: [],
   recommendedCosts: [],
@@ -64,7 +81,25 @@ const projectSlice = createSlice({
       })
       .addCase(fetchUniqueInfrastrukturProyek.rejected, (state, action) => {
         state.uniqueInfrastrukturProyek = {};
+      })
+      // NEW: approval toggle handlers
+      .addCase(updateProjectApproval.fulfilled, (state, action) => {
+        const updated = action.payload;
+        if (!updated?.id) return;
+        // update list
+        const idx = state.projects.findIndex((p) => String(p.id) === String(updated.id));
+        if (idx !== -1) {
+          state.projects[idx] = { ...state.projects[idx], approval: updated.approval };
+        }
+        // update selected details if open
+        if (state.selectedProjectDetails && String(state.selectedProjectDetails.id) === String(updated.id)) {
+          state.selectedProjectDetails = {
+            ...state.selectedProjectDetails,
+            approval: updated.approval,
+          };
+        }
       });
+      // (optional) you can add pending/rejected for UI flags if needed
   },
 });
 
@@ -74,7 +109,7 @@ export const {
   setLoadingRecommendedCosts,
   createProject,
   setSelectedProjectDetails,
-  setProjectDetailCache, // NEW
+  setProjectDetailCache,
   deleteProjectById,
 } = projectSlice.actions;
 
@@ -236,9 +271,12 @@ export const updateProject = (projectId, projectData) => async (dispatch, getSta
   }
 };
 
-export const fetchProjectDetailCache = (projectId) => async (dispatch, getState) => { // NEW
+// FIX: complete the truncated function and return cached/fetched detail
+export const fetchProjectDetailCache = (projectId) => async (dispatch, getState) => {
   try {
-    if (getState().projects.detailCache[projectId]) return getState().projects.detailCache[projectId];
+    const cached = getState()?.projects?.detailCache?.[projectId];
+    if (cached) return cached;
+
     const res = await axios.get(`${process.env.REACT_APP_API}/projects/${projectId}`, {
       headers: getAuthHeaders(),
     });

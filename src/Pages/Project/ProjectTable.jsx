@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CreateProjectModal from "./CreateProjectModal";
-import { fetchProjects, fetchProjectById, deleteProject } from "../../Provider/Project/ProjectSlice";
+import { fetchProjects, fetchProjectById, deleteProject, updateProjectApproval } from "../../Provider/Project/ProjectSlice";
 import { useNavigate } from "react-router-dom";
 import DeleteModal from '../../Components/Modal/DeleteModal'; // NEW
 
@@ -26,6 +26,7 @@ const ProjectTable = () => {
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.projects);
   const projectDetails = useSelector((state) => state.projects.selectedProjectDetails);
+  const { user } = useSelector((state) => state.auth); // NEW: for role check
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -60,6 +61,14 @@ const ProjectTable = () => {
     setDeleteTarget(null);
   };
 
+  // NEW: toggle approval handler (admin only)
+  const handleToggleApproval = (e, project) => {
+    e.stopPropagation();
+    if (!project?.id) return;
+    const next = !project.approval;
+    dispatch(updateProjectApproval({ projectId: project.id, approval: next }));
+  };
+
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
@@ -88,6 +97,8 @@ const ProjectTable = () => {
                   <th scope="col" className="px-4 py-3">Volume</th>
                   <th scope="col" className="px-4 py-3">Infrastruktur</th>
                   <th scope="col" className="px-4 py-3">Total Harga</th>
+                  {/* NEW: Approval column added next to Aksi */}
+                  <th scope="col" className="px-4 py-3 text-center">Approval</th>
                   <th scope="col" className="px-4 py-3 text-center">Aksi</th>
                 </tr>
               </thead>
@@ -100,6 +111,7 @@ const ProjectTable = () => {
                     }`}
                     onClick={() => handleRowClick(project)}
                   >
+                    {/* ...existing cells... */}
                     <td className="px-4 py-3">{index + 1}</td>
                     <td className="px-4 py-3">{project.name}</td>
                     <td className="px-4 py-3">{project.lokasi}</td>
@@ -112,6 +124,29 @@ const ProjectTable = () => {
                     <td className="px-4 py-3">
                       {project.harga ? `Rp${project.harga.toLocaleString()}` : "-"}
                     </td>
+
+                    {/* NEW: Approval status + toggle (admin only) */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-center gap-2">
+                        {user?.role === 'admin' && (
+                          <button
+                            type="button"
+                            title={project.approval ? "Set Unapproved" : "Set Approved"}
+                            onClick={(e) => handleToggleApproval(e, project)}
+                            className={`inline-flex items-center justify-center w-8 h-8 rounded-md ${
+                              project.approval
+                                ? 'bg-emerald-600 hover:bg-emerald-700'
+                                : 'bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600'
+                            } text-white focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-600 shadow-sm`}
+                          >
+                            <span className="sr-only">Toggle Approval</span>
+                            {project.approval ? '✓' : '✕'}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Aksi: Edit/Delete only (toggle removed from here) */}
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
@@ -131,7 +166,7 @@ const ProjectTable = () => {
                           className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteProject(project.id); // now opens modal
+                            handleDeleteProject(project.id);
                           }}
                         >
                           <TrashIcon className="w-4 h-4" />
