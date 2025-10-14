@@ -26,7 +26,8 @@ const ProjectTable = () => {
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.projects);
   const projectDetails = useSelector((state) => state.projects.selectedProjectDetails);
-  const { user } = useSelector((state) => state.auth); // NEW: for role check
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = typeof user?.role === 'string' && user.role.toLowerCase() === 'admin'; // NEW
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -89,6 +90,7 @@ const ProjectTable = () => {
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
+                  {/* ...existing headers... */}
                   <th scope="col" className="px-4 py-3">No</th>
                   <th scope="col" className="px-4 py-3">Nama Project</th>
                   <th scope="col" className="px-4 py-3">Lokasi</th>
@@ -97,9 +99,10 @@ const ProjectTable = () => {
                   <th scope="col" className="px-4 py-3">Volume</th>
                   <th scope="col" className="px-4 py-3">Infrastruktur</th>
                   <th scope="col" className="px-4 py-3">Total Harga</th>
-                  {/* NEW: Approval column added next to Aksi */}
-                  <th scope="col" className="px-4 py-3 text-center">Approval</th>
                   <th scope="col" className="px-4 py-3 text-center">Aksi</th>
+                  {isAdmin && (
+                    <th scope="col" className="px-4 py-3 text-center">Approval</th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -111,7 +114,7 @@ const ProjectTable = () => {
                     }`}
                     onClick={() => handleRowClick(project)}
                   >
-                    {/* ...existing cells... */}
+                    {/* ...existing cells before Aksi... */}
                     <td className="px-4 py-3">{index + 1}</td>
                     <td className="px-4 py-3">{project.name}</td>
                     <td className="px-4 py-3">{project.lokasi}</td>
@@ -125,28 +128,7 @@ const ProjectTable = () => {
                       {project.harga ? `Rp${project.harga.toLocaleString()}` : "-"}
                     </td>
 
-                    {/* NEW: Approval status + toggle (admin only) */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-2">
-                        {user?.role === 'admin' && (
-                          <button
-                            type="button"
-                            title={project.approval ? "Set Unapproved" : "Set Approved"}
-                            onClick={(e) => handleToggleApproval(e, project)}
-                            className={`inline-flex items-center justify-center w-8 h-8 rounded-md ${
-                              project.approval
-                                ? 'bg-emerald-600 hover:bg-emerald-700'
-                                : 'bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600'
-                            } text-white focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-600 shadow-sm`}
-                          >
-                            <span className="sr-only">Toggle Approval</span>
-                            {project.approval ? '✓' : '✕'}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Aksi: Edit/Delete only (toggle removed from here) */}
+                    {/* Aksi: Edit/Delete only */}
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
@@ -173,6 +155,27 @@ const ProjectTable = () => {
                         </button>
                       </div>
                     </td>
+
+                    {/* Approval: admin only */}
+                    {isAdmin && (
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            title={project.approval ? "Set Unapproved" : "Set Approved"}
+                            onClick={(e) => handleToggleApproval(e, project)}
+                            className={`inline-flex items-center justify-center w-8 h-8 rounded-md ${
+                              project.approval
+                                ? 'bg-emerald-600 hover:bg-emerald-700'
+                                : 'bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600'
+                            } text-white focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-600 shadow-sm`}
+                          >
+                            <span className="sr-only">Toggle Approval</span>
+                            {project.approval ? '✓' : '✕'}
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
