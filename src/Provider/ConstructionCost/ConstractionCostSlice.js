@@ -75,6 +75,26 @@ export const deleteConstructionCost = createAsyncThunk(
   }
 );
 
+// NEW: Delete multiple construction costs by ids (calls single delete endpoint per id)
+export const deleteConstructionCostIds = createAsyncThunk(
+  'constractionCost/deleteConstructionCostIds',
+  async (ids = [], { rejectWithValue }) => {
+    try {
+      if (!Array.isArray(ids) || ids.length === 0) return [];
+      await Promise.all(
+        ids.map((id) =>
+          axios.delete(`${API_URL}/construction-costs/${id}`, {
+            headers: getAuthHeaders(),
+          })
+        )
+      );
+      return ids;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   costs: [],
   filterJenis: null,
@@ -158,6 +178,20 @@ const constractionCostSlice = createSlice({
         state.costs = state.costs.filter((c) => String(c.id) !== String(removedId));
       })
       .addCase(deleteConstructionCost.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // NEW: batch delete by ids
+      .addCase(deleteConstructionCostIds.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteConstructionCostIds.fulfilled, (state, action) => {
+        state.loading = false;
+        const removedIds = new Set((action.payload || []).map((x) => String(x)));
+        state.costs = state.costs.filter((c) => !removedIds.has(String(c.id)));
+      })
+      .addCase(deleteConstructionCostIds.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProjectById, updateProject } from '../../Provider/Project/ProjectSlice';
+import { deleteConstructionCostIds } from '../../Provider/ConstructionCost/ConstractionCostSlice';
 import {
   setItems,
   selectItems,
@@ -157,7 +158,13 @@ const EditProjectConstruction = () => {
     }));
   };
 
-  const handleDeleteItem = (idx) => dispatch(deleteItem(idx));
+  const handleDeleteItem = (idx) => {
+    const item = items[idx];
+    if (item?.id) {
+      dispatch(deleteConstructionCostIds([item.id]));
+    }
+    dispatch(deleteItem(idx));
+  };
 
   const handleOpenModal = (idx) => dispatch(openModal({ type: 'material', itemIdx: idx, search: '' }));
   const handleCloseModal = () => dispatch(closeModal());

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Spinner from '../../Components/Spinner/Spinner';
-import { updateConstructionCost, deleteConstructionCost } from '../../Provider/ConstructionCost/ConstractionCostSlice';
+import { updateConstructionCost, deleteConstructionCostIds } from '../../Provider/ConstructionCost/ConstractionCostSlice';
 
 // Helper for currency formatting
 const formatCurrency = (value) =>
@@ -112,7 +112,7 @@ const ConstractionCostTable = () => {
   const handleDelete = (row) => {
     if (!row?.id) return;
     if (window.confirm('Hapus construction cost ini? Tindakan tidak dapat dibatalkan.')) {
-      dispatch(deleteConstructionCost(row.id));
+      dispatch(deleteConstructionCostIds([row.id]));
     }
   };
 
