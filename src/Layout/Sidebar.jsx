@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleSidebar } from "../Provider/GlobalSlice";
 import ConstructionPriceSidebar from "./ConstructionPriceSidebar";
 import UnitPriceSidebar from "./UnitPriceSidebar";
-// import BottomNavSidebar from "./BottomNavSidebar";
+import { fetchApprovedLibraryProjects } from "../Provider/Library/PreviewSlice"; // NEW
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -12,6 +12,10 @@ const Sidebar = () => {
   const { isSidebarOpen } = useSelector((state) => state.global);
   const { user } = useSelector((state) => state.auth);
   const isActive = (path) => location.pathname === path;
+
+  const prefetchLibrary = () => {
+    dispatch(fetchApprovedLibraryProjects());
+  };
 
   return (
     <aside
@@ -209,7 +213,7 @@ const Sidebar = () => {
               </span>
             </Link>
           </li>
-          <Link to="/library">
+          <Link to="/library" onClick={prefetchLibrary}>
             <li
               className={
                 isActive("/library")

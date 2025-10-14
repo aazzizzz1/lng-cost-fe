@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProjects } from "../../Provider/Project/ProjectSlice";
+import { fetchApprovedLibraryProjects, selectApprovedLibraryProjects } from "../../Provider/Library/PreviewSlice"; // NEW
 import { Link } from "react-router-dom";
 
 const Card = ({ children }) => (
@@ -39,13 +39,13 @@ class ErrorBoundary extends React.Component {
 
 const LibraryPages = () => {
   const dispatch = useDispatch();
-  const projects = useSelector((s) => s.projects.projects);
+  const approved = useSelector(selectApprovedLibraryProjects);
 
   useEffect(() => {
-    if (!projects?.length) dispatch(fetchProjects());
-  }, [dispatch, projects?.length]);
+    dispatch(fetchApprovedLibraryProjects()); // CHANGED: always fetch on mount
+  }, [dispatch]);
 
-  const list = projects || [];
+  const list = approved || []; // CHANGED: use approved projects
 
   return (
     <ErrorBoundary>

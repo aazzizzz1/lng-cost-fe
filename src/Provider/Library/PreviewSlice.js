@@ -1,6 +1,8 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import html2canvas from "html2canvas"; // NEW
 import { jsPDF } from "jspdf"; // NEW
+import axios from "axios";
+import Cookies from "js-cookie";
 
 // Resolve LNGBV images from src (support a couple of common filename variants)
 let IMG_LNGBV_5K, IMG_LNGBV_10K, IMG_LNGBV_15K;
@@ -176,6 +178,27 @@ export const resolveVariant = (project) => {
   return { group: null, variant: null };
 };
 
+// NEW: auth header helper (optional; will include token if present)
+const getAuthHeaders = () => {
+  const token = Cookies.get('accessToken');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+// NEW: fetch only approved projects for Library
+export const fetchApprovedLibraryProjects = createAsyncThunk(
+  "libraryPreview/fetchApprovedLibraryProjects",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API}/projects/library`, {
+        headers: getAuthHeaders(),
+      });
+      return res.data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 // NEW: helper to group costs (kelompok -> kelompokDetail)
 function groupCostsTree(constructionCosts = []) {
   const groups = {};
@@ -327,6 +350,10 @@ const previewSlice = createSlice({
     catalog,
     selectedProjectId: null,
     resolved: { group: null, variant: null },
+    // NEW: library-approved projects state
+    approvedProjects: [],
+    approvedLoading: false,
+    approvedError: null,
   },
   reducers: {
     setSelectedProjectId(state, action) {
@@ -338,6 +365,23 @@ const previewSlice = createSlice({
     resolveFromProject(state, action) {
       state.resolved = resolveVariant(action.payload);
     },
+  },
+  extraReducers: (builder) => {
+    // ...existing code...
+    // NEW: reducers for approved library projects
+    builder
+      .addCase(fetchApprovedLibraryProjects.pending, (state) => {
+        state.approvedLoading = true;
+        state.approvedError = null;
+      })
+      .addCase(fetchApprovedLibraryProjects.fulfilled, (state, action) => {
+        state.approvedLoading = false;
+        state.approvedProjects = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(fetchApprovedLibraryProjects.rejected, (state, action) => {
+        state.approvedLoading = false;
+        state.approvedError = action.payload || "Failed to load approved projects";
+      });
   },
 });
 
@@ -351,5 +395,7 @@ export const selectCurrentVariant = (s) => {
   const { resolved, catalog } = s.libraryPreview;
   return resolved.group && resolved.variant ? catalog[resolved.group]?.[resolved.variant] : null;
 };
+// NEW: selector for approved projects
+export const selectApprovedLibraryProjects = (s) => s.libraryPreview.approvedProjects;
 
 export default previewSlice.reducer;
