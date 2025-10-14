@@ -58,6 +58,9 @@ const EditProjectConstruction = () => {
   const [volume, setVolume] = useState('');
   const [saving, setSaving] = useState(false);
   const [inflasi, setInflasi] = useState(''); // NEW
+  const [levelAACE, setLevelAACE] = useState(''); // NEW
+  const [satuan, setSatuan] = useState(''); // NEW
+  const [harga, setHarga] = useState(''); // NEW
 
   // Load project
   useEffect(() => {
@@ -74,6 +77,9 @@ const EditProjectConstruction = () => {
     setTahun(project.tahun || '');
     setVolume(project.volume || '');
     setInflasi(project.inflasi ?? ''); // NEW
+    setLevelAACE(project.levelAACE ?? ''); // NEW
+    setSatuan(project.satuan ?? ''); // NEW
+    setHarga(project.harga ?? ''); // NEW
 
     const mapped =
       Array.isArray(project.constructionCosts)
@@ -118,6 +124,18 @@ const EditProjectConstruction = () => {
 
   const kelompokList = useMemo(() => Object.keys(grouped), [grouped]);
 
+  // NEW: determine preferred tipe from existing items (most common non-empty, excluding "Auto-generated")
+  const preferredTipe = useMemo(() => {
+    const counts = {};
+    (items || []).forEach((it) => {
+      const t = (it?.tipe || '').trim();
+      if (!t || t.toLowerCase() === 'auto-generated') return;
+      counts[t] = (counts[t] || 0) + 1;
+    });
+    const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    return best ? best[0] : (items?.find((x) => x?.tipe)?.tipe || '');
+  }, [items]);
+
   // Handlers
   const handleItemChange = (idx, field, value) => {
     if (field === 'qty' || field === 'hargaSatuan') {
@@ -151,10 +169,11 @@ const EditProjectConstruction = () => {
       tahun: Number(tahun) || project?.tahun,
       proyek: name || project?.name,
       lokasi: lokasi || project?.lokasi,
-      tipe: kategori || project?.kategori || '',
+      // CHANGED: use existing project's tipe, not kategori
+      tipe: preferredTipe || '', 
       kelompok,
       isCategory: false,
-      projectId: Number(id), // NEW: bind to current project
+      projectId: Number(id),
     }));
   };
 
@@ -223,10 +242,13 @@ const EditProjectConstruction = () => {
         kategori,
         tahun: Number(tahun),
         volume: Number(volume),
-        inflasi: inflasi === '' ? null : Number(inflasi), // NEW include project inflasi
+        inflasi: inflasi === '' ? null : Number(inflasi),
+        levelAACE: levelAACE === '' ? null : Number(levelAACE),
+        satuan: satuan || '',
+        harga: harga === '' ? null : Number(harga),
         constructionCosts: (items || []).map((it) => ({
-          id: it.id ?? undefined,               // CHANGED: use stored DB id
-          workcode: it.workcode || '', // NEW
+          id: it.id ?? undefined,
+          workcode: it.workcode || '',
           uraian: it.uraian,
           specification: it.specification || '',
           qty: Number(it.qty) || 0,
@@ -243,8 +265,9 @@ const EditProjectConstruction = () => {
           kelompok: it.kelompok || '',
           kelompokDetail: it.kelompokDetail || '',
           lokasi,
-          tipe: kategori || '',
-          projectId: Number(id), // NEW: ensure each cost carries project id
+          // CHANGED: keep per-item tipe; fallback to preferred tipe
+          tipe: (it.tipe && it.tipe !== 'Auto-generated') ? it.tipe : (preferredTipe || ''),
+          projectId: Number(id),
         })),
       };
 
@@ -265,8 +288,122 @@ const EditProjectConstruction = () => {
   }
 
   return (
-    <div className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Edit Project</h1>
+    <div className="p-4 md:p-6 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
+      <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Edit Project</h1>
+
+      {/* Header form (Flowbite-like, compact, 4-rows per column on lg) */}
+      <section className="mb-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="px-4 py-4 lg:py-5">
+          <h2 className="mb-3 text-base font-bold text-gray-900 dark:text-white">Informasi Project</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="sm:col-span-2 lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Nama Project</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nama Project"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Infrastruktur</label>
+              <input
+                type="text"
+                value={infrastruktur}
+                onChange={(e) => setInfrastruktur(e.target.value)}
+                placeholder="Infrastruktur"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Lokasi</label>
+              <input
+                type="text"
+                value={lokasi}
+                onChange={(e) => setLokasi(e.target.value)}
+                placeholder="Lokasi"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
+              <input
+                type="text"
+                value={kategori}
+                onChange={(e) => setKategori(e.target.value)}
+                placeholder="Kategori"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Tahun</label>
+              <input
+                type="number"
+                value={tahun}
+                onChange={(e) => setTahun(e.target.value)}
+                placeholder="Tahun"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Level AACE</label>
+              <input
+                type="number" min={1} max={5}
+                value={levelAACE}
+                onChange={(e) => setLevelAACE(e.target.value)}
+                placeholder="1-5"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Satuan</label>
+              <input
+                type="text"
+                value={satuan}
+                onChange={(e) => setSatuan(e.target.value)}
+                placeholder="CBM / MTPA / MMSCFD"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Volume</label>
+              <div className="flex gap-2">
+                <input
+                  type="number" step="any"
+                  value={volume}
+                  onChange={(e) => setVolume(e.target.value)}
+                  placeholder="Nilai volume"
+                  className="flex-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                />
+                <div className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs flex items-center min-w-[64px] text-gray-700 dark:text-gray-300">
+                  {satuan || '-'}
+                </div>
+              </div>
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Inflasi (%)</label>
+              <input
+                type="number" step="any"
+                value={inflasi}
+                onChange={(e) => setInflasi(e.target.value)}
+                placeholder="5"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+            <div className="lg:col-auto">
+              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Harga (legacy)</label>
+              <input
+                type="number" step="any"
+                value={harga}
+                onChange={(e) => setHarga(e.target.value)}
+                placeholder="0"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Validation Summary */}
       {(headerMissing.length > 0 || hasMissingItems) && (
@@ -299,71 +436,27 @@ const EditProjectConstruction = () => {
         </div>
       )}
 
-      {/* Header form */}
-      <div className="mb-6 bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Nama Project</div>
-            <input className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
-                   value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Infrastruktur</div>
-            <input className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
-                   value={infrastruktur} onChange={(e) => setInfrastruktur(e.target.value)} />
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Lokasi</div>
-            <input className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
-                   value={lokasi} onChange={(e) => setLokasi(e.target.value)} />
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Kategori</div>
-            <input className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
-                   value={kategori} onChange={(e) => setKategori(e.target.value)} />
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Tahun</div>
-            <input type="number" className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
-                   value={tahun} onChange={(e) => setTahun(e.target.value)} />
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Volume</div>
-            <input type="number" step="any" className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
-                   value={volume} onChange={(e) => setVolume(e.target.value)} />
-          </div>
-          <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Inflasi (%)</div>
-            <input type="number" step="any" className="w-full px-2 py-1 rounded border dark:bg-gray-900 dark:border-gray-700"
-                   value={inflasi} onChange={(e) => setInflasi(e.target.value)} />
-          </div>
-        </div>
-      </div>
-
       <div className="mt-2 flex justify-end">
         <button
           type="button"
           disabled={isSaveDisabled}
           onClick={handleSave}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-primary-600 to-primary-500 disabled:opacity-60 text-white px-6 py-2 rounded-full font-semibold shadow-md hover:scale-[1.01] transition"
+          className="inline-flex items-center gap-2 bg-primary-600 disabled:opacity-60 text-white px-4 py-1.5 rounded-md text-sm font-semibold shadow-sm hover:opacity-95 transition"
         >
           {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
         </button>
       </div>
 
-      {/* Tables per kelompok */}
+      {/* Tables per kelompok (compact) */}
       {kelompokList.map((kelompok) => (
-        <div key={kelompok} className="mb-8">
-          <div className="text-lg font-bold mb-2 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
+        <div key={kelompok} className="mb-6">
+          <div className="text-sm font-semibold mb-1 text-primary-700 dark:text-primary-300 uppercase tracking-wide">{kelompok}</div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left border-separate border-spacing-y-2 border-spacing-x-0">
+            <table className="w-full text-xs text-left table-auto">
               <thead>
-                <tr className="bg-transparent">
+                <tr>
                   {columns.map((c) => (
-                    <th
-                      key={c.key}
-                      className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400"
-                    >
+                    <th key={c.key} className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
                       {c.label}
                     </th>
                   ))}
@@ -377,33 +470,29 @@ const EditProjectConstruction = () => {
                     return rec && rec.missing.includes(field);
                   };
 
-                  // Softer inputs with focus ring; missing shows red ring
                   const inputBaseCls =
-                    "w-full bg-transparent px-2 py-1 rounded-md border border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500/60 dark:focus:ring-primary-400/40 placeholder-gray-400";
+                    "w-full bg-transparent px-1.5 py-1 rounded border border-transparent focus:outline-none focus:ring-1 focus:ring-primary-400/60 dark:focus:ring-primary-400/40 placeholder-gray-400 text-xs";
                   const inputBorderCls = "ring-0";
-                  const missingCls = "ring-2 ring-red-500 focus:ring-red-500";
+                  const missingCls = "ring-1 ring-red-500 focus:ring-red-500";
 
                   return (
                     <tr key={absIdx} className="group">
-                      {/* tambahkan nomor urut per group */}
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors rounded-l-xl font-medium text-gray-700 dark:text-gray-200">
-                        {grouped[kelompok].indexOf(item) + 1}
-                      </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">{grouped[kelompok].indexOf(item) + 1}</td>
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           value={item.workcode || ''}
                           onChange={(e) => handleItemChange(absIdx, 'workcode', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('workcode') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           value={item.uraian || ''}
                           onChange={(e) => handleItemChange(absIdx, 'uraian', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('uraian') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <textarea
                           rows={2}
                           value={item.specification || ''}
@@ -411,14 +500,14 @@ const EditProjectConstruction = () => {
                           className={`${inputBaseCls} resize-y ${missingFor('specification') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           value={item.satuan || ''}
                           onChange={(e) => handleItemChange(absIdx, 'satuan', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('satuan') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           type="number" min={0} step="any"
                           value={item.qty ?? 0}
@@ -426,7 +515,7 @@ const EditProjectConstruction = () => {
                           className={`${inputBaseCls} text-right ${missingFor('qty') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           type="number" min={0} step="any"
                           value={item.hargaSatuan ?? 0}
@@ -434,10 +523,10 @@ const EditProjectConstruction = () => {
                           className={`${inputBaseCls} text-right ${missingFor('hargaSatuan') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors text-right">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60 text-right">
                         {formatCurrency(item.totalHarga || 0)}
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           type="number" min={1} max={5}
                           value={item.aaceClass ?? 5}
@@ -445,38 +534,38 @@ const EditProjectConstruction = () => {
                           className={`${inputBaseCls} text-center ${missingFor('aaceClass') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           value={item.kelompokDetail || ''}
                           onChange={(e) => handleItemChange(absIdx, 'kelompokDetail', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('kelompokDetail') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           value={item.satuanVolume || ''}
                           onChange={(e) => handleItemChange(absIdx, 'satuanVolume', e.target.value)}
                           className={`${inputBaseCls} ${missingFor('satuanVolume') ? missingCls : inputBorderCls}`}
                         />
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <button
                           type="button"
                           title="Ambil Harga Satuan"
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-600 shadow-sm"
+                          className="inline-flex items-center justify-center w-7 h-7 rounded bg-primary-600 text-white hover:bg-primary-700 focus:outline-none focus:ring-1 focus:ring-primary-300 dark:focus:ring-primary-600 text-[11px]"
                           onClick={() => handleOpenModal(absIdx)}
                         >
-                          <PriceTagIcon className="w-4 h-4" />
+                          <PriceTagIcon className="w-3.5 h-3.5" />
                         </button>
                       </td>
-                      <td className="px-3 py-2 bg-white dark:bg-gray-900/60 group-hover:bg-gray-50 dark:group-hover:bg-gray-800/60 transition-colors rounded-r-xl">
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <button
                           type="button"
                           title="Hapus Item"
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
+                          className="inline-flex items-center justify-center w-7 h-7 rounded bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-1 focus:ring-rose-300 dark:focus:ring-rose-600 text-[11px]"
                           onClick={() => handleDeleteItem(absIdx)}
                         >
-                          <TrashIcon className="w-4 h-4" />
+                          <TrashIcon className="w-3.5 h-3.5" />
                         </button>
                       </td>
                     </tr>
@@ -487,7 +576,7 @@ const EditProjectConstruction = () => {
           </div>
           <button
             type="button"
-            className="bg-primary-700 hover:bg-primary-800 text-white px-3 py-1 rounded mb-2"
+            className="bg-primary-600 hover:bg-primary-700 text-white px-2.5 py-1 rounded text-xs mt-2"
             onClick={() => handleAddItem(kelompok)}
           >
             Tambah Item {kelompok}

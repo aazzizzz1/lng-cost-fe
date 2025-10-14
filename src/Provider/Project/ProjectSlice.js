@@ -152,17 +152,17 @@ export const deleteProject = (projectId) => async (dispatch) => {
   }
 };
 
-export const updateProject = (projectId, projectData) => async (dispatch) => {
+export const updateProject = (projectId, projectData) => async (dispatch, getState) => {
   try {
-    // Build a normalized payload to avoid null/undefined fields
+    const existing = getState()?.projects?.selectedProjectDetails || {};
     const normalized = (() => {
       const pd = projectData || {};
       const tahunHeader = Number(pd.tahun ?? new Date().getFullYear());
       const volumeHeader = Number(pd.volume ?? 0);
       const lokasiHeader = pd.lokasi ?? '';
       const infraHeader = pd.infrastruktur ?? '';
-      const tipeHeader = pd.kategori ?? '';
-      const inflasiHeader = pd.inflasi === null || pd.inflasi === undefined ? null : Number(pd.inflasi); // NEW
+      const tipeHeader = pd.kategori ?? ''; // keep for project-level category only
+      const inflasiHeader = pd.inflasi === null || pd.inflasi === undefined ? null : Number(pd.inflasi);
 
       const normalizeNumber = (v, fallback = 0) => {
         const n = Number(v);
@@ -172,8 +172,8 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
 
       const costs = Array.isArray(pd.constructionCosts) ? pd.constructionCosts : [];
       const normalizedCosts = costs.map((c) => ({
-        id: c.id, // keep id if present
-        workcode: normalizeString(c.workcode), // NEW
+        id: c.id,
+        workcode: normalizeString(c.workcode),
         uraian: normalizeString(c.uraian),
         specification: normalizeString(c.specification),
         qty: normalizeNumber(c.qty),
@@ -190,57 +190,38 @@ export const updateProject = (projectId, projectData) => async (dispatch) => {
         kelompok: normalizeString(c.kelompok),
         kelompokDetail: normalizeString(c.kelompokDetail),
         lokasi: normalizeString(c.lokasi ?? lokasiHeader, lokasiHeader),
-        tipe: normalizeString(tipeHeader || c.tipe, tipeHeader),
-        projectId: Number(projectId), // NEW: bind each cost to current project id
+        // CHANGED: keep per-item tipe; do NOT override with kategori
+        tipe: normalizeString(c.tipe),
+        projectId: Number(projectId),
       }));
 
       return {
-        ...pd,
+        id: Number(projectId),
+        name: normalizeString(pd.name, existing?.name || ''),
         tahun: tahunHeader,
         volume: volumeHeader,
         infrastruktur: infraHeader,
         lokasi: lokasiHeader,
-        kategori: tipeHeader,
-        inflasi: inflasiHeader, // NEW
+        kategori: tipeHeader, // project-level category unchanged
+        inflasi: inflasiHeader,
+        levelAACE: pd.levelAACE === undefined || pd.levelAACE === '' ? existing.levelAACE : Number(pd.levelAACE),
+        harga: pd.harga === undefined || pd.harga === '' ? existing.harga : Number(pd.harga),
+        satuan: pd.satuan === undefined ? existing.satuan : normalizeString(pd.satuan, existing.satuan || ''),
         constructionCosts: normalizedCosts,
       };
     })();
 
-    // DEBUG: log normalized payload and check missing fields
+    const finalPayload = { ...existing, ...normalized };
+
+    // DEBUG
     if (typeof window !== 'undefined') {
       console.log('[updateProject] projectId:', projectId);
-      console.log('[updateProject] normalized payload:', normalized);
-      if (Array.isArray(normalized.constructionCosts)) {
-        const required = [
-          'uraian',
-          'specification',
-          'qty',
-          'satuan',
-          'hargaSatuan',
-          'totalHarga',
-          'aaceClass',
-          'tahun',
-          'infrastruktur',
-          'volume',
-          'satuanVolume',
-          'kelompok',
-          'kelompokDetail',
-          'lokasi',
-          'tipe',
-        ];
-        const missingReport = normalized.constructionCosts
-          .map((c, idx) => {
-            const missing = required.filter((k) => c[k] === undefined || c[k] === null || c[k] === '');
-            return missing.length ? { idx, id: c.id, missing } : null;
-          })
-          .filter(Boolean);
-        if (missingReport.length) console.warn('[updateProject] Missing fields per item:', missingReport);
-      }
+      console.log('[updateProject] final payload (merged):', finalPayload);
     }
 
     const res = await axios.put(
       `${process.env.REACT_APP_API}/projects/${projectId}`,
-      normalized,
+      finalPayload,
       { headers: getAuthHeaders() }
     );
 

@@ -198,7 +198,15 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
         value: row.kelompokDetail || "",
       })
     );
-    // NEW: stamp owning project id on the edited construction item
+    // NEW: set tipe from source (row or selectedType)
+    dispatch(
+      updateItem({
+        idx: modal.itemIdx,
+        field: "tipe",
+        value: row.tipe || selectedType || "",
+      })
+    );
+    // NEW: stamp owning project id
     dispatch(
       updateItem({
         idx: modal.itemIdx,

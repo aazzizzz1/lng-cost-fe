@@ -147,7 +147,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
         tahun: cost.tahun,
         proyek: newProject.name,
         lokasi: newProject.lokasi,
-        tipe: newProject.infrastruktur,
+        tipe: cost.tipe || '', // CHANGED: use tipe from cost, not infrastruktur
         aaceClass: cost.aaceClass,
         isCategory: false,
       }));
