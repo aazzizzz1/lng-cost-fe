@@ -84,11 +84,11 @@ const EditProjectConstruction = () => {
     const mapped =
       Array.isArray(project.constructionCosts)
         ? project.constructionCosts.map((c) => ({
-            id: c.id,                          // NEW: keep DB id
-            kode: c.workcode || c.id,          // prefer workcode for display
-            workcode: c.workcode || '', // NEW
+            id: c.id,
+            kode: c.workcode || c.id,
+            workcode: c.workcode || '',
             uraian: c.uraian,
-            specification: c.specification, // preserved
+            specification: c.specification,
             satuan: c.satuan,
             qty: c.qty,
             hargaSatuan: c.hargaSatuan,
@@ -106,7 +106,8 @@ const EditProjectConstruction = () => {
             tipe: c.tipe,
             proyek: project.name,
             isCategory: false,
-            projectId: project.id, // NEW: keep owning project id
+            projectId: project.id,
+            // removed createdAt
           }))
         : [];
     dispatch(setItems(mapped));
@@ -218,7 +219,7 @@ const EditProjectConstruction = () => {
 
   const columns = [
     { key: 'no', label: 'No' },
-    { key: 'workcode', label: 'Workcode*' },                              // NEW
+    { key: 'workcode', label: 'Workcode*' },
     { key: 'uraian', label: 'Uraian*' },
     { key: 'specification', label: 'Specification*' },
     { key: 'satuan', label: 'Satuan*' },
@@ -226,6 +227,12 @@ const EditProjectConstruction = () => {
     { key: 'hargaSatuan', label: 'Harga Satuan*' },
     { key: 'totalHarga', label: 'Total Harga' },
     { key: 'aaceClass', label: 'AACE Class*' },
+    // NEW: show complete numeric bounds and meta
+    { key: 'accuracyLow', label: 'Accuracy Low' },
+    { key: 'accuracyHigh', label: 'Accuracy High' },
+    { key: 'tahun', label: 'Tahun' },
+    { key: 'lokasi', label: 'Lokasi' },
+    { key: 'tipe', label: 'Tipe' },
     { key: 'kelompokDetail', label: 'Kelompok Detail*' },
     { key: 'satuanVolume', label: 'Satuan Volume*' },
     { key: 'ambil', label: 'Ambil Harga' },
@@ -265,9 +272,9 @@ const EditProjectConstruction = () => {
           kelompok: it.kelompok || '',
           kelompokDetail: it.kelompokDetail || '',
           lokasi,
-          // CHANGED: keep per-item tipe; fallback to preferred tipe
           tipe: (it.tipe && it.tipe !== 'Auto-generated') ? it.tipe : (preferredTipe || ''),
           projectId: Number(id),
+          // removed createdAt
         })),
       };
 
@@ -534,6 +541,50 @@ const EditProjectConstruction = () => {
                           className={`${inputBaseCls} text-center ${missingFor('aaceClass') ? missingCls : inputBorderCls}`}
                         />
                       </td>
+                      {/* NEW: Accuracy Low */}
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
+                        <input
+                          type="number" step="any"
+                          value={item.accuracyLow ?? 0}
+                          onChange={(e) => handleItemChange(absIdx, 'accuracyLow', e.target.value)}
+                          className={`${inputBaseCls} text-right ${inputBorderCls}`}
+                        />
+                      </td>
+                      {/* NEW: Accuracy High */}
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
+                        <input
+                          type="number" step="any"
+                          value={item.accuracyHigh ?? 0}
+                          onChange={(e) => handleItemChange(absIdx, 'accuracyHigh', e.target.value)}
+                          className={`${inputBaseCls} text-right ${inputBorderCls}`}
+                        />
+                      </td>
+                      {/* NEW: Tahun (per item) */}
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
+                        <input
+                          type="number"
+                          value={item.tahun ?? tahun ?? ''}
+                          onChange={(e) => handleItemChange(absIdx, 'tahun', e.target.value)}
+                          className={`${inputBaseCls} text-center ${inputBorderCls}`}
+                        />
+                      </td>
+                      {/* NEW: Lokasi (per item) */}
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
+                        <input
+                          value={item.lokasi || lokasi || ''}
+                          onChange={(e) => handleItemChange(absIdx, 'lokasi', e.target.value)}
+                          className={`${inputBaseCls} ${inputBorderCls}`}
+                        />
+                      </td>
+                      {/* NEW: Tipe (per item) */}
+                      <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
+                        <input
+                          value={item.tipe || ''}
+                          onChange={(e) => handleItemChange(absIdx, 'tipe', e.target.value)}
+                          className={`${inputBaseCls} ${inputBorderCls}`}
+                        />
+                      </td>
+                      {/* NEW: Kelompok Detail (matches header order) */}
                       <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           value={item.kelompokDetail || ''}
@@ -541,6 +592,7 @@ const EditProjectConstruction = () => {
                           className={`${inputBaseCls} ${missingFor('kelompokDetail') ? missingCls : inputBorderCls}`}
                         />
                       </td>
+                      {/* NEW: Satuan Volume (matches header order) */}
                       <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <input
                           value={item.satuanVolume || ''}
@@ -548,6 +600,7 @@ const EditProjectConstruction = () => {
                           className={`${inputBaseCls} ${missingFor('satuanVolume') ? missingCls : inputBorderCls}`}
                         />
                       </td>
+                      {/* Ambil Harga */}
                       <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <button
                           type="button"
@@ -558,6 +611,7 @@ const EditProjectConstruction = () => {
                           <PriceTagIcon className="w-3.5 h-3.5" />
                         </button>
                       </td>
+                      {/* Aksi */}
                       <td className="px-2 py-1 bg-white dark:bg-gray-900/60">
                         <button
                           type="button"

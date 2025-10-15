@@ -225,7 +225,6 @@ export const updateProject = (projectId, projectData) => async (dispatch, getSta
         kelompok: normalizeString(c.kelompok),
         kelompokDetail: normalizeString(c.kelompokDetail),
         lokasi: normalizeString(c.lokasi ?? lokasiHeader, lokasiHeader),
-        // CHANGED: keep per-item tipe; do NOT override with kategori
         tipe: normalizeString(c.tipe),
         projectId: Number(projectId),
       }));

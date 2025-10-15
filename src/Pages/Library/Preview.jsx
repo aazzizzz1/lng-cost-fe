@@ -175,6 +175,13 @@ const Preview = () => {
     { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', isCurrency: true },
     { key: 'totalHarga', label: 'Total Harga', className: 'text-right', isCurrency: true },
     { key: 'aaceClass', label: 'AACE Class' },
+    // NEW: more complete fields
+    { key: 'accuracyLow', label: 'Accuracy Low', className: 'text-right' },
+    { key: 'accuracyHigh', label: 'Accuracy High', className: 'text-right' },
+    { key: 'tahun', label: 'Tahun', className: 'text-center' },
+    { key: 'lokasi', label: 'Lokasi' },
+    { key: 'satuanVolume', label: 'Satuan Volume' },
+    { key: 'tipe', label: 'Tipe' },
   ];
 
   const formatCurrency = (value) => (value ? `Rp${Number(value).toLocaleString()}` : '-');

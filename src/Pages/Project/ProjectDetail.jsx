@@ -37,7 +37,7 @@ const ProjectDetail = () => {
 
   // Kolom tabel
   const columns = [
-    { key: 'workcode', label: 'Workcode' }, // NEW
+    { key: 'workcode', label: 'Workcode' },
     { key: 'uraian', label: 'Uraian' },
     { key: 'specification', label: 'Specification' },
     { key: 'qty', label: 'Qty', className: 'text-right' },
@@ -45,6 +45,13 @@ const ProjectDetail = () => {
     { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', isCurrency: true },
     { key: 'totalHarga', label: 'Total Harga', className: 'text-right', isCurrency: true },
     { key: 'aaceClass', label: 'AACE Class' },
+    // NEW: more complete fields
+    { key: 'accuracyLow', label: 'Accuracy Low', className: 'text-right' },
+    { key: 'accuracyHigh', label: 'Accuracy High', className: 'text-right' },
+    { key: 'tahun', label: 'Tahun', className: 'text-center' },
+    { key: 'lokasi', label: 'Lokasi' },
+    { key: 'satuanVolume', label: 'Satuan Volume' },
+    { key: 'tipe', label: 'Tipe' },
   ];
 
   const formatCurrency = (value) =>
