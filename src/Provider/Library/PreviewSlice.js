@@ -200,7 +200,8 @@ export const fetchApprovedLibraryProjects = createAsyncThunk(
 );
 
 // NEW: helper to group costs (kelompok -> kelompokDetail)
-function groupCostsTree(constructionCosts = []) {
+// change to exported to avoid no-unused-vars warning
+export function groupCostsTree(constructionCosts = []) {
   const groups = {};
   constructionCosts.forEach((item) => {
     const g = item.kelompok || "Lainnya";
@@ -254,88 +255,144 @@ export async function generatePreviewPdf(element, filename = "preview.pdf") {
   pdf.save(filename);
 }
 
-// NEW: build and download recap-like Excel (TSV in .xls)
+// NEW: build grouped-by-kelompok, styled HTML workbook for Excel
 export function generatePreviewExcel({ projectDetails, currentVariant, resolved, title = "Project Library Preview" }) {
-  const rows = [];
   const pd = projectDetails || {};
-  const totalHarga = pd?.totalConstructionCost ?? pd?.harga ?? 0;
+  const costs = Array.isArray(pd.constructionCosts) ? pd.constructionCosts : [];
 
-  // Title + Summary
-  rows.push([title]);
-  rows.push([]);
-  rows.push(["Project", pd.name || ""]);
-  rows.push(["Infrastructure", pd.infrastruktur || ""]);
-  rows.push(["Location", pd.lokasi || ""]);
-  rows.push(["Year", pd.tahun || ""]);
-  rows.push(["Estimated Total (IDR)", totalHarga]);
-  rows.push(["Resolved", `${resolved?.group || "-"} — ${currentVariant?.label || "-"}`]);
-  rows.push([]);
+  // Columns matching UI
+  const columns = [
+    { key: 'workcode', label: 'Workcode' },
+    { key: 'uraian', label: 'Uraian' },
+    { key: 'specification', label: 'Specification' },
+    { key: 'qty', label: 'Qty', align: 'right' },
+    { key: 'satuan', label: 'Satuan' },
+    { key: 'hargaSatuan', label: 'Harga Satuan', align: 'right', currency: true },
+    { key: 'totalHarga', label: 'Total Harga', align: 'right', currency: true },
+    { key: 'aaceClass', label: 'AACE Class' },
+    { key: 'accuracyLow', label: 'Accuracy Low', align: 'right' },
+    { key: 'accuracyHigh', label: 'Accuracy High', align: 'right' },
+    { key: 'tahun', label: 'Tahun', align: 'center' },
+    { key: 'lokasi', label: 'Lokasi' },
+    { key: 'satuanVolume', label: 'Satuan Volume' },
+    { key: 'tipe', label: 'Tipe' },
+  ];
 
-  // Parameters
-  if (currentVariant) {
-    rows.push(["Parameters"]);
-    const md = currentVariant.params?.["Main Dimension"] || {};
-    const ct = currentVariant.params?.["Cargo Tank"] || {};
-    rows.push(["Main Dimension"]);
-    rows.push(["", "LOA (Length Over All)", md.LOA || ""]);
-    rows.push(["", "Breadth", md.Breadth || ""]);
-    rows.push(["", "Deadweight", md.Deadweight || ""]);
-    rows.push(["Cargo Tank"]);
-    rows.push(["", "Type of Cargo Tank", ct["Type of Cargo Tank"] || ""]);
-    rows.push(["", "Gas Capacities", ct["Gas Capacities"] || ""]);
-    rows.push(["Propeller Type", currentVariant.params?.["Propeller Type"] || ""]);
-    rows.push([]);
-  }
-
-  // Drawings
-  if (currentVariant?.drawings?.length) {
-    rows.push(["Technical Drawings"]);
-    rows.push(["Title", "URL"]);
-    currentVariant.drawings.forEach((d) => {
-      rows.push([d.title || "-", d.url || "-"]);
+  // Group by kelompok only (mirror UI)
+  const groupsMap = {};
+  costs.forEach((it) => {
+    const g = it.kelompok || 'Lainnya';
+    if (!groupsMap[g]) groupsMap[g] = [];
+    groupsMap[g].push(it);
+  });
+  const groups = Object.keys(groupsMap).sort((a,b)=>a.localeCompare(b)).map((g)=> {
+    const items = groupsMap[g].slice().sort((a,b) => {
+      const ak = a.workcode || a.kode || '';
+      const bk = b.workcode || b.kode || '';
+      if (ak && bk) {
+        const lc = ak.localeCompare(bk, undefined, { numeric: true });
+        if (lc !== 0) return lc;
+      }
+      return (a.uraian || '').localeCompare(b.uraian || '');
     });
-    rows.push([]);
-  }
+    const total = items.reduce((s, it)=> s + (Number(it.totalHarga) || 0), 0);
+    return { name: g, items, total };
+  });
+  const overallTotal = groups.reduce((s, g)=> s + g.total, 0);
 
-  // Construction Costs (grouped)
-  const tree = groupCostsTree(pd.constructionCosts || []);
-  if (tree.length) {
-    rows.push(["Construction Costs"]);
-    rows.push(["Workcode", "Uraian", "Specification", "Qty", "Satuan", "Harga Satuan", "Total Harga", "AACE Class", "Kelompok", "Kelompok Detail"]);
-    tree.forEach((g) => {
-      rows.push([]);
-      rows.push([g.group.toUpperCase()]);
-      g.subgroups.forEach((sg) => {
-        rows.push([sg.subgroup]);
-        sg.items.forEach((it) => {
-          rows.push([
-            it.workcode || "",
-            it.uraian || "",
-            it.specification || "",
-            it.qty ?? "",
-            it.satuan || "",
-            it.hargaSatuan ?? "",
-            it.totalHarga ?? "",
-            it.aaceClass ?? "",
-            it.kelompok || "",
-            it.kelompokDetail || "",
-          ]);
-        });
-      });
-    });
-    rows.push([]);
-    rows.push(["TOTAL", "", "", "", "", "", (pd.totalConstructionCost ?? 0)]);
-    rows.push(["PPN 11%", "", "", "", "", "", (pd.ppn ?? 0)]);
-    rows.push(["GRAND TOTAL TERMASUK PPN", "", "", "", "", "", (pd.totalEstimation ?? (pd.totalConstructionCost ?? 0) + (pd.ppn ?? 0))]);
-  }
+  const summaryRows = [
+    ['Project', pd.name || ''],
+    ['Infrastructure', pd.infrastruktur || ''],
+    ['Location', pd.lokasi || ''],
+    ['Year', pd.tahun || ''],
+    ['Estimated Total (IDR)', (pd.totalConstructionCost ?? pd.harga ?? 0)],
+    ['Resolved', `${resolved?.group || '-'} — ${currentVariant?.label || '-'}`],
+  ];
 
-  // Download as .xls (TSV)
-  const tsv = rows.map((r) => r.map((c) => (c === null || c === undefined ? "" : String(c))).join("\t")).join("\n");
-  const blob = new Blob([tsv], { type: "text/tab-separated-values;charset=utf-8" });
+  const th = columns.map(c =>
+    `<th style="border:1px solid #e5e7eb;padding:6px 8px;background:#f3f4f6;color:#374151;text-align:${c.align || 'left'};font-weight:600;">${c.label}</th>`
+  ).join('');
+
+  const groupsHtml = groups.map(g => {
+    const header = `
+      <tr>
+        <td colspan="${columns.length}" style="background:#dbeafe;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-transform:uppercase;">
+          ${g.name}
+        </td>
+      </tr>`;
+    const rows = g.items.map(item => `
+      <tr>
+        ${columns.map(c => {
+          const valRaw = item[c.key];
+          const v = c.currency ? (valRaw ? `Rp${Number(valRaw).toLocaleString()}` : '-') : (valRaw ?? '-');
+          return `<td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;text-align:${c.align || 'left'};">${v}</td>`;
+        }).join('')}
+      </tr>`
+    ).join('');
+    const total = `
+      <tr>
+        <td colspan="${columns.length - 1}" style="background:#fef3c7;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Total ${g.name}</td>
+        <td style="background:#fef3c7;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Rp${Number(g.total).toLocaleString()}</td>
+      </tr>`;
+    return header + rows + total;
+  }).join('');
+
+  const overallRow = `
+    <tr>
+      <td colspan="${columns.length - 1}" style="background:#fed7aa;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">TOTAL</td>
+      <td style="background:#fed7aa;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Rp${Number(overallTotal).toLocaleString()}</td>
+    </tr>`;
+
+  const summaryTable = `
+    <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin-bottom:12px;">
+      ${summaryRows.map(r => `
+        <tr>
+          <td style="padding:4px 8px;border:1px solid #e5e7eb;background:#f9fafb;font-weight:600;color:#374151;">${r[0]}</td>
+          <td style="padding:4px 8px;border:1px solid #e5e7eb;color:#111827;">${r[1]}</td>
+        </tr>`).join('')}
+    </table>`;
+
+  const costsTable = `
+    <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
+      <thead><tr>${th}</tr></thead>
+      <tbody>
+        ${groupsHtml}
+        ${overallRow}
+      </tbody>
+    </table>`;
+
+  const drawingsHtml = (currentVariant?.drawings || []).length
+    ? `
+      <h3 style="font-family:Arial,Helvetica,sans-serif;color:#111827;margin:14px 0 6px;">Technical Drawings</h3>
+      <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin-bottom:12px;">
+        <tr>
+          <th style="border:1px solid #e5e7eb;padding:6px 8px;background:#f3f4f6;color:#374151;text-align:left;font-weight:600;">Title</th>
+          <th style="border:1px solid #e5e7eb;padding:6px 8px;background:#f3f4f6;color:#374151;text-align:left;font-weight:600;">URL</th>
+        </tr>
+        ${(currentVariant.drawings || []).map(d => `
+          <tr>
+            <td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;">${d.title || '-'}</td>
+            <td style="border:1px solid #e5e7eb;padding:6px 8px;color:#2563eb;text-decoration:underline;">${d.url || '-'}</td>
+          </tr>
+        `).join('')}
+      </table>`
+    : '';
+
+  const html = `
+    <!DOCTYPE html>
+    <html><head><meta charset="utf-8"><title>${title}</title></head>
+    <body>
+      <h2 style="font-family:Arial,Helvetica,sans-serif;color:#111827;">${title}</h2>
+      ${summaryTable}
+      ${drawingsHtml}
+      ${costsTable}
+    </body></html>`;
+
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
-  a.download = `${(pd.name || "project").replace(/\s+/g, "_")}_preview.xls`;
+  a.download = `${(pd.name || 'project').replace(/\s+/g, '_')}_preview.xls`;
   document.body.appendChild(a);
   a.click();
   setTimeout(() => {
@@ -381,13 +438,14 @@ const previewSlice = createSlice({
       .addCase(fetchApprovedLibraryProjects.rejected, (state, action) => {
         state.approvedLoading = false;
         state.approvedError = action.payload || "Failed to load approved projects";
+        state.approvedProjects = [];
       });
   },
 });
 
 export const { setSelectedProjectId, setResolved, resolveFromProject } = previewSlice.actions;
 
-// selectors
+// NEW: selectors (needed by LibraryPages, Preview, RecapModal)
 export const selectLibraryState = (s) => s.libraryPreview;
 export const selectCatalog = (s) => s.libraryPreview.catalog;
 export const selectResolved = (s) => s.libraryPreview.resolved;
@@ -395,7 +453,6 @@ export const selectCurrentVariant = (s) => {
   const { resolved, catalog } = s.libraryPreview;
   return resolved.group && resolved.variant ? catalog[resolved.group]?.[resolved.variant] : null;
 };
-// NEW: selector for approved projects
 export const selectApprovedLibraryProjects = (s) => s.libraryPreview.approvedProjects;
 
 export default previewSlice.reducer;

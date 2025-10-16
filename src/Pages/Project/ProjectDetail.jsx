@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchProjectById } from '../../Provider/Project/ProjectSlice'
+import { fetchProjectById, generateProjectDetailExcel } from '../../Provider/Project/ProjectSlice'
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -72,6 +72,11 @@ const ProjectDetail = () => {
     [groupedTree]
   );
 
+  // NEW: Delegate export to slice helper (kept styling & grouping in slice)
+  const handleExportExcel = () => {
+    generateProjectDetailExcel({ project, columns });
+  };
+
   if (!project) {
     return <div className="p-4">Loading...</div>;
   }
@@ -113,7 +118,16 @@ const ProjectDetail = () => {
       </div>
       {Array.isArray(project.constructionCosts) && project.constructionCosts.length > 0 ? (
         <div>
-          <div className="font-semibold mb-3 text-gray-900 dark:text-white">Construction Costs</div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="font-semibold text-gray-900 dark:text-white">Construction Costs</div>
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded"
+            >
+              Export ke Excel
+            </button>
+          </div>
           <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
             {/* CHANGED: Flowbite-like table + dark text/borders */}
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">

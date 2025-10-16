@@ -312,4 +312,165 @@ export const fetchProjectDetailCache = (projectId) => async (dispatch, getState)
   }
 };
 
+// NEW: Export Project Detail to Excel (styled HTML, grouped by 'kelompok')
+export function generateProjectDetailExcel({ project, columns: passedColumns } = {}) {
+  const p = project || {};
+  const costs = Array.isArray(p.constructionCosts) ? p.constructionCosts : [];
+
+  // Columns default (same as UI)
+  const columns = passedColumns && Array.isArray(passedColumns) && passedColumns.length
+    ? passedColumns
+    : [
+        { key: 'workcode', label: 'Workcode' },
+        { key: 'uraian', label: 'Uraian' },
+        { key: 'specification', label: 'Specification' },
+        { key: 'qty', label: 'Qty', className: 'text-right' },
+        { key: 'satuan', label: 'Satuan' },
+        { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', isCurrency: true },
+        { key: 'totalHarga', label: 'Total Harga', className: 'text-right', isCurrency: true },
+        { key: 'aaceClass', label: 'AACE Class' },
+        { key: 'accuracyLow', label: 'Accuracy Low', className: 'text-right' },
+        { key: 'accuracyHigh', label: 'Accuracy High', className: 'text-right' },
+        { key: 'tahun', label: 'Tahun', className: 'text-center' },
+        { key: 'lokasi', label: 'Lokasi' },
+        { key: 'satuanVolume', label: 'Satuan Volume' },
+        { key: 'tipe', label: 'Tipe' },
+      ];
+
+  // Group by kelompok only (mirror UI)
+  const groupsMap = {};
+  costs.forEach((it) => {
+    const g = it.kelompok || 'Lainnya';
+    if (!groupsMap[g]) groupsMap[g] = [];
+    groupsMap[g].push(it);
+  });
+
+  const groups = Object.keys(groupsMap)
+    .sort((a, b) => a.localeCompare(b))
+    .map((g) => {
+      const items = groupsMap[g].slice().sort((a, b) => {
+        const ak = a.workcode || a.kode || '';
+        const bk = b.workcode || b.kode || '';
+        if (ak && bk) {
+          const lc = ak.localeCompare(bk, undefined, { numeric: true });
+          if (lc !== 0) return lc;
+        }
+        return (a.uraian || '').localeCompare(b.uraian || '');
+      });
+      const total = items.reduce((s, it) => s + (Number(it.totalHarga) || 0), 0);
+      return { name: g, items, total };
+    });
+
+  const overallTotal = groups.reduce((s, g) => s + g.total, 0);
+
+  const headerInfo = [
+    ['Project', p?.name || ''],
+    ['Infrastruktur', p?.infrastruktur || ''],
+    ['Lokasi', p?.lokasi || ''],
+    ['Tahun', p?.tahun || ''],
+    ['Inflasi', p?.inflasi ?? '-'],
+  ];
+
+  const th = columns
+    .map((c) => {
+      const align = c.className?.includes('text-right')
+        ? 'right'
+        : c.className?.includes('text-center')
+        ? 'center'
+        : 'left';
+      return `<th style="border:1px solid #e5e7eb;padding:6px 8px;background:#f9fafb;color:#374151;text-align:${align};font-weight:600;">${c.label}</th>`;
+    })
+    .join('');
+
+  const groupsHtml = groups
+    .map((g) => {
+      const header = `
+        <tr>
+          <td colspan="${columns.length}" style="background:#dbeafe;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-transform:uppercase;">
+            ${g.name}
+          </td>
+        </tr>`;
+      const rows = g.items
+        .map(
+          (item) => `
+        <tr>
+          ${columns
+            .map((c) => {
+              const align = c.className?.includes('text-right')
+                ? 'right'
+                : c.className?.includes('text-center')
+                ? 'center'
+                : 'left';
+              const valRaw = item[c.key];
+              const v = c.isCurrency
+                ? valRaw
+                  ? `Rp${Number(valRaw).toLocaleString()}`
+                  : '-'
+                : valRaw ?? '-';
+              return `<td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;text-align:${align};">${v}</td>`;
+            })
+            .join('')}
+        </tr>`
+        )
+        .join('');
+      const total = `
+        <tr>
+          <td colspan="${columns.length - 1}" style="background:#fef3c7;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Total ${g.name}</td>
+          <td style="background:#fef3c7;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Rp${Number(g.total).toLocaleString()}</td>
+        </tr>`;
+      return header + rows + total;
+    })
+    .join('');
+
+  const overallRow = `
+    <tr>
+      <td colspan="${columns.length - 1}" style="background:#fed7aa;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">TOTAL</td>
+      <td style="background:#fed7aa;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Rp${Number(overallTotal).toLocaleString()}</td>
+    </tr>`;
+
+  const summaryTable = `
+    <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;margin-bottom:12px;">
+      ${headerInfo
+        .map(
+          (r) => `
+        <tr>
+          <td style="padding:4px 8px;border:1px solid #e5e7eb;background:#f9fafb;font-weight:600;color:#374151;">${r[0]}</td>
+          <td style="padding:4px 8px;border:1px solid #e5e7eb;color:#111827;">${r[1]}</td>
+        </tr>`
+        )
+        .join('')}
+    </table>`;
+
+  const table = `
+    <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
+      <thead><tr>${th}</tr></thead>
+      <tbody>
+        ${groupsHtml}
+        ${overallRow}
+      </tbody>
+    </table>`;
+
+  const title = `Construction Costs — ${p?.name || ''}`;
+  const html = `
+    <!DOCTYPE html>
+    <html><head><meta charset="utf-8"><title>${title}</title></head>
+    <body>
+      <h2 style="font-family:Arial,Helvetica,sans-serif;color:#111827;">${title}</h2>
+      ${summaryTable}
+      ${table}
+    </body></html>`;
+
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(p?.name || 'project').replace(/\s+/g, '_')}_construction_costs.xls`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
 export default projectSlice.reducer;
