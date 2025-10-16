@@ -60,8 +60,8 @@ const ManageData = () => {
   };
 
   return (
-    <div className="p-4 dark:bg-darkmode min-h-screen dark:overflow-auto">
-      <div className="max-w-5xl mx-auto">
+    <div className="p-4 dark:bg-darkmode mb-2">
+      <div className="w-full"> {/* CHANGED: was max-w-5xl mx-auto */}
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
           Management and Configuration Project
         </h1>

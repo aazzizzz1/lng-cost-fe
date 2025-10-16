@@ -9,7 +9,7 @@ const api = process.env.REACT_APP_API;
 const emptyForm = { username: "", email: "", role: "user", password: "" };
 
 const UserManagement = () => {
-  const { user, accessToken } = useSelector((s) => s.auth);
+  const { user } = useSelector((s) => s.auth); // removed accessToken
   const isAdmin = useMemo(() => user?.role === "admin", [user]);
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState([]);
@@ -19,27 +19,22 @@ const UserManagement = () => {
   const [form, setForm] = useState(emptyForm);
   const [query, setQuery] = useState("");
 
-  const authHeader = useMemo(
-    () => ({ headers: { Authorization: `Bearer ${accessToken}` } }),
-    [accessToken]
-  );
-
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
-      const res = await axios.get(`${api}/auth/users`, authHeader);
+      const res = await axios.get(`${api}/auth/users`, { withCredentials: true });
       setRows(res.data.data || []);
     } catch (e) {
       setError(e.response?.data?.message || "Failed to fetch users");
     } finally {
       setLoading(false);
     }
-  }, [authHeader]);
+  }, []);
 
   useEffect(() => {
-    if (isAdmin && accessToken) fetchUsers();
-  }, [isAdmin, accessToken, fetchUsers]);
+    if (isAdmin) fetchUsers(); // removed accessToken gate
+  }, [isAdmin, fetchUsers]);
 
   const onEdit = (u) => {
     setSelectedId(u.id);
@@ -55,7 +50,7 @@ const UserManagement = () => {
   const onDelete = async (id) => {
     if (!window.confirm("Delete this user?")) return;
     try {
-      await axios.delete(`${api}/auth/users/${id}`, authHeader);
+      await axios.delete(`${api}/auth/users/${id}`, { withCredentials: true });
       setRows((prev) => prev.filter((r) => r.id !== id));
     } catch (e) {
       alert(e.response?.data?.message || "Delete failed");
@@ -67,7 +62,7 @@ const UserManagement = () => {
     const payload = { username: form.username, email: form.email, role: form.role };
     if (form.password) payload.password = form.password;
     try {
-      await axios.put(`${api}/auth/users/${selectedId}`, payload, authHeader);
+      await axios.put(`${api}/auth/users/${selectedId}`, payload, { withCredentials: true });
       setEditOpen(false);
       setForm(emptyForm);
       setSelectedId(null);

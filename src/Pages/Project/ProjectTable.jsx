@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CreateProjectModal from "./CreateProjectModal";
-import { fetchProjects, fetchProjectById, deleteProject, updateProjectApproval } from "../../Provider/Project/ProjectSlice";
+import { fetchManualProjects, fetchAutoProjects, deleteProject, updateProjectApproval } from "../../Provider/Project/ProjectSlice";
 import { useNavigate } from "react-router-dom";
 import DeleteModal from '../../Components/Modal/DeleteModal'; // NEW
 
@@ -22,39 +22,36 @@ const TrashIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
-const ProjectTable = () => {
+// NEW: Detail (eye) icon
+const EyeIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M1.5 12s4-7.5 10.5-7.5S22.5 12 22.5 12 18.5 19.5 12 19.5 1.5 12 1.5 12z" />
+    <circle cx="12" cy="12" r="3" strokeWidth="1.6" />
+  </svg>
+);
+
+const ProjectTable = ({ variant = "manual" }) => {
   const dispatch = useDispatch();
   const projects = useSelector((state) => state.projects.projects);
-  const projectDetails = useSelector((state) => state.projects.selectedProjectDetails);
   const { user } = useSelector((state) => state.auth);
-  const isAdmin = typeof user?.role === 'string' && user.role.toLowerCase() === 'admin'; // NEW
+  const isAdmin = typeof user?.role === 'string' && user.role.toLowerCase() === 'admin';
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(fetchProjects());
-  }, [dispatch]);
-
-  const handleRowClick = (project) => {
-    setSelectedProject(project);
-    dispatch(fetchProjectById(project.id));
-  };
-
-  const handleDetailClick = () => {
-    if (projectDetails && projectDetails.id) {
-      navigate(`/project/${projectDetails.id}/detail`);
+    if (variant === "auto") {
+      dispatch(fetchAutoProjects());
+    } else {
+      dispatch(fetchManualProjects());
     }
-  };
+  }, [dispatch, variant]);
 
-  // open delete confirmation modal
   const handleDeleteProject = (projectId) => {
     setDeleteTarget(projectId);
     setShowDeleteModal(true);
   };
-  // confirmed deletion — DELEGATE to projectSlice thunk, do not handle HTTP here
   const confirmDeleteProject = () => {
     if (!deleteTarget) return;
     dispatch(deleteProject(deleteTarget));
@@ -62,7 +59,6 @@ const ProjectTable = () => {
     setDeleteTarget(null);
   };
 
-  // NEW: toggle approval handler (admin only)
   const handleToggleApproval = (e, project) => {
     e.stopPropagation();
     if (!project?.id) return;
@@ -109,10 +105,7 @@ const ProjectTable = () => {
                 {projects.map((project, index) => (
                   <tr
                     key={project.id}
-                    className={`border-b dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
-                      selectedProject && selectedProject.id === project.id ? "bg-blue-50 dark:bg-blue-900/40" : ""
-                    }`}
-                    onClick={() => handleRowClick(project)}
+                    className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                   >
                     {/* ...existing cells before Aksi... */}
                     <td className="px-4 py-3">{index + 1}</td>
@@ -128,7 +121,7 @@ const ProjectTable = () => {
                       {project.harga ? `Rp${project.harga.toLocaleString()}` : "-"}
                     </td>
 
-                    {/* Aksi: Edit/Delete only */}
+                    {/* Aksi: Edit / Detail / Delete */}
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1.5">
                         <button
@@ -142,6 +135,20 @@ const ProjectTable = () => {
                         >
                           <EditIcon className="w-4 h-4" />
                         </button>
+
+                        {/* NEW: Detail button to open construction detail */}
+                        <button
+                          aria-label="Detail"
+                          title="Detail Konstruksi"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-300 dark:focus:ring-sky-600 shadow-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/project/${project.id}/detail`);
+                          }}
+                        >
+                          <EyeIcon className="w-4 h-4" />
+                        </button>
+
                         <button
                           aria-label="Hapus"
                           title="Delete"
@@ -181,45 +188,8 @@ const ProjectTable = () => {
               </tbody>
             </table>
           </div>
-          <div className="w-full md:w-96 md:min-w-[320px] md:max-w-md p-4 bg-gray-100 dark:bg-gray-700 mt-2 md:mt-0 md:ml-4 rounded h-fit self-start">
-            {projectDetails ? (
-              <div className="flex flex-col gap-2">
-                <div className="font-bold text-center text-gray-900 dark:text-white">{projectDetails.name}</div>
-                <div className="text-center text-gray-700 dark:text-gray-200">{projectDetails.tahun}</div>
-                <div className="text-center text-gray-700 dark:text-gray-200">{projectDetails.lokasi}</div>
-                <div className="mt-4 flex flex-col gap-1 text-sm bg-white dark:bg-gray-800 rounded p-3 shadow">
-                  <div>
-                    <span className="font-semibold text-gray-700 dark:text-gray-200">Total Harga Pekerjaan: </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.totalConstructionCost?.toLocaleString?.() ?? (projectDetails.harga?.toLocaleString?.() ?? "-")}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700 dark:text-gray-200">PPN 11%: </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.ppn?.toLocaleString?.() ?? "-"}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700 dark:text-gray-200">Asuransi (2,5‰): </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.insurance?.toLocaleString?.() ?? "-"}</span>
-                  </div>
-                  <div>
-                    <span className="font-semibold text-gray-700 dark:text-gray-200">Total Perkiraan: </span>
-                    <span className="text-gray-900 dark:text-white">Rp{projectDetails.totalEstimation?.toLocaleString?.() ?? "-"}</span>
-                  </div>
-                </div>
-                <button
-                  className="mt-4 bg-primary-700 hover:bg-primary-800 text-white font-semibold py-2 px-4 rounded"
-                  onClick={handleDetailClick}
-                >
-                  Lihat Detail Harga Konstruksi
-                </button>
-                {/* Hapus tampilan tabel constructionCosts di sini */}
-              </div>
-            ) : (
-              <div className="text-gray-400 dark:text-gray-300 text-center">
-                Klik salah satu project untuk melihat detail harga konstruksi.
-              </div>
-            )}
-          </div>
         </div>
+
         {/* Delete confirmation modal */}
         <DeleteModal
           isOpen={showDeleteModal}
@@ -227,7 +197,7 @@ const ProjectTable = () => {
           message="This will permanently remove the selected project and its construction cost records. This action cannot be undone. Proceed?"
           confirmText="Yes, delete"
           cancelText="Cancel"
-          loading={false} // visual loading not tracked here; projectSlice handles backend
+          loading={false}
           onConfirm={confirmDeleteProject}
           onCancel={() => setShowDeleteModal(false)}
           danger

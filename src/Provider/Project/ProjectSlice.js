@@ -118,6 +118,30 @@ const getAuthHeaders = () => {
   return { Authorization: `Bearer ${token}` };
 };
 
+// NEW: explicit manual projects fetch (/projects/manual)
+export const fetchManualProjects = () => async (dispatch) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API}/projects/manual`, {
+      headers: getAuthHeaders(),
+    });
+    dispatch(setProjects(response.data.data));
+  } catch (error) {
+    console.error('Error fetching manual projects:', error);
+  }
+};
+
+// NEW: explicit auto projects fetch (/projects/auto)
+export const fetchAutoProjects = () => async (dispatch) => {
+  try {
+    const response = await axios.get(`${process.env.REACT_APP_API}/projects/auto`, {
+      headers: getAuthHeaders(),
+    });
+    dispatch(setProjects(response.data.data));
+  } catch (error) {
+    console.error('Error fetching auto projects:', error);
+  }
+};
+
 export const fetchProjects = () => async (dispatch, getState) => {
   try {
     const role = getState()?.auth?.user?.role;

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import ManageData from './ManageData';
+import ProjectTable from '../Project/ProjectTable';
 
 class ErrorBoundary extends Component{
   constructor(props) {
@@ -26,7 +27,16 @@ class ErrorBoundary extends Component{
 const ManageDataPages = () => {
   return (
     <ErrorBoundary>
-      <ManageData />
+      <div className="p-4 dark:bg-darkmode">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="lg:col-span-9 space-y-3">
+            <ManageData />
+            <div className="mt-2">
+              <ProjectTable variant="auto" />
+            </div>
+          </div>
+        </div>
+      </div>
     </ErrorBoundary>
   )
 }
