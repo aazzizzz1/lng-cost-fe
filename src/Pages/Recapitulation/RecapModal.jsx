@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProjects } from '../../Provider/Project/ProjectSlice';
+// import { fetchProjects } from '../../Provider/Project/ProjectSlice';
+import { fetchApprovedLibraryProjects, selectApprovedLibraryProjects } from '../../Provider/Library/PreviewSlice';
 
 const RecapModal = ({ isOpen, onClose, onAdd, selectedIds = [] }) => {
   const dispatch = useDispatch();
-  const projects = useSelector(state => state.projects.projects) || [];
+  const projects = useSelector(selectApprovedLibraryProjects) || [];
   const [checkedIds, setCheckedIds] = useState([]);
 
-  // Fetch all projects when modal opens
+  // Fetch approved library projects when modal opens
   useEffect(() => {
     if (isOpen) {
-      dispatch(fetchProjects());
+      // dispatch(fetchProjects());
+      dispatch(fetchApprovedLibraryProjects());
       setCheckedIds([]); // reset selection when opened
     }
   }, [isOpen, dispatch]);

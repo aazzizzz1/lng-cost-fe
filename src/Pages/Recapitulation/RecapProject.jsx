@@ -21,10 +21,13 @@ const RecapProject = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // selected projects
+  // selected projects (fallback to detailCache so names are available without projects list)
   const selectedProjects = useMemo(
-    () => projects.filter((p) => selectedIds.includes(p.id)),
-    [projects, selectedIds]
+    () =>
+      selectedIds
+        .map((id) => projects.find((p) => p.id === id) || detailCache[id])
+        .filter(Boolean),
+    [projects, detailCache, selectedIds]
   );
 
   // fetch missing project details whenever selection changes

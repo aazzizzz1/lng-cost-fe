@@ -14,25 +14,34 @@ const ProjectDetail = () => {
     }
   }, [dispatch, id, project]);
 
-  // Kelompokkan constructionCosts berdasarkan 'kelompok' dan 'kelompokDetail'
+  // Kelompokkan constructionCosts berdasarkan 'kelompok' (tanpa kelompokDetail)
   const groupedTree = useMemo(() => {
     if (!project || !Array.isArray(project.constructionCosts)) return [];
     const groups = {};
     project.constructionCosts.forEach((item) => {
       const g = item.kelompok || "Lainnya";
-      const sg = item.kelompokDetail || "Lainnya";
-      if (!groups[g]) groups[g] = {};
-      if (!groups[g][sg]) groups[g][sg] = [];
-      groups[g][sg].push(item);
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(item);
     });
+
+    // Build sorted list with totals per group
     return Object.keys(groups)
       .sort((a, b) => a.localeCompare(b))
-      .map((group) => ({
-        group,
-        subgroups: Object.keys(groups[group])
-          .sort((a, b) => a.localeCompare(b))
-          .map((subgroup) => ({ subgroup, items: groups[group][subgroup] })),
-      }));
+      .map((group) => {
+        const items = groups[group]
+          .slice()
+          .sort((a, b) => {
+            const ak = a.workcode || a.kode || '';
+            const bk = b.workcode || b.kode || '';
+            if (ak && bk) {
+              const lc = ak.localeCompare(bk, undefined, { numeric: true });
+              if (lc !== 0) return lc;
+            }
+            return (a.uraian || '').localeCompare(b.uraian || '');
+          });
+        const groupTotal = items.reduce((s, it) => s + (it.totalHarga || 0), 0);
+        return { group, items, groupTotal };
+      });
   }, [project]);
 
   // Kolom tabel
@@ -56,6 +65,12 @@ const ProjectDetail = () => {
 
   const formatCurrency = (value) =>
     value ? `Rp${Number(value).toLocaleString()}` : '-';
+
+  // NEW: total seluruh kelompok
+  const overallTotal = useMemo(
+    () => groupedTree.reduce((s, g) => s + (g.groupTotal || 0), 0),
+    [groupedTree]
+  );
 
   if (!project) {
     return <div className="p-4">Loading...</div>;
@@ -117,34 +132,57 @@ const ProjectDetail = () => {
               <tbody>
                 {groupedTree.map((g) => (
                   <React.Fragment key={g.group}>
-                    <tr className="bg-gray-100 dark:bg-gray-800">
-                      <td colSpan={columns.length} className="font-semibold text-gray-800 dark:text-gray-100 py-2 px-3">
+                    {/* Group header (biru) */}
+                    <tr className="bg-blue-100 dark:bg-blue-900">
+                      <td colSpan={columns.length} className="font-bold text-gray-900 dark:text-white py-2 px-3 uppercase">
                         {g.group}
                       </td>
                     </tr>
-                    {g.subgroups.map((sg) => (
-                      <React.Fragment key={sg.subgroup}>
-                        <tr className="bg-gray-50 dark:bg-gray-900">
-                          <td colSpan={columns.length} className="font-semibold text-gray-700 dark:text-gray-200 py-2 pl-5 pr-3">
-                            {sg.subgroup}
+
+                    {/* Items (tanpa kelompok detail) */}
+                    {g.items.map((cost, idx) => (
+                      <tr
+                        key={`${g.group}-${idx}`}
+                        className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
+                      >
+                        {columns.map((col) => (
+                          <td
+                            key={col.key}
+                            className={`px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 ${col.className || ''}`}
+                          >
+                            {col.isCurrency ? formatCurrency(cost[col.key]) : (cost[col.key] ?? '-')}
                           </td>
-                        </tr>
-                        {sg.items.map((cost, idx) => (
-                          <tr key={`${g.group}-${sg.subgroup}-${idx}`} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
-                            {columns.map((col) => (
-                              <td
-                                key={col.key}
-                                className={`px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 ${col.className || ''}`}
-                              >
-                                {col.isCurrency ? formatCurrency(cost[col.key]) : (cost[col.key] ?? '-')}
-                              </td>
-                            ))}
-                          </tr>
                         ))}
-                      </React.Fragment>
+                      </tr>
                     ))}
+
+                    {/* Total per kelompok */}
+                    <tr className="bg-yellow-100 dark:bg-yellow-900 font-bold">
+                      <td
+                        colSpan={columns.length - 1}
+                        className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-right text-gray-900 dark:text-gray-100"
+                      >
+                        Total {g.group}
+                      </td>
+                      <td className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-right text-gray-900 dark:text-gray-100">
+                        {formatCurrency(g.groupTotal)}
+                      </td>
+                    </tr>
                   </React.Fragment>
                 ))}
+
+                {/* TOTAL keseluruhan */}
+                <tr className="bg-orange-200 dark:bg-orange-700 font-bold">
+                  <td
+                    colSpan={columns.length - 1}
+                    className="px-4 py-2 text-right text-gray-900 dark:text-white"
+                  >
+                    TOTAL
+                  </td>
+                  <td className="px-4 py-2 text-right text-gray-900 dark:text-white">
+                    {formatCurrency(overallTotal)}
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
