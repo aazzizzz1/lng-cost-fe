@@ -30,10 +30,11 @@ const ProjectPages = () => {
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
           Management and Configuration Project
         </p>
-        <p className="text-xl text-gray-600 dark:text-white mb-2">
+        <p className="text-xl text-gray-600 dark:text-white mb-3">
           Management and Configuration Project Detail
         </p>
-        <ProjectTable />
+
+        <ProjectTable variant="manual" />
       </div>
     </ErrorBoundary>
   )

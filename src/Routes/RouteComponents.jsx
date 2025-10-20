@@ -44,6 +44,16 @@ const PrivateRoute = ({ children }) => {
 };
 
 const RouteComponents = () => {
+  // NEW: global validate on first mount to hydrate user from cookies
+  const dispatch = useDispatch();
+  const { user, isValidating, sessionChecked } = useSelector((s) => s.auth);
+
+  useEffect(() => {
+    if (!user && !isValidating && !sessionChecked) {
+      dispatch(validateAccessToken());
+    }
+  }, [dispatch, user, isValidating, sessionChecked]);
+
   return (
     <BrowserRouter>
       <GlobalProvider>

@@ -95,9 +95,15 @@ export const validateAccessToken = createAsyncThunk(
         await dispatch(fetchCurrentUser()).unwrap();
         return { message: 'Token refreshed successfully' };
       } catch {
-        // Let route guard handle navigation
         return rejectWithValue('Session expired. Please log in again.');
       }
+    }
+  },
+  {
+    // Prevent spamming validate calls (helps avoid 429)
+    condition: (_, { getState }) => {
+      const { isValidating } = getState().auth || {};
+      return !isValidating;
     }
   }
 );
@@ -125,6 +131,9 @@ const authSlice = createSlice({
     confirmPasswordVisible: false,
     termsAccepted: false,
     openModal: false,
+    // NEW: validation flags
+    isValidating: false,
+    sessionChecked: false,
   },
   reducers: {
     setInputSignUp: (state, action) => {
@@ -207,6 +216,18 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+      })
+      // NEW: throttle and mark session checks
+      .addCase(validateAccessToken.pending, (state) => {
+        state.isValidating = true;
+      })
+      .addCase(validateAccessToken.fulfilled, (state) => {
+        state.isValidating = false;
+        state.sessionChecked = true;
+      })
+      .addCase(validateAccessToken.rejected, (state) => {
+        state.isValidating = false;
+        state.sessionChecked = true;
       });
   },
 });

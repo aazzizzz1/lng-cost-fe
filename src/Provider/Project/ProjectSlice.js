@@ -34,8 +34,99 @@ export const updateProjectApproval = createAsyncThunk(
   }
 );
 
+// NEW: fetch dropdown filter options
+export const fetchProjectFilters = createAsyncThunk(
+  'projects/fetchProjectFilters',
+  async ({ infrastruktur } = {}, { rejectWithValue }) => {
+    try {
+      const params = {};
+      if (infrastruktur) params.infrastruktur = infrastruktur;
+      const res = await axios.get(`${process.env.REACT_APP_API}/projects/filters`, {
+        params,
+        headers: getAuthHeaders(),
+      });
+      // Normalisasi agar selalu { infrastruktur: [], volume: [] }
+      const d = res.data?.data || {};
+      return {
+        infrastruktur: Array.isArray(d.infrastruktur) ? d.infrastruktur : [],
+        volume: Array.isArray(d.volume) ? d.volume : [],
+      };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// NEW: fetch paginated projects (supports /, /manual, /auto)
+export const fetchProjectsPaged = createAsyncThunk(
+  'projects/fetchProjectsPaged',
+  async (args = {}, { getState, rejectWithValue }) => {
+    try {
+      const state = getState().projects || {};
+      const {
+        variant = 'manual', // 'manual' | 'auto' | 'all' (default manual)
+        page = state.pagination?.page || 1,
+        limit = state.pagination?.limit || 10,
+        sort = state.filters?.sort || 'createdAt',
+        order = state.filters?.order || 'desc',
+        infrastruktur = state.filters?.infrastruktur || '',
+        volume = state.filters?.volume || '',
+      } = args;
+
+      const params = { page, limit, sort, order };
+      if (infrastruktur) params.infrastruktur = infrastruktur;
+      if (volume) params.volume = volume;
+
+      const suffix =
+        variant === 'auto' ? '/auto' : variant === 'manual' ? '/manual' : '';
+      const res = await axios.get(`${process.env.REACT_APP_API}/projects${suffix}`, {
+        params,
+        headers: getAuthHeaders(),
+      });
+
+      const payload = res.data || {};
+      const data = payload.data || [];
+      const pg = payload.pagination || {};
+
+      // FIX: avoid mixing ?? with || by normalizing first
+      const totalVal = pg.totalData ?? pg.total ?? data.length ?? 0;
+      const limitVal = (pg.limit ?? limit) ?? 10;
+
+      return {
+        data,
+        pagination: {
+          page: pg.currentPage ?? pg.page ?? page,
+          limit: limitVal,
+          total: totalVal,
+          totalPages: pg.totalPages ?? Math.max(1, Math.ceil(totalVal / limitVal)),
+        },
+      };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   projects: [],
+  // NEW: list filters/pagination/loading/options
+  filters: {
+    infrastruktur: '',
+    volume: '',
+    sort: 'createdAt',
+    order: 'desc',
+  },
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  },
+  loading: false,
+  filterOptions: {
+    infrastruktur: [],
+    volume: [],
+  },
   recommendedCosts: [],
   selectedProjectDetails: null,
   loadingRecommendedCosts: false,
@@ -50,6 +141,14 @@ const projectSlice = createSlice({
     setProjects: (state, action) => {
       state.projects = action.payload;
     },
+    // NEW: set filters for list
+    setProjectFilters: (state, action) => {
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    // NEW: set pagination for list
+    setProjectPagination: (state, action) => {
+      state.pagination = { ...state.pagination, ...action.payload };
+    },
     setRecommendedCosts: (state, action) => {
       state.recommendedCosts = action.payload;
     },
@@ -58,6 +157,12 @@ const projectSlice = createSlice({
     },
     createProject: (state, action) => {
       state.projects.push(action.payload);
+      // optional: update pagination.total
+      state.pagination.total += 1;
+      state.pagination.totalPages = Math.max(
+        1,
+        Math.ceil(state.pagination.total / (state.pagination.limit || 10))
+      );
     },
     setSelectedProjectDetails: (state, action) => {
       state.selectedProjectDetails = action.payload;
@@ -72,6 +177,11 @@ const projectSlice = createSlice({
         state.selectedProjectDetails = null;
       }
       delete state.detailCache[action.payload]; // NEW: remove from cache
+      // NEW: adjust pagination counters
+      const p = state.pagination;
+      const newTotal = Math.max(0, Number(p.total || 0) - 1);
+      const newTotalPages = Math.max(1, Math.ceil(newTotal / (p.limit || 10)));
+      state.pagination = { ...p, total: newTotal, totalPages: newTotalPages };
     },
   },
   extraReducers: (builder) => {
@@ -98,6 +208,32 @@ const projectSlice = createSlice({
             approval: updated.approval,
           };
         }
+      })
+      // NEW: filters options
+      .addCase(fetchProjectFilters.fulfilled, (state, action) => {
+        const payload = action.payload || { infrastruktur: [], volume: [] };
+        // Jika memanggil tanpa infrastruktur: isi keduanya
+        // Jika memanggil dengan infrastruktur: biasanya hanya volume yang berubah
+        if (payload.infrastruktur?.length) state.filterOptions.infrastruktur = payload.infrastruktur;
+        state.filterOptions.volume = payload.volume || [];
+      })
+      // NEW: paged list handlers
+      .addCase(fetchProjectsPaged.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProjectsPaged.fulfilled, (state, action) => {
+        state.loading = false;
+        state.projects = action.payload?.data || [];
+        const p = action.payload?.pagination || {};
+        state.pagination = {
+          page: p.page || 1,
+          limit: p.limit || 10,
+          total: p.total || 0,
+          totalPages: p.totalPages || 1,
+        };
+      })
+      .addCase(fetchProjectsPaged.rejected, (state) => {
+        state.loading = false;
       });
       // (optional) you can add pending/rejected for UI flags if needed
   },
@@ -105,6 +241,9 @@ const projectSlice = createSlice({
 
 export const {
   setProjects,
+  // NEW
+  setProjectFilters,
+  setProjectPagination,
   setRecommendedCosts,
   setLoadingRecommendedCosts,
   createProject,
@@ -115,31 +254,41 @@ export const {
 
 const getAuthHeaders = () => {
   const token = Cookies.get('accessToken');
-  return { Authorization: `Bearer ${token}` };
+  const headers = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 };
 
-// NEW: explicit manual projects fetch (/projects/manual)
-export const fetchManualProjects = () => async (dispatch) => {
-  try {
-    const response = await axios.get(`${process.env.REACT_APP_API}/projects/manual`, {
-      headers: getAuthHeaders(),
-    });
-    dispatch(setProjects(response.data.data));
-  } catch (error) {
-    console.error('Error fetching manual projects:', error);
-  }
+// NEW: explicit manual projects fetch using paged thunk
+export const fetchManualProjects = () => async (dispatch, getState) => {
+  const { filters, pagination } = getState().projects || {};
+  await dispatch(
+    fetchProjectsPaged({
+      variant: 'manual',
+      page: pagination?.page,
+      limit: pagination?.limit,
+      sort: filters?.sort,
+      order: filters?.order,
+      infrastruktur: filters?.infrastruktur,
+      volume: filters?.volume,
+    })
+  );
 };
 
-// NEW: explicit auto projects fetch (/projects/auto)
-export const fetchAutoProjects = () => async (dispatch) => {
-  try {
-    const response = await axios.get(`${process.env.REACT_APP_API}/projects/auto`, {
-      headers: getAuthHeaders(),
-    });
-    dispatch(setProjects(response.data.data));
-  } catch (error) {
-    console.error('Error fetching auto projects:', error);
-  }
+// NEW: explicit auto projects fetch using paged thunk
+export const fetchAutoProjects = () => async (dispatch, getState) => {
+  const { filters, pagination } = getState().projects || {};
+  await dispatch(
+    fetchProjectsPaged({
+      variant: 'auto',
+      page: pagination?.page,
+      limit: pagination?.limit,
+      sort: filters?.sort,
+      order: filters?.order,
+      infrastruktur: filters?.infrastruktur,
+      volume: filters?.volume,
+    })
+  );
 };
 
 export const fetchProjects = () => async (dispatch, getState) => {
