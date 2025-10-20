@@ -25,35 +25,25 @@ import UserManagement from "../Pages/Admin/UserManagement"; // NEW
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, isValidating, sessionChecked } = useSelector((state) => state.auth);
   const [checking, setChecking] = React.useState(true);
 
   useEffect(() => {
     let mounted = true;
-    if (!user) {
-      dispatch(validateAccessToken())
-        .finally(() => { if (mounted) setChecking(false); });
+    // Only validate if we haven't checked yet and not currently validating
+    if (!user && !sessionChecked && !isValidating) {
+      dispatch(validateAccessToken()).finally(() => { if (mounted) setChecking(false); });
     } else {
       setChecking(false);
     }
     return () => { mounted = false; };
-  }, [dispatch, user]);
+  }, [dispatch, user, isValidating, sessionChecked]);
 
-  if (checking) return null; // ...optional loader...
+  if (checking) return null;
   return user ? children : <Navigate to="/signin" />;
 };
 
 const RouteComponents = () => {
-  // NEW: global validate on first mount to hydrate user from cookies
-  const dispatch = useDispatch();
-  const { user, isValidating, sessionChecked } = useSelector((s) => s.auth);
-
-  useEffect(() => {
-    if (!user && !isValidating && !sessionChecked) {
-      dispatch(validateAccessToken());
-    }
-  }, [dispatch, user, isValidating, sessionChecked]);
-
   return (
     <BrowserRouter>
       <GlobalProvider>

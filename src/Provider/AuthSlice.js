@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import Cookies from 'js-cookie'; // NEW
 
 // Create axios instance bound to env baseURL with credentials
 const http = axios.create({
@@ -74,9 +75,24 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await http.post(`/auth/logout`, {});
+      // Also clear any client-visible cookies (if not HttpOnly or mirrored)
+      try {
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');
+        // Try with path root to be safe
+        Cookies.remove('accessToken', { path: '/' });
+        Cookies.remove('refreshToken', { path: '/' });
+      } catch {}
       window.location.href = '/signin';
       return true;
     } catch (error) {
+      // Still try to clear cookies on failure
+      try {
+        Cookies.remove('accessToken');
+        Cookies.remove('refreshToken');
+        Cookies.remove('accessToken', { path: '/' });
+        Cookies.remove('refreshToken', { path: '/' });
+      } catch {}
       return rejectWithValue('Logout failed');
     }
   }
@@ -216,6 +232,11 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+        state.sessionChecked = true; // avoid re-validating after logout redirect
+      })
+      .addCase(logoutUser.rejected, (state) => {
+        state.user = null; // force local logout even if server call failed
+        state.sessionChecked = true;
       })
       // NEW: throttle and mark session checks
       .addCase(validateAccessToken.pending, (state) => {
