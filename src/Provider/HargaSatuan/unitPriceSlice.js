@@ -190,6 +190,28 @@ export const deleteUnitPrice = createAsyncThunk(
   }
 );
 
+// NEW: fetch dropdown filter options for Unit Price (support fetching all volumes on first load)
+export const fetchUnitPriceFilters = createAsyncThunk(
+  'unitPrice/fetchUnitPriceFilters',
+  async ({ infrastruktur } = {}, { rejectWithValue }) => {
+    try {
+      const params = {};
+      if (infrastruktur) params.infrastruktur = infrastruktur;
+      const res = await axios.get(`${api}/unit-prices/filters`, {
+        params,
+        headers: getAuthHeaders(),
+      });
+      const d = res.data?.data || {};
+      return {
+        infrastruktur: Array.isArray(d.infrastruktur) ? d.infrastruktur : [],
+        volume: Array.isArray(d.volume) ? d.volume : [],
+      };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 const initialState = {
   uniqueFields: {
     tipe: [],
@@ -202,6 +224,10 @@ const initialState = {
   loadingRecommended: false,
   error: null,
   modalError: null,
+  // NEW: dropdown options (volume cascaded by infrastruktur)
+  filterOptions: {
+    volume: [],
+  },
 };
 
 const transportInitialState = {
@@ -260,7 +286,21 @@ const unitPriceSlice = createSlice({
   },
   reducers: {
     setFilters: (state, action) => {
-      state.transport.filters = { ...state.transport.filters, ...action.payload };
+      const payload = action.payload || {};
+      const next = { ...state.transport.filters, ...payload };
+
+      // NEW: reset volume when other filters change (unless volume is explicitly provided)
+      const shouldResetVolume =
+        !Object.prototype.hasOwnProperty.call(payload, 'volume') &&
+        ['infrastruktur', 'kelompok', 'tipe'].some((k) =>
+          Object.prototype.hasOwnProperty.call(payload, k)
+        );
+
+      if (shouldResetVolume) {
+        next.volume = '';
+      }
+
+      state.transport.filters = next;
     },
     setPagination: (state, action) => {
       state.transport.pagination = { ...state.transport.pagination, ...action.payload };
@@ -301,6 +341,25 @@ const unitPriceSlice = createSlice({
           page: action.payload.pagination.currentPage,
           limit: action.payload.pagination.limit,
         }; // Update pagination data
+        // NEW: derive volume options from current rows (accumulate + dedupe)
+        try {
+          const existing = Array.isArray(state.filterOptions.volume) ? state.filterOptions.volume : [];
+          const fromRows = (Array.isArray(action.payload.data) ? action.payload.data : [])
+            .map(r => r?.volume)
+            .filter(v => v !== null && v !== undefined && v !== '')
+            .map(v => String(v));
+          const set = new Set([...existing, ...fromRows]);
+          // sort numerically when possible, fallback to string
+          const sorted = Array.from(set).sort((a, b) => {
+            const na = Number(a), nb = Number(b);
+            const fa = Number.isFinite(na), fb = Number.isFinite(nb);
+            if (fa && fb) return na - nb;
+            if (fa) return -1;
+            if (fb) return 1;
+            return a.localeCompare(b);
+          });
+          state.filterOptions.volume = sorted;
+        } catch {}
       })
       .addCase(fetchTransportData.rejected, (state, action) => {
         state.transport.loading = false;
@@ -472,10 +531,67 @@ const unitPriceSlice = createSlice({
         state.rowDeleteLoading = false;
         state.rowDeletingId = null;
         state.transport.error = action.payload;
+      })
+      // NEW: handle unit price filters options
+      .addCase(fetchUnitPriceFilters.fulfilled, (state, action) => {
+        const payload = action.payload || { volume: [] };
+        // Only overwrite when backend provides volume list; otherwise keep accumulated options
+        if (payload.volume && payload.volume.length) {
+          state.filterOptions.volume = payload.volume.map(v => String(v));
+        }
+        if (payload.infrastruktur?.length) {
+          state.uniqueFields.infrastruktur = payload.infrastruktur;
+        }
       });
   },
 });
 
 export const { setFilters, setPagination } = unitPriceSlice.actions;
+
+// NEW: export helper (moved from component)
+export function exportUnitPricesExcel({ rows = [], columns = [], filename = 'unit_prices.xls' } = {}) {
+  const safeCols = Array.isArray(columns) && columns.length ? columns : [];
+  const safeRows = Array.isArray(rows) ? rows : [];
+
+  const th = safeCols
+    .map((c) => `<th style="border:1px solid #e5e7eb;padding:6px 8px;background:#f9fafb;color:#374151;text-align:left;font-weight:600;">${c.label}</th>`)
+    .join('');
+
+  const trs = safeRows
+    .map((row) => {
+      const tds = safeCols
+        .map((c) => {
+          let v = row[c.key];
+          if (c.key === 'hargaSatuan' || c.key === 'totalHarga') {
+            v = v ? `Rp${Number(v).toLocaleString()}` : '';
+          }
+          return `<td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;">${v ?? ''}</td>`;
+        })
+        .join('');
+      return `<tr>${tds}</tr>`;
+    })
+    .join('');
+
+  const html = `
+    <!DOCTYPE html><html><head><meta charset="utf-8"><title>UnitPrice</title></head>
+    <body>
+      <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
+        <thead><tr>${th}</tr></thead>
+        <tbody>${trs}</tbody>
+      </table>
+    </body></html>`;
+
+  const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
 
 export default unitPriceSlice.reducer;
