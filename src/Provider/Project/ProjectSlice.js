@@ -66,16 +66,19 @@ export const fetchProjectsPaged = createAsyncThunk(
       const {
         variant = 'manual', // 'manual' | 'auto' | 'all' (default manual)
         page = state.pagination?.page || 1,
-        limit = state.pagination?.limit || 10,
+        // ensure numeric
+        limit = Number(state.pagination?.limit) || 10,
         sort = state.filters?.sort || 'createdAt',
         order = state.filters?.order || 'desc',
         infrastruktur = state.filters?.infrastruktur || '',
         volume = state.filters?.volume || '',
+        // removed search
       } = args;
 
       const params = { page, limit, sort, order };
       if (infrastruktur) params.infrastruktur = infrastruktur;
       if (volume) params.volume = volume;
+      // removed: if (search) params.search = search;
 
       const suffix =
         variant === 'auto' ? '/auto' : variant === 'manual' ? '/manual' : '';
@@ -87,10 +90,8 @@ export const fetchProjectsPaged = createAsyncThunk(
       const payload = res.data || {};
       const data = payload.data || [];
       const pg = payload.pagination || {};
-
-      // FIX: avoid mixing ?? with || by normalizing first
       const totalVal = pg.totalData ?? pg.total ?? data.length ?? 0;
-      const limitVal = (pg.limit ?? limit) ?? 10;
+      const limitVal = Number((pg.limit ?? limit) ?? 10);
 
       return {
         data,
@@ -115,6 +116,7 @@ const initialState = {
     volume: '',
     sort: 'createdAt',
     order: 'desc',
+    // removed: search
   },
   pagination: {
     page: 1,

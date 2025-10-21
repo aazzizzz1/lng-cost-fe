@@ -91,7 +91,7 @@ const Navbar = () => {
             </span> */}
           </Link>
         </div>
-        <div className="flex-1 flex justify-center">
+        {/* <div className="flex-1 flex justify-center">
           <form
             action="#"
             method="GET"
@@ -124,7 +124,7 @@ const Navbar = () => {
               />
             </div>
           </form>
-        </div>
+        </div> */}
         <div className="flex items-center lg:order-2 flex-1 justify-end">
           <button
             type="button"

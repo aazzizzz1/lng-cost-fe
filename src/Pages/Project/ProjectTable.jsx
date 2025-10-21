@@ -42,6 +42,8 @@ const ProjectTable = ({ variant = "manual" }) => {
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  // NEW: UI state for filter dropdown
+  const [openFilter, setOpenFilter] = useState(false);
 
   // Load initial filter options
   useEffect(() => {
@@ -68,6 +70,7 @@ const ProjectTable = ({ variant = "manual" }) => {
       order: filters.order,
       infrastruktur: filters.infrastruktur || undefined,
       volume: filters.volume || undefined,
+      // removed: search
     };
     dispatch(fetchProjectsPaged(params));
   }, [
@@ -79,6 +82,7 @@ const ProjectTable = ({ variant = "manual" }) => {
     filters.order,
     filters.infrastruktur,
     filters.volume,
+    // removed: filters.search
   ]);
 
   const handleDeleteProject = (projectId) => {
@@ -95,28 +99,23 @@ const ProjectTable = ({ variant = "manual" }) => {
   const handleToggleApproval = (e, project) => {
     e.stopPropagation();
     if (!project?.id) return;
-    const next = !project.approval;
-    dispatch(updateProjectApproval({ projectId: project.id, approval: next }));
+    dispatch(updateProjectApproval({ projectId: project.id, approval: !project.approval }));
   };
 
-  // NEW: filters & sorting handlers
+  // Filters & sorting handlers
   const onInfraChange = (e) => {
-    const v = e.target.value || "";
-    dispatch(setProjectFilters({ infrastruktur: v, volume: "" }));
+    dispatch(setProjectFilters({ infrastruktur: e.target.value || "", volume: "" }));
     dispatch(setProjectPagination({ page: 1 }));
   };
   const onVolumeChange = (e) => {
-    const v = e.target.value || "";
-    dispatch(setProjectFilters({ volume: v }));
+    dispatch(setProjectFilters({ volume: e.target.value || "" }));
     dispatch(setProjectPagination({ page: 1 }));
   };
   const onLimitChange = (e) => {
     const limit = Number(e.target.value) || 10;
     dispatch(setProjectPagination({ limit, page: 1 }));
   };
-  const onPageChange = (page) => {
-    dispatch(setProjectPagination({ page }));
-  };
+  const onPageChange = (page) => dispatch(setProjectPagination({ page }));
   const toggleSort = (key) => {
     const order = filters.sort === key && filters.order === 'asc' ? 'desc' : 'asc';
     dispatch(setProjectFilters({ sort: key, order }));
@@ -128,42 +127,93 @@ const ProjectTable = ({ variant = "manual" }) => {
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
-        <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+        {/* Header bar: actions on right, no search */}
+        <div className="flex flex-col items-center justify-between p-4 space-y-3 md:flex-row md:space-y-0 md:space-x-4">
           <div className="w-full md:w-1/2">
-            <h1 className="text-base dark:text-white">Project Overview</h1>
-            {/* NEW: Filters */}
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <select
-                aria-label="Filter Infrastruktur"
-                value={filters.infrastruktur}
-                onChange={onInfraChange}
-                className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200"
-              >
-                <option value="">Semua Infrastruktur</option>
-                {(filterOptions.infrastruktur || []).map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-              <select
-                aria-label="Filter Volume"
-                value={filters.volume}
-                onChange={onVolumeChange}
-                className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200"
-              >
-                <option value="">Semua Volume</option>
-                {(filterOptions.volume || []).map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
+            {/* optional title area (left side) */}
+          </div>
+          <div className="flex flex-col items-stretch justify-end flex-shrink-0 w-full space-y-2 md:w-auto md:flex-row md:space-y-0 md:items-center md:space-x-3">
+            <button
+              type="button"
+              className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700"
+              onClick={() => setCreateModalOpen(true)}
+            >
+              <svg className="h-3.5 w-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path clipRule="evenodd" fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+              </svg>
+              Add Project
+            </button>
+            <div className="flex items-center w-full space-x-3 md:w-auto">
+              {/* Filter button + dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setOpenFilter((v) => !v)}
+                  className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg md:w-auto hover:bg-gray-100 hover:text-primary-700 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="w-4 h-4 mr-2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+                  </svg>
+                  Filter
+                  <svg className="-mr-1 ml-1.5 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path clipRule="evenodd" fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                  </svg>
+                </button>
+                {openFilter && (
+                  <div className="absolute right-0 z-10 mt-2 w-64 p-3 bg-white rounded-lg shadow dark:bg-gray-700">
+                    <h6 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">Filters</h6>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs mb-1 text-gray-600 dark:text-gray-300">Infrastruktur</label>
+                        <select
+                          value={filters.infrastruktur}
+                          onChange={onInfraChange}
+                          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                        >
+                          <option value="">Semua Infrastruktur</option>
+                          {(filterOptions.infrastruktur || []).map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs mb-1 text-gray-600 dark:text-gray-300">Volume</label>
+                        <select
+                          value={filters.volume}
+                          onChange={onVolumeChange}
+                          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                        >
+                          <option value="">Semua Volume</option>
+                          {(filterOptions.volume || []).map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            dispatch(setProjectFilters({ infrastruktur: '', volume: '' }));
+                            dispatch(setProjectPagination({ page: 1 }));
+                          }}
+                          className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        >
+                          Reset
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setOpenFilter(false)}
+                          className="px-3 py-1 text-xs rounded bg-primary-600 text-white hover:bg-primary-700"
+                        >
+                          Apply
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <button
-            type="button"
-            className="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-            onClick={() => setCreateModalOpen(true)}
-          >
-            Add Project
-          </button>
         </div>
         <div className="flex flex-col md:flex-row">
           <div className="flex-1 overflow-x-auto">
@@ -314,14 +364,13 @@ const ProjectTable = ({ variant = "manual" }) => {
             <span className="ml-1 font-semibold text-gray-900 dark:text-white">{total}</span>
           </span>
           <div className="flex items-center gap-4">
-            {/* NEW: move limit selector beside pagination */}
             <select
               aria-label="Limit"
               value={limit}
               onChange={onLimitChange}
               className="px-3 py-2 border rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
             >
-              {[5, 10, 20, 50].map((n) => (
+              {[10, 20, 30, 40, 50].map((n) => (
                 <option key={n} value={n}>{n} per page</option>
               ))}
             </select>

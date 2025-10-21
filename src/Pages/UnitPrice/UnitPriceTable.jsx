@@ -225,7 +225,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
               onChange={(e) => onLimitChange(Number(e.target.value))}
               className="px-3 py-2 border rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
             >
-              {[10, 30, 50].map((option) => (
+              {[10, 20, 30, 40, 50].map((option) => (
                 <option key={option} value={option}>
                   {option} per page
                 </option>
