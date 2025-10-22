@@ -7,6 +7,33 @@ import {
   deleteCCIById,
 } from '../../Provider/administratorSlice';
 
+// Icons copied to match ProjectTable
+const EditIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.25 2.25 0 0 1 3.182 3.182L9.06 17.653a2 2 0 0 1-.9.53L5 19l.817-3.16a2 2 0 0 1 .53-.9L16.862 3.487z" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M19 13v5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5" />
+  </svg>
+);
+const TrashIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" d="M4 7h16" />
+    <path strokeWidth="1.6" strokeLinecap="round" d="M10 11v6M14 11v6" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+// Compact icons for Save/Cancel
+const CheckIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+  </svg>
+);
+const XIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+
 const AdministratorLocation = () => {
   const provinces = useSelector((state) => state.administrator.provinces);
   const dispatch = useDispatch();
@@ -82,10 +109,11 @@ const AdministratorLocation = () => {
         <button
           type="button"
           onClick={openAdd}
-          className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 rounded-md shadow hover:from-blue-700 hover:to-blue-600"
+          className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          {/* Same plus icon as ProjectTable */}
+          <svg className="h-3.5 w-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path clipRule="evenodd" fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
           </svg>
           Add CCI
         </button>
@@ -97,12 +125,11 @@ const AdministratorLocation = () => {
             <th className="border px-2 py-1">Kode Provinsi</th>
             <th className="border px-2 py-1">Provinsi</th>
             <th className="border px-2 py-1">IKK/CCI</th>
-            <th className="border px-2 py-1">Delivery</th>
+            {/* <th className="border px-2 py-1">Delivery</th> */}
             <th className="border px-2 py-1">Aksi</th>
           </tr>
         </thead>
         <tbody>
-          {/* ...removed inline add row... */}
           {provinces.map((prov) => {
             const isEditing = editingId === prov.id;
             return (
@@ -119,7 +146,7 @@ const AdministratorLocation = () => {
                     disabled={!isEditing}
                   />
                 </td>
-                <td className="border px-2 py-1">
+                {/* <td className="border px-2 py-1">
                   <input
                     type="number"
                     step="0.01"
@@ -128,44 +155,45 @@ const AdministratorLocation = () => {
                     onChange={(e) => isEditing && setEdits((s) => ({ ...s, delivery: e.target.value }))}
                     disabled={!isEditing}
                   />
-                </td>
+                </td> */}
                 <td className="border px-2 py-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center gap-1.5">
                     {!isEditing ? (
                       <button
-                        type="button"
-                        className="px-3 py-1.5 text-xs font-medium text-white bg-amber-500 rounded hover:bg-amber-600"
+                        aria-label="Edit"
+                        title="Edit"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-600 shadow-sm"
                         onClick={() => startEdit(prov)}
                       >
-                        Update
+                        <EditIcon />
                       </button>
                     ) : (
                       <>
                         <button
-                          type="button"
-                          className="px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded hover:bg-green-700"
+                          aria-label="Save"
+                          title="Save"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-600 shadow-sm"
                           onClick={() => saveEdit(prov.id)}
                         >
-                          Save
+                          <CheckIcon />
                         </button>
                         <button
-                          type="button"
-                          className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 dark:text-white dark:bg-gray-700 dark:hover:bg-gray-600"
+                          aria-label="Cancel"
+                          title="Cancel"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-gray-300 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 shadow-sm"
                           onClick={cancelEdit}
                         >
-                          Cancel
+                          <XIcon />
                         </button>
                       </>
                     )}
                     <button
-                      type="button"
-                      className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 border border-red-300 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                      aria-label="Delete"
+                      title="Delete"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
                       onClick={() => handleDelete(prov.id)}
                     >
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
-                        <path d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      </svg>
-                      Delete
+                      <TrashIcon />
                     </button>
                   </div>
                 </td>
@@ -186,9 +214,7 @@ const AdministratorLocation = () => {
                 className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
                 aria-label="Close"
               >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 6l12 12M18 6l-12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+                <XIcon className="w-4 h-4" />
               </button>
             </div>
             <div className="p-5 grid grid-cols-1 gap-4">
@@ -230,7 +256,7 @@ const AdministratorLocation = () => {
                     placeholder="1.12"
                   />
                 </div>
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Delivery
                   </label>
@@ -242,7 +268,7 @@ const AdministratorLocation = () => {
                     onChange={(e) => setNewRow((s) => ({ ...s, delivery: e.target.value }))}
                     placeholder="0.05"
                   />
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-2">
