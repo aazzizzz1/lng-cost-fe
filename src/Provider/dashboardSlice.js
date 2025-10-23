@@ -1,17 +1,69 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const api = process.env.REACT_APP_API;
+const getAuthHeaders = () => {
+  const token = Cookies.get('accessToken');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
-// Async thunk untuk fetch chart data
+// Chart data (unit prices)
 export const fetchChartData = createAsyncThunk(
   'dashboard/fetchChartData',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${api}/unit-prices/chart-data`);
-      return response.data;
+      const response = await axios.get(`${api}/unit-prices/chart-data`, { headers: getAuthHeaders() });
+      return response.data || { labels: [], series: [] };
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+// Recent manual projects (CAPEX)
+export const fetchDashboardManualRecent = createAsyncThunk(
+  'dashboard/fetchDashboardManualRecent',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(`${api}/projects/manual`, {
+        params: { page: 1, limit: 5, sort: 'createdAt', order: 'desc' },
+        headers: getAuthHeaders(),
+      });
+      const payload = res.data || {};
+      const items = (payload.data || []).map((p) => ({
+        id: p.id,
+        name: p.name || '-',
+        value: p.harga ?? p.totalConstructionCost ?? 0,
+        date: p.createdAt || null,
+      }));
+      return items;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// Counts: manual projects and library items
+export const fetchDashboardCounts = createAsyncThunk(
+  'dashboard/fetchDashboardCounts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const [manualRes, libraryRes] = await Promise.all([
+        axios.get(`${api}/projects/manual`, { params: { page: 1, limit: 1 }, headers: getAuthHeaders() }),
+        axios.get(`${api}/projects/library`, { params: { page: 1, limit: 1 }, headers: getAuthHeaders() }),
+      ]);
+      const manualTotal =
+        manualRes.data?.pagination?.totalData ??
+        manualRes.data?.pagination?.total ??
+        (manualRes.data?.data?.length || 0);
+      const libraryTotal =
+        libraryRes.data?.pagination?.totalData ??
+        libraryRes.data?.pagination?.total ??
+        (libraryRes.data?.data?.length || 0);
+      return { manualTotal, libraryTotal };
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
@@ -21,18 +73,16 @@ const dashboardSlice = createSlice({
   initialState: {
     chart: { labels: [], series: [], loading: false, error: null },
     statCards: [
-      { id: "total-estimates", label: "Total Estimates", value: 1, icon: "🧮", color: "bg-stat-blue" },
-      { id: "infra-types", label: "Infrastructure Types", value: 6, icon: "🏗️", color: "bg-stat-emerald" },
-      { id: "total-value", label: "Total Value", value: "$3300.0M", icon: "💰", color: "bg-stat-fuchsia" },
+      { id: "total-estimates", label: "Total Estimates", value: 0, icon: "🧮", color: "bg-stat-blue" },
+      { id: "infra-types", label: "Library Items", value: 0, icon: "🗂️", color: "bg-stat-emerald" },
     ],
     quickActions: [
-      { id: "new-estimate", label: "Create New Estimate", icon: "➕" },
+      { id: "new-estimate", label: "Create Estimate", icon: "➕" },
       { id: "view-reports", label: "View Reports", icon: "📄" },
       { id: "cost-analytics", label: "Cost Analytics", icon: "📊" },
+      { id: "library", label: "Open Library", icon: "🗂️" },
     ],
-    recentEstimates: [
-      { id: 232, name: "LNG Jetty • 20 MTPA", value: "$3300.0M", date: "8/9/2025" },
-    ],
+    recentCapex: [],
     infrastructures: [
       {
         id: "onshore-plant",
@@ -91,10 +141,12 @@ const dashboardSlice = createSlice({
         accent: "amber"
       },
     ],
+    counts: { manualTotal: 0, libraryTotal: 0 },
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Chart
       .addCase(fetchChartData.pending, (state) => {
         state.chart.loading = true; state.chart.error = null;
       })
@@ -105,6 +157,20 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchChartData.rejected, (state, action) => {
         state.chart.loading = false; state.chart.error = action.payload;
+      })
+      // Recent manual CAPEX
+      .addCase(fetchDashboardManualRecent.fulfilled, (state, action) => {
+        state.recentCapex = Array.isArray(action.payload) ? action.payload : [];
+      })
+      // Counts
+      .addCase(fetchDashboardCounts.fulfilled, (state, action) => {
+        const { manualTotal = 0, libraryTotal = 0 } = action.payload || {};
+        state.counts = { manualTotal, libraryTotal };
+        state.statCards = state.statCards.map((c) => {
+          if (c.id === 'total-estimates') return { ...c, value: manualTotal };
+          if (c.id === 'infra-types') return { ...c, label: 'Library Items', value: libraryTotal, icon: '🗂️' };
+          return c;
+        });
       });
   },
 });

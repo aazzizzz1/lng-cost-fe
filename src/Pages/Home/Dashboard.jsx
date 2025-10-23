@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import ChartItems from "./ChartItems";
-import { useSelector } from "react-redux";
-import CreateProjectModal from "../Project/CreateProjectModal";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { fetchDashboardManualRecent, fetchDashboardCounts } from "../../Provider/dashboardSlice";
 import ModalCapacityFactor from "../CapacityFactor/ModalCapacityFactor";
+import CreateProjectModal from "../Project/CreateProjectModal";
 
 const AccentRing = ({ accent, styles }) => {
   const a = styles[accent];
@@ -16,26 +17,28 @@ const Dashboard = () => {
   const {
     statCards,
     quickActions,
-    recentEstimates,
     infrastructures,
+    recentCapex,
   } = useSelector((s) => s.dashboard);
-
-  // read shared styling from global slice
   const accentStyles = useSelector((s) => s.global.accentStyles);
   const chartGradients = useSelector((s) => s.global.chartGradients);
+  const { labels: chartLabels, series: chartSeries, loading: chartLoading } = useSelector((state) => state.dashboard.chart);
 
-  const { labels: chartLabels, series: chartSeries, loading: chartLoading } = useSelector(
-    (state) => state.dashboard.chart
-  );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    dispatch(fetchDashboardManualRecent());
+    dispatch(fetchDashboardCounts());
+  }, [dispatch]);
+
   const totalValue = chartSeries.reduce((a, b) => a + (typeof b === "number" ? b : 0), 0);
   const topItems = chartLabels
     .map((l, i) => ({ label: l, value: chartSeries[i] || 0 }))
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
+    .sort((a, b) => b.value - a.value);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCapacityModal, setShowCapacityModal] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <section className="bg-white dark:bg-gray-900">
@@ -49,37 +52,55 @@ const Dashboard = () => {
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Common tasks and shortcuts</p>
             <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-              {quickActions.map((a) => (
-                <button
-                  key={a.id}
-                  onClick={() => {
-                    if (a.id === "new-estimate") setShowCreateModal(true);
-                    else if (a.id === "view-reports") navigate("/rekap"); // NEW
-                    // else if (a.id === "cost-analytics") navigate("/unitprice"); // OPTIONAL example route
-                    else if (a.id === "cost-analytics") setShowCapacityModal(true);
-                  }}
-                  className="group flex items-center gap-3 px-5 py-3 bg-white/60 dark:bg-gray-800/60 hover:bg-blue-50 dark:hover:bg-gray-700/70 text-left transition-colors"
-                >
-                  <span className="text-lg">{a.icon}</span>
-                  <span className="font-medium text-gray-700 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-white">
-                    {a.label}
-                  </span>
-                  <span className="ml-auto opacity-0 group-hover:opacity-100 text-blue-600 dark:text-blue-400 text-xs font-semibold transition-opacity">
-                    Go →
-                  </span>
-                </button>
-              ))}
+              {quickActions.map((a) => {
+                const isLibrary = a.id === "library";
+                const icon = isLibrary ? "🗂️" : a.icon; // CHANGED
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => {
+                      if (a.id === "new-estimate") setShowCreateModal(true);
+                      else if (a.id === "view-reports") navigate("/rekap");
+                      else if (a.id === "cost-analytics") setShowCapacityModal(true);
+                      else if (a.id === "library") navigate("/library");
+                    }}
+                    className={`group flex items-center gap-3 px-5 py-3 text-left transition-colors
+                      bg-white/60 dark:bg-gray-800/60 hover:bg-blue-50 dark:hover:bg-gray-700/70
+                      ${isLibrary ? "relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-violet-400/80" : ""}`}
+                  >
+                    <span className={`text-lg ${isLibrary ? "text-violet-600" : ""}`}>{icon}</span>
+                    <span className={`font-medium text-gray-700 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-white ${isLibrary ? "tracking-wide" : ""}`}>
+                      {a.label}
+                    </span>
+                    <span className="ml-auto opacity-0 group-hover:opacity-100 text-blue-600 dark:text-blue-400 text-xs font-semibold transition-opacity">
+                      Go →
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Recent Estimates */}
+          {/* Recent Capex (manual only) */}
           <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
-              <span className="text-emerald-600">🗂️</span> Recent Capex
-            </h2>
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <span className="text-emerald-600">🗂️</span> Recent Capex
+              </h2>
+              {/* CHANGED: wrapped action in a compact bordered pill */}
+              {/* <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-fuchsia-200 dark:border-fuchsia-500/30 bg-fuchsia-50/50 dark:bg-fuchsia-500/10">
+                <button
+                  onClick={() => navigate('/project')}
+                  className="text-[11px] font-semibold text-fuchsia-700 dark:text-fuchsia-300"
+                  title="View all Capex"
+                >
+                  View Capex →
+                </button>
+              </div> */}
+            </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Your latest cost estimations</p>
             <ul className="space-y-3">
-              {recentEstimates.map((r) => (
+              {recentCapex.map((r) => (
                 <li
                   key={r.id}
                   className="group relative rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-white/70 dark:bg-gray-800/60 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
@@ -90,16 +111,17 @@ const Dashboard = () => {
                       <p className="text-xs text-gray-500 dark:text-gray-400">{r.name}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-gray-900 dark:text-white">{r.value}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{r.date}</p>
+                      <p className="font-bold text-gray-900 dark:text-white">
+                        {r.value ? `Rp${Number(r.value).toLocaleString()}` : "-"}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {r.date ? new Date(r.date).toLocaleDateString() : "-"}
+                      </p>
                     </div>
                   </div>
                 </li>
               ))}
             </ul>
-            <button className="mt-4 w-full text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-              View all →
-            </button>
             {/* OPEX Summary */}
             <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-start justify-between mb-2">
@@ -109,9 +131,16 @@ const Dashboard = () => {
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400">LNG Vessel • 135–150K CBM</p>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-md bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-500/10 dark:text-fuchsia-300 border border-fuchsia-200 dark:border-fuchsia-500/30">
-                  2024
-                </span>
+                {/* CHANGED: wrapped action in a compact bordered pill */}
+                {/* <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-fuchsia-200 dark:border-fuchsia-500/30 bg-fuchsia-50/50 dark:bg-fuchsia-500/10">
+                  <button
+                    onClick={() => navigate('/opex')}
+                    className="text-[11px] font-semibold text-fuchsia-700 dark:text-fuchsia-300"
+                    title="Open OPEX Viewer"
+                  >
+                    View OPEX →
+                  </button>
+                </div> */}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-2.5">
@@ -123,34 +152,44 @@ const Dashboard = () => {
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">$14,990</p>
                 </div>
               </div>
-              <button
-                onClick={() => navigate('/opex')}
-                className="mt-3 w-full text-xs font-semibold text-white bg-fuchsia-600 hover:bg-fuchsia-700 dark:bg-fuchsia-500 dark:hover:bg-fuchsia-600 rounded-lg py-2 transition-colors"
-              >
-                Open OPEX Viewer →
-              </button>
             </div>
           </div>
 
-          {/* Stats Column */}
-          <div className="flex flex-col gap-5">
-            {statCards.map((c) => (
-              <div
-                key={c.id}
-                className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 shadow-sm hover:shadow-md transition-all p-5"
-              >
-                <div className={`absolute inset-0 ${c.color} opacity-0 group-hover:opacity-100 transition-opacity`} />
-                <div className="relative z-10 flex items-start gap-4">
-                  <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/70 dark:bg-gray-700/60 shadow-inner text-xl">
-                    {c.icon}
+          {/* Stats Column wrapped in one box */}
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+              <span className="text-indigo-600">📊</span> Overview
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Summary of manual estimates and library items
+            </p>
+            <div className="grid gap-4">
+              {statCards.map((c) => (
+                <div
+                  key={c.id}
+                  className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 px-4 py-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-700/60 shadow-inner text-lg">
+                      {c.icon}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                        {c.label}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {c.id === 'total-estimates'
+                          ? 'Total manual projects you created'
+                          : 'Total items available in Library'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{c.label}</span>
-                    <span className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{c.value}</span>
+                  <div className="text-2xl font-extrabold text-gray-900 dark:text-white tabular-nums">
+                    {c.value}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
@@ -171,9 +210,7 @@ const Dashboard = () => {
                   Composition & top contributors
                 </p>
               </div>
-              <button className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                View details →
-              </button>
+              {/* removed: View details button */}
             </div>
 
             {chartLoading ? (
@@ -253,7 +290,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* LNG Infrastructure */}
+        {/* LNG Infrastructure (no Details button) */}
         <div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <span className="text-indigo-600">🧾</span> LNG Infrastructure
@@ -275,14 +312,6 @@ const Dashboard = () => {
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         {c.desc}
                       </p>
-                      <button
-                        onClick={() => {
-                          if (c.id === 'lng-carrier') navigate('/opex');
-                        }}
-                        className="mt-2 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
-                      >
-                        Details <span>→</span>
-                      </button>
                     </div>
                   </div>
                   <div className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-500 to-transparent transition-all" />

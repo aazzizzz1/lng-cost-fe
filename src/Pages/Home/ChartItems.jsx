@@ -72,7 +72,7 @@ const ChartItems = () => {
             <span className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-300 text-xs shadow-inner">
               𝛑
             </span>
-            Harga Satuan LNG
+            LNG Unit Prices
           </h5>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             Distribution of unit price components
