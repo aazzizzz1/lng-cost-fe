@@ -8,7 +8,7 @@ import {
   setModalSearch,
 } from "../../Provider/Project/detailCreateProjectConstructionSlice";
 
-const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList }) => {
+const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList, onPick }) => { // CHANGED: add onPick
   const dispatch = useDispatch();
   const modal = useSelector(selectModal);
   const {
@@ -137,6 +137,33 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
       row.volume || 1,
       project?.volume || 1
     );
+
+    const selectedItem = { // NEW: build a single item for external consumers (RAB)
+      workcode: row.workcode || "",
+      kode: row.workcode || row.kode || "",
+      uraian: row.uraian || "",
+      specification: row.spesifikasi || row.specification || "",
+      satuan: row.satuan || "",
+      hargaSatuan: Math.round(hargaLokasiProject),
+      qty: Math.round(adjustedQty),
+      totalHarga: Math.round(adjustedQty * Math.round(hargaLokasiProject)),
+      tahun: Number(tahunProject) || Number(row.tahun) || new Date().getFullYear(),
+      lokasi: lokasiProject || row.lokasi || "",
+      infrastruktur: project?.infrastruktur || row.infrastruktur || "",
+      volume: Number(project?.volume || row.volume || 0),
+      satuanVolume: row.satuanVolume || "",
+      kelompok: row.kelompok || "",
+      kelompokDetail: row.kelompokDetail || "",
+      tipe: row.tipe || selectedType || "",
+      projectId: Number(project?.id) || undefined,
+    };
+
+    // If an external handler is provided, use it and exit
+    if (typeof onPick === "function") {
+      onPick(selectedItem);         // NEW RAB
+      dispatch(closeModal());       // keep modal UX consistent
+      return;                       // prevent construction slice updates
+    }
 
     dispatch(
       updateItem({
