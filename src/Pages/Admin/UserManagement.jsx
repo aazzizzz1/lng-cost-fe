@@ -3,6 +3,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { Modal } from "flowbite-react";
+import EyeOpenIcon from "../../Assets/Svg/Auth/EyeOpenIcon";
+import EyeClosedIcon from "../../Assets/Svg/Auth/EyeClosedIcon";
 
 const api = process.env.REACT_APP_API;
 
@@ -18,6 +20,15 @@ const UserManagement = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [query, setQuery] = useState("");
+  // Add User modal state
+  const [addOpen, setAddOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ username: "", email: "", password: "", confirm_password: "" });
+  const [addError, setAddError] = useState("");
+  const [adding, setAdding] = useState(false);
+  // New: Password visibility + backend info
+  const [addPasswordVisible, setAddPasswordVisible] = useState(false);
+  const [addConfirmVisible, setAddConfirmVisible] = useState(false);
+  const [addInfo, setAddInfo] = useState("");
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -72,6 +83,49 @@ const UserManagement = () => {
     }
   };
 
+  // Handlers for Add User modal
+  const openAdd = () => {
+    setAddError("");
+    setAddInfo("");
+    setAddForm({ username: "", email: "", password: "", confirm_password: "" });
+    setAddOpen(true);
+  };
+  const closeAdd = () => setAddOpen(false);
+  const submitAdd = async (e) => {
+    e.preventDefault();
+    setAddError("");
+    setAddInfo("");
+    const { username, email, password, confirm_password } = addForm;
+    if (!username || !email || !password || !confirm_password) {
+      setAddError("All fields are required.");
+      return;
+    }
+    if (password.length < 8) {
+      setAddError("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirm_password) {
+      setAddError("Password doesn't match.");
+      return;
+    }
+    try {
+      setAdding(true);
+      const res = await axios.post(
+        `${api}/auth/register`,
+        { username: username.trim(), email: email.trim(), password },
+        { withCredentials: true }
+      );
+      // Show backend message below the form and keep modal open
+      setAddInfo(res?.data?.message || "User created successfully.");
+      setAddForm({ username: "", email: "", password: "", confirm_password: "" });
+      fetchUsers();
+    } catch (e) {
+      setAddError(e.response?.data?.message || "Create user failed");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   if (!isAdmin) return <Navigate to="/dashboard" replace />;
 
   const filtered = rows.filter((u) => {
@@ -122,6 +176,18 @@ const UserManagement = () => {
               </form>
             </div>
             <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+              {/* Add User button */}
+              <button
+                onClick={openAdd}
+                type="button"
+                className="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+              >
+                <svg className="h-3.5 w-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path clipRule="evenodd" fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                </svg>
+                Add user
+              </button>
+              {/* Existing Refresh button */}
               <button
                 onClick={fetchUsers}
                 type="button"
@@ -220,7 +286,119 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* Edit Modal */}
+      {/* Add User Modal */}
+      <Modal show={addOpen} size="lg" onClose={closeAdd}>
+        <Modal.Header>Add User</Modal.Header>
+        <Modal.Body>
+          <form id="add-user-form" onSubmit={submitAdd}>
+            <div className="grid grid-flow-row gap-4 mb-4 sm:grid-cols-2">
+              {/* Only render when error exists to avoid empty grid item affecting layout */}
+              {addError ? (
+                <div className="sm:col-span-2">
+                  <div className="text-sm text-red-600 dark:text-red-400">{addError}</div>
+                </div>
+              ) : null}
+              <div className="sm:order-1">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  value={addForm.username}
+                  onChange={(e) => setAddForm((f) => ({ ...f, username: e.target.value }))}
+                  placeholder="Type username"
+                  autoFocus
+                  required
+                />
+              </div>
+              <div className="sm:order-2">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                  value={addForm.email}
+                  onChange={(e) => setAddForm((f) => ({ ...f, email: e.target.value }))}
+                  placeholder="user@example.com"
+                  required
+                />
+              </div>
+              <div className="sm:order-3">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    type={addPasswordVisible ? "text" : "password"}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-9 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    value={addForm.password}
+                    onChange={(e) => setAddForm((f) => ({ ...f, password: e.target.value }))}
+                    placeholder="Min 8 characters"
+                    required
+                  />
+                  <span
+                    className="absolute inset-y-0 right-2 flex items-center cursor-pointer"
+                    onClick={() => setAddPasswordVisible((v) => !v)}
+                    aria-label="Toggle password visibility"
+                  >
+                    {addPasswordVisible ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                  </span>
+                </div>
+              </div>
+              <div className="sm:order-4">
+                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                  Confirm password
+                </label>
+                <div className="relative">
+                  <input
+                    type={addConfirmVisible ? "text" : "password"}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 pr-9 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    value={addForm.confirm_password}
+                    onChange={(e) => setAddForm((f) => ({ ...f, confirm_password: e.target.value }))}
+                    placeholder="Re-enter password"
+                    required
+                  />
+                  <span
+                    className="absolute inset-y-0 right-2 flex items-center cursor-pointer"
+                    onClick={() => setAddConfirmVisible((v) => !v)}
+                    aria-label="Toggle confirm password visibility"
+                  >
+                    {addConfirmVisible ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {/* Backend response info below all form fields */}
+            {addInfo && (
+              <div className="mt-2 text-sm text-emerald-600 dark:text-emerald-400">
+                {addInfo}
+              </div>
+            )}
+          </form>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            type="button"
+            className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+            onClick={closeAdd}
+            disabled={adding}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="add-user-form"
+            className="text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 disabled:opacity-60"
+            disabled={adding}
+          >
+            {adding ? "Creating..." : "Create"}
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Edit Modal (restored to remove ESLint warnings and enable editing) */}
       <Modal show={editOpen} size="lg" onClose={() => setEditOpen(false)}>
         <Modal.Header>Edit User</Modal.Header>
         <Modal.Body>

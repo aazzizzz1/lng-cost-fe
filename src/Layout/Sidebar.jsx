@@ -348,7 +348,7 @@ const Sidebar = () => {
             </li>
           </Link>
            )}
-          <li>
+          {/* <li>
             <a
               href="#askjd"
               className="flex items-center p-2 textBase font-medium text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
@@ -372,7 +372,7 @@ const Sidebar = () => {
               </svg>
               <span className="ml-3">Dokumen Referensi</span>
             </a>
-          </li>
+          </li> */}
         </ul>
       </div>
       {/* Bottom Navbar */}
