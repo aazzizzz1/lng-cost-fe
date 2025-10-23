@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUnitPriceDataForModal, fetchTypes } from "../../Provider/HargaSatuan/unitPriceSlice";
+import { fetchUnitPriceDataForModal, fetchTypes, fetchUniqueFields } from "../../Provider/HargaSatuan/unitPriceSlice";
 import {
   updateItem,
   closeModal,
@@ -11,21 +11,69 @@ import {
 const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList }) => {
   const dispatch = useDispatch();
   const modal = useSelector(selectModal);
-  const { types = [], transport: { data = [] }, modalLoading } = useSelector((state) => state.unitPrice); // FIX selector
+  const {
+    types = [],
+    transport: { data = [] },
+    modalLoading,
+    uniqueFields = {}, // NEW: grouped unique fields from API
+  } = useSelector((state) => state.unitPrice);
   const search = modal.search || "";
 
   const [selectedType, setSelectedType] = useState("");
-  const [selectedRow, setSelectedRow] = useState(null); // NEW: Track selected row for composing prices modal
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedInfra, setSelectedInfra] = useState("");     // NEW
+  const [selectedKelompok, setSelectedKelompok] = useState(""); // NEW
 
   useEffect(() => {
     dispatch(fetchTypes());
+    dispatch(fetchUniqueFields()); // NEW: load grouped fields once
   }, [dispatch]);
 
+  // Derive options safely from uniqueFields structure (supports grouped object)
+  const infraOptions = React.useMemo(() => {
+    const byType = uniqueFields?.[selectedType];
+    if (byType && typeof byType === "object" && !Array.isArray(byType)) {
+      return Object.keys(byType);
+    }
+    // fallback: try flat list
+    return Array.isArray(uniqueFields?.infrastruktur) ? uniqueFields.infrastruktur : [];
+  }, [uniqueFields, selectedType]);
+
+  const kelompokOptions = React.useMemo(() => {
+    const byType = uniqueFields?.[selectedType];
+    if (byType && typeof byType === "object" && !Array.isArray(byType)) {
+      if (selectedInfra && Array.isArray(byType[selectedInfra])) {
+        return byType[selectedInfra];
+      }
+      // union of all kelompok across infra if infra not selected
+      const all = Object.values(byType)
+        .flat()
+        .filter(Boolean);
+      return Array.from(new Set(all));
+    }
+    // fallback: try flat list
+    return Array.isArray(uniqueFields?.kelompok) ? uniqueFields.kelompok : [];
+  }, [uniqueFields, selectedType, selectedInfra]);
+
+  // Fetch whenever filters change
   useEffect(() => {
     if (selectedType) {
-      dispatch(fetchUnitPriceDataForModal({ tipe: selectedType, search }));
+      dispatch(
+        fetchUnitPriceDataForModal({
+          tipe: selectedType,
+          search,
+          infrastruktur: selectedInfra || "",
+          kelompok: selectedKelompok || "",
+        })
+      );
     }
-  }, [dispatch, selectedType, search]);
+  }, [dispatch, selectedType, search, selectedInfra, selectedKelompok]);
+
+  // Reset dependent filters when type changes
+  useEffect(() => {
+    setSelectedInfra("");
+    setSelectedKelompok("");
+  }, [selectedType]);
 
   const modalColumns = [
     { key: "workcode", label: "Workcode" },
@@ -266,7 +314,8 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
             &times;
           </button>
         </div>
-        <div className="flex gap-2 mb-3">
+        {/* CHANGED: Filters row (Type, Infrastruktur, Kelompok, Search) */}
+        <div className="flex flex-wrap gap-2 mb-3">
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
@@ -277,6 +326,28 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList 
               <option key={type} value={type}>
                 {type}
               </option>
+            ))}
+          </select>
+          <select
+            value={selectedInfra}
+            onChange={(e) => setSelectedInfra(e.target.value)}
+            className="px-3 py-2 border rounded text-sm"
+            disabled={!selectedType}
+          >
+            <option value="">Semua Infrastruktur</option>
+            {infraOptions.map((opt) => (
+              <option key={opt} value={opt}>{opt}</option>
+            ))}
+          </select>
+          <select
+            value={selectedKelompok}
+            onChange={(e) => setSelectedKelompok(e.target.value)}
+            className="px-3 py-2 border rounded text-sm"
+            disabled={!selectedType}
+          >
+            <option value="">Semua Kelompok</option>
+            {kelompokOptions.map((opt) => (
+              <option key={opt} value={opt}>{opt}</option>
             ))}
           </select>
           <input

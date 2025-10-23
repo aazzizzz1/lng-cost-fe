@@ -254,10 +254,18 @@ const transportInitialState = {
 
 export const fetchUnitPriceDataForModal = createAsyncThunk(
   'unitPrice/fetchUnitPriceDataForModal',
-  async ({ tipe = '', search = '' } = {}, { rejectWithValue }) => {
+  async (
+    { tipe = '', search = '', infrastruktur = '', kelompok = '' } = {}, // CHANGED: add filters
+    { rejectWithValue }
+  ) => {
     try {
       const params = { tipe, search };
-      const response = await axios.get(`${api}/unit-prices/best-prices`, { params });
+      if (infrastruktur) params.infrastruktur = infrastruktur; // NEW
+      if (kelompok) params.kelompok = kelompok;                 // NEW
+      const response = await axios.get(`${api}/unit-prices/best-prices`, {
+        params,
+        headers: getAuthHeaders(), // NEW: include auth headers
+      });
       return response.data; // Adjust response to include recommended and composing prices
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
