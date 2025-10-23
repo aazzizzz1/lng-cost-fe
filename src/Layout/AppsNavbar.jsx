@@ -191,8 +191,8 @@ const AppsNavbar = ({ appsRef: propAppsRef, setCFModalOpen }) => {
                   Administrator 
                 </div>
               </Link>
-              <a
-                href="sajdj"
+              <Link
+                to="/library"
                 className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
               >
                 <svg
@@ -204,14 +204,14 @@ const AppsNavbar = ({ appsRef: propAppsRef, setCFModalOpen }) => {
                 >
                   <path
                     fillRule="evenodd"
-                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 004 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                    d="M4 4.5A1.5 1.5 0 0 1 5.5 3h9A1.5 1.5 0 0 1 16 4.5V16a1 1 0 0 1-1.447.894L10 14.118l-4.553 2.776A1 1 0 0 1 4 16V4.5Zm1.5-.5a.5.5 0 0 0-.5.5v10.764l4.053-2.47a1 1 0 0 1 .894 0L14 15.264V4.5a.5.5 0 0 0-.5-.5h-8Z"
                     clipRule="evenodd"
                   />
                 </svg>
                 <div className="text-sm text-gray-900 dark:text-white">
-                  Profile
+                  Library
                 </div>
-              </a>
+              </Link>
             </div>
           </>
         )}
