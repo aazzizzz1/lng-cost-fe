@@ -40,6 +40,20 @@ const Dashboard = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCapacityModal, setShowCapacityModal] = useState(false);
 
+  // NEW: derive latest CAPEX by project date time (fallbacks supported), limit to 5
+  const recentCapexLatest = React.useMemo(() => {
+    const getTs = (r) => new Date(
+      r?.projectDateTime ||
+      r?.updatedAt ||
+      r?.createdAt ||
+      r?.date ||
+      0
+    ).getTime();
+    const arr = Array.isArray(recentCapex) ? recentCapex.slice() : [];
+    arr.sort((a, b) => getTs(b) - getTs(a));
+    return arr.slice(0, 1); // CHANGED: show only the latest one
+  }, [recentCapex]);
+
   return (
     <section className="bg-white dark:bg-gray-900">
       <div className="px-4 py-6 space-y-8 max-w-7xl mx-auto">
@@ -100,27 +114,30 @@ const Dashboard = () => {
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Your latest cost estimations</p>
             <ul className="space-y-3">
-              {recentCapex.map((r) => (
-                <li
-                  key={r.id}
-                  className="group relative rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-white/70 dark:bg-gray-800/60 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-gray-900 dark:text-white">{r.id}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{r.name}</p>
+              {recentCapexLatest.map((r) => {
+                const dt = r.projectDateTime || r.updatedAt || r.createdAt || r.date;
+                return (
+                  <li
+                    key={r.id}
+                    className="group relative rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-white/70 dark:bg-gray-800/60 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">{r.id}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{r.name}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-gray-900 dark:text-white">
+                          {r.value ? `Rp${Number(r.value).toLocaleString()}` : "-"}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {dt ? new Date(dt).toLocaleDateString() : "-"}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-gray-900 dark:text-white">
-                        {r.value ? `Rp${Number(r.value).toLocaleString()}` : "-"}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {r.date ? new Date(r.date).toLocaleDateString() : "-"}
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
             {/* OPEX Summary */}
             <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
