@@ -114,14 +114,14 @@ const dashboardSlice = createSlice({
       },
       {
         id: "storage-tank",
-        label: "Storage Tank",
+        label: "LNGBV",
         desc: "Full containment cryogenic tank storing LNG at -162°C prior to loading/regasification.",
         icon: "🛢️",
         accent: "blue"
       },
       {
         id: "orf",
-        label: "ORF Receiving Terminal",
+        label: "ORF",
         desc: "Onshore receiving facility: unloading arms, storage, regasification & send-out systems.",
         icon: "🏗️",
         accent: "cyan"
@@ -135,7 +135,7 @@ const dashboardSlice = createSlice({
       },
       {
         id: "pipeline",
-        label: "Gas Pipeline",
+        label: "ORU",
         desc: "High-pressure transmission delivering regasified natural gas to end users or grids.",
         icon: "🛤️",
         accent: "amber"

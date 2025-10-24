@@ -35,6 +35,15 @@ const TrashIcon = ({ className = "w-4 h-4" }) => (
   </svg>
 );
 
+// NEW: Static kelompok list to support add-by-dropdown
+const DEFAULT_KELOMPOK = [
+  'General & Finalization',
+  'Construction and Installation',
+  'Material & Equipment',
+  'Engineering & Management',
+  'Testing & Commissioning',
+];
+
 const EditProjectConstruction = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -61,6 +70,10 @@ const EditProjectConstruction = () => {
   const [levelAACE, setLevelAACE] = useState(''); // NEW
   const [satuan, setSatuan] = useState(''); // NEW
   const [harga, setHarga] = useState(''); // NEW
+
+  // NEW: local UI state to manage kelompok added via dropdown (render even if empty)
+  const [extraGroups, setExtraGroups] = useState([]);
+  const [kelompokToAdd, setKelompokToAdd] = useState('');
 
   // Load project
   useEffect(() => {
@@ -113,7 +126,7 @@ const EditProjectConstruction = () => {
     dispatch(setItems(mapped));
   }, [dispatch, project]);
 
-  // Group by 'kelompok'
+  // Group by 'kelompok' (do NOT auto-add default groups)
   const grouped = useMemo(() => {
     return (items || []).reduce((acc, it) => {
       const key = it.kelompok || '-';
@@ -123,7 +136,18 @@ const EditProjectConstruction = () => {
     }, {});
   }, [items]);
 
-  const kelompokList = useMemo(() => Object.keys(grouped), [grouped]);
+  // Build list of groups to render: existing + UI-added extra groups (deduped)
+  const kelompokList = useMemo(() => {
+    const current = Object.keys(grouped);
+    return Array.from(new Set([...current, ...extraGroups]));
+  }, [grouped, extraGroups]);
+
+  // Choices for dropdown: defaults not already present or already added
+  const availableKelompokToAdd = useMemo(() => {
+    const current = new Set(Object.keys(grouped));
+    const extras = new Set(extraGroups);
+    return DEFAULT_KELOMPOK.filter((k) => !current.has(k) && !extras.has(k));
+  }, [grouped, extraGroups]);
 
   // NEW: determine preferred tipe from existing items (most common non-empty, excluding "Auto-generated")
   const preferredTipe = useMemo(() => {
@@ -298,7 +322,7 @@ const EditProjectConstruction = () => {
     <div className="p-4 md:p-6 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Edit Project</h1>
 
-      {/* Header form (Flowbite-like, compact, 4-rows per column on lg) */}
+      {/* Header form */}
       <section className="mb-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="px-4 py-4 lg:py-5">
           <h2 className="mb-3 text-base font-bold text-gray-900 dark:text-white">Informasi Project</h2>
@@ -398,16 +422,7 @@ const EditProjectConstruction = () => {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
               />
             </div>
-            <div className="lg:col-auto">
-              <label className="block mb-1 text-sm font-medium text-gray-900 dark:text-white">Harga (legacy)</label>
-              <input
-                type="number" step="any"
-                value={harga}
-                onChange={(e) => setHarga(e.target.value)}
-                placeholder="0"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              />
-            </div>
+            {/* REMOVED: Harga (legacy) field (do not display price from DB) */}
           </div>
         </div>
       </section>
@@ -443,7 +458,34 @@ const EditProjectConstruction = () => {
         </div>
       )}
 
-      <div className="mt-2 flex justify-end">
+      <div className="mt-2 flex justify-between items-center gap-3">
+        {/* NEW: Add Kelompok dropdown (adds a group section even if no items yet) */}
+        <div className="flex items-center gap-2 mb-2">
+          <select
+            value={kelompokToAdd}
+            onChange={(e) => setKelompokToAdd(e.target.value)}
+            className="px-3 py-1.5 border rounded-md text-sm bg-white dark:bg-gray-800 dark:border-gray-700"
+          >
+            <option value="">Tambah Kelompok...</option>
+            {availableKelompokToAdd.map((k) => (
+              <option key={k} value={k}>{k}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            disabled={!kelompokToAdd}
+            onClick={() => {
+              if (kelompokToAdd) {
+                setExtraGroups((prev) => [...prev, kelompokToAdd]);
+                setKelompokToAdd('');
+              }
+            }}
+            className="bg-primary-600 disabled:opacity-60 text-white px-3 py-1.5 rounded text-sm"
+          >
+            Tambah Kelompok
+          </button>
+        </div>
+
         <button
           type="button"
           disabled={isSaveDisabled}
@@ -470,7 +512,8 @@ const EditProjectConstruction = () => {
                 </tr>
               </thead>
               <tbody>
-                {grouped[kelompok].map((item) => {
+                {/* Render rows if any; still show header when empty so user can add */}
+                {(grouped[kelompok] || []).map((item) => {
                   const absIdx = items.findIndex((it) => it === item);
                   const missingFor = (field) => {
                     const rec = itemMissingMap[absIdx];
