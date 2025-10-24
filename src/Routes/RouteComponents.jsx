@@ -21,7 +21,7 @@ import EditProjectConstruction from "../Pages/Project/EditProjectConstruction"; 
 import OpexPages from "../Pages/Opex/OpexPages"; // NEW
 import LibraryPages from "../Pages/Library/LibraryPages"; // NEW
 import Preview from "../Pages/Library/Preview"; // NEW
-import UserManagement from "../Pages/Admin/UserManagement"; // NEW
+import UserManagementPages from "../Pages/Admin/UserManagementPages";
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -167,7 +167,7 @@ const RouteComponents = () => {
             element={
               <PrivateRoute>
                 <LayoutPages>
-                  <UserManagement />
+                  <UserManagementPages />
                 </LayoutPages>
               </PrivateRoute>
             }

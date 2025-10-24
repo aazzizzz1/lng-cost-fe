@@ -24,6 +24,21 @@ const columns = [
 
 const numericKeys = new Set(["qty", "hargaSatuan", "totalHarga", "tahun", "volume"]);
 
+const EditIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.25 2.25 0 0 1 3.182 3.182L9.06 17.653a2 2 0 0 1-.9.53L5 19l.817-3.16a2 2 0 0 1 .53-.9L16.862 3.487z" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M19 13v5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5" />
+  </svg>
+);
+const TrashIcon = ({ className = "w-4 h-4" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className={className} aria-hidden="true">
+    <path strokeWidth="1.6" strokeLinecap="round" d="M4 7h16" />
+    <path strokeWidth="1.6" strokeLinecap="round" d="M10 11v6M14 11v6" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12" />
+    <path strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
 const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange, onSortChange }) => {
   const { page, limit, total, totalPages } = pagination;
   const dispatch = useDispatch();
@@ -246,21 +261,23 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                         ) : (
                           //user
                           user?.role === 'admin' && (
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => startEdit(row)}
-                              className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(row)}
-                              disabled={rowDeleteLoading && rowDeletingId === row.id}
-                              className="px-3 py-1 text-xs rounded bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => startEdit(row)}
+                                title="Edit"
+                                className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-600 shadow-sm"
+                              >
+                                <EditIcon />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(row)}
+                                title="Delete"
+                                disabled={rowDeleteLoading && rowDeletingId === row.id}
+                                className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
+                              >
+                                <TrashIcon />
+                              </button>
+                            </div>
                           )
                         )}
                       </td>

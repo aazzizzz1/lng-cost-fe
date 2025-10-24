@@ -16,29 +16,31 @@ const AdministratorInflasi = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      <table className="min-w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-100 dark:bg-gray-700">
-            <th className="border px-2 py-1">Tahun</th>
-            <th className="border px-2 py-1">Inflasi (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="border px-2 py-1">{currentYear}</td>
-            <td className="border px-2 py-1">
-              <input
-                type="number"
-                className="w-24 px-1 py-0.5 border rounded"
-                value={current.value}
-                onChange={(e) => handleChange(e.target.value)}
-                step="0.01"
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div className="max-w-md mx-auto bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
+      <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
+        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+            <tr>
+              <th className="px-4 py-3">Tahun</th>
+              <th className="px-4 py-3">Inflasi (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{currentYear}</td>
+              <td className="px-4 py-3">
+                <input
+                  type="number"
+                  className="w-28 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                  value={current.value}
+                  onChange={(e) => handleChange(e.target.value)}
+                  step="0.01"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

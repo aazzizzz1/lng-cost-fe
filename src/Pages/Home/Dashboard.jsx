@@ -60,153 +60,168 @@ const Dashboard = () => {
         {/* Quick Actions / Recent / Stats */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Quick Actions */}
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
-              <span className="text-blue-600">⚡</span> Quick Actions
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Common tasks and shortcuts</p>
-            <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
-              {quickActions.map((a) => {
-                const isLibrary = a.id === "library";
-                const icon = isLibrary ? "🗂️" : a.icon; // CHANGED
-                return (
-                  <button
-                    key={a.id}
-                    onClick={() => {
-                      if (a.id === "new-estimate") setShowCreateModal(true);
-                      else if (a.id === "view-reports") navigate("/rekap");
-                      else if (a.id === "cost-analytics") setShowCapacityModal(true);
-                      else if (a.id === "library") navigate("/library");
-                    }}
-                    className={`group flex items-center gap-3 px-5 py-3 text-left transition-colors
-                      bg-white/60 dark:bg-gray-800/60 hover:bg-blue-50 dark:hover:bg-gray-700/70
-                      ${isLibrary ? "relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-violet-400/80" : ""}`}
-                  >
-                    <span className={`text-lg ${isLibrary ? "text-violet-600" : ""}`}>{icon}</span>
-                    <span className={`font-medium text-gray-700 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-white ${isLibrary ? "tracking-wide" : ""}`}>
-                      {a.label}
-                    </span>
-                    <span className="ml-auto opacity-0 group-hover:opacity-100 text-blue-600 dark:text-blue-400 text-xs font-semibold transition-opacity">
-                      Go →
-                    </span>
-                  </button>
-                );
-              })}
+          <div className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
+            {/* NEW: gradient hover overlay */}
+            <AccentRing accent="blue" styles={accentStyles} />
+            <div className="relative z-10">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                <span className="text-blue-600">⚡</span> Quick Actions
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Common tasks and shortcuts</p>
+              <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                {quickActions.map((a) => {
+                  const isLibrary = a.id === "library";
+                  const icon = isLibrary ? "🗂️" : a.icon;
+                  return (
+                    <button
+                      key={a.id}
+                      onClick={() => {
+                        if (a.id === "new-estimate") setShowCreateModal(true);
+                        else if (a.id === "view-reports") navigate("/opex"); // CHANGED: route to OPEX
+                        else if (a.id === "cost-analytics") setShowCapacityModal(true);
+                        else if (a.id === "library") navigate("/library");
+                      }}
+                      className={`group flex items-center gap-3 px-5 py-3 text-left transition-colors
+                        bg-white/60 dark:bg-gray-800/60 hover:bg-blue-50 dark:hover:bg-gray-700/70
+                        ${isLibrary ? "relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-violet-400/80" : ""}`}
+                    >
+                      <span className={`text-lg ${isLibrary ? "text-violet-600" : ""}`}>{icon}</span>
+                      <span className={`font-medium text-gray-700 dark:text-gray-200 group-hover:text-blue-700 dark:group-hover:text-white ${isLibrary ? "tracking-wide" : ""}`}>
+                        {a.label}
+                      </span>
+                      <span className="ml-auto opacity-0 group-hover:opacity-100 text-blue-600 dark:text-blue-400 text-xs font-semibold transition-opacity">
+                        Go →
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+            {/* NEW: bottom accent bar */}
+            <div className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full bg-gradient-to-r from-blue-500 to-transparent transition-all" />
           </div>
 
           {/* Recent Capex (manual only) */}
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
-            <div className="flex items-center justify-between mb-1">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                <span className="text-emerald-600">🗂️</span> Recent Capex
-              </h2>
-              {/* CHANGED: wrapped action in a compact bordered pill */}
-              {/* <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-fuchsia-200 dark:border-fuchsia-500/30 bg-fuchsia-50/50 dark:bg-fuchsia-500/10">
-                <button
-                  onClick={() => navigate('/project')}
-                  className="text-[11px] font-semibold text-fuchsia-700 dark:text-fuchsia-300"
-                  title="View all Capex"
-                >
-                  View Capex →
-                </button>
-              </div> */}
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Your latest cost estimations</p>
-            <ul className="space-y-3">
-              {recentCapexLatest.map((r) => {
-                const dt = r.projectDateTime || r.updatedAt || r.createdAt || r.date;
-                return (
-                  <li
-                    key={r.id}
-                    className="group relative rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-white/70 dark:bg-gray-800/60 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">{r.id}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{r.name}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-gray-900 dark:text-white">
-                          {r.value ? `Rp${Number(r.value).toLocaleString()}` : "-"}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {dt ? new Date(dt).toLocaleDateString() : "-"}
-                        </p>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            {/* OPEX Summary */}
-            <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span className="text-fuchsia-500">⚓</span> OPEX Summary
-                  </h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">LNG Vessel • 135–150K CBM</p>
-                </div>
+          <div className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
+            {/* NEW: gradient hover overlay */}
+            <AccentRing accent="cyan" styles={accentStyles} />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <span className="text-emerald-600">🗂️</span> Recent Capex
+                </h2>
                 {/* CHANGED: wrapped action in a compact bordered pill */}
                 {/* <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-fuchsia-200 dark:border-fuchsia-500/30 bg-fuchsia-50/50 dark:bg-fuchsia-500/10">
                   <button
-                    onClick={() => navigate('/opex')}
+                    onClick={() => navigate('/project')}
                     className="text-[11px] font-semibold text-fuchsia-700 dark:text-fuchsia-300"
-                    title="Open OPEX Viewer"
+                    title="View all Capex"
                   >
-                    View OPEX →
+                    View Capex →
                   </button>
                 </div> */}
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-2.5">
-                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Annual OPEX</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">$5,463,080</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Your latest cost estimations</p>
+              <ul className="space-y-3">
+                {recentCapexLatest.map((r) => {
+                  const dt = r.projectDateTime || r.updatedAt || r.createdAt || r.date;
+                  return (
+                    <li key={r.id} className="group relative rounded-xl border border-gray-200 dark:border-gray-700 p-4 bg-white/70 dark:bg-gray-800/60 hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900 dark:text-white">{r.id}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{r.name}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-gray-900 dark:text-white">
+                            {r.value ? `Rp${Number(r.value).toLocaleString()}` : "-"}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {dt ? new Date(dt).toLocaleDateString() : "-"}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              {/* OPEX Summary */}
+              <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                      <span className="text-fuchsia-500">⚓</span> OPEX Summary
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">LNG Vessel • 135–150K CBM</p>
+                  </div>
+                  {/* CHANGED: wrapped action in a compact bordered pill */}
+                  {/* <div className="inline-flex items-center gap-2 px-2 py-1 rounded-lg border border-fuchsia-200 dark:border-fuchsia-500/30 bg-fuchsia-50/50 dark:bg-fuchsia-500/10">
+                    <button
+                      onClick={() => navigate('/opex')}
+                      className="text-[11px] font-semibold text-fuchsia-700 dark:text-fuchsia-300"
+                      title="Open OPEX Viewer"
+                    >
+                      View OPEX →
+                    </button>
+                  </div> */}
                 </div>
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-2.5">
-                  <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Daily (15-yr)</p>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">$14,990</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-2.5">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Annual OPEX</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">$5,463,080</p>
+                  </div>
+                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-2.5">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Daily (15-yr)</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">$14,990</p>
+                  </div>
                 </div>
               </div>
             </div>
+            {/* NEW: bottom accent bar */}
+            <div className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full bg-gradient-to-r from-cyan-500 to-transparent transition-all" />
           </div>
 
-          {/* Stats Column wrapped in one box */}
-          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
-              <span className="text-indigo-600">📊</span> Overview
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Summary of manual estimates and library items
-            </p>
-            <div className="grid gap-4">
-              {statCards.map((c) => (
-                <div
-                  key={c.id}
-                  className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 px-4 py-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-700/60 shadow-inner text-lg">
-                      {c.icon}
+          {/* Overview (Stats) */}
+          <div className="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/70 shadow-sm p-6">
+            {/* NEW: gradient hover overlay */}
+            <AccentRing accent="violet" styles={accentStyles} />
+            <div className="relative z-10">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                <span className="text-indigo-600">📊</span> Overview
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Summary of manual estimates and library items
+              </p>
+              <div className="grid gap-4">
+                {statCards.map((c) => (
+                  <div
+                    key={c.id}
+                    className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-800/60 px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-700/60 shadow-inner text-lg">
+                        {c.icon}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {c.label}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {c.id === 'total-estimates'
+                            ? 'Total manual projects you created'
+                            : 'Total items available in Library'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        {c.label}
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {c.id === 'total-estimates'
-                          ? 'Total manual projects you created'
-                          : 'Total items available in Library'}
-                      </span>
+                    <div className="text-2xl font-extrabold text-gray-900 dark:text-white tabular-nums">
+                      {c.value}
                     </div>
                   </div>
-                  <div className="text-2xl font-extrabold text-gray-900 dark:text-white tabular-nums">
-                    {c.value}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+            {/* NEW: bottom accent bar */}
+            <div className="absolute bottom-0 left-0 h-1 w-0 group-hover:w-full bg-gradient-to-r from-violet-500 to-transparent transition-all" />
           </div>
         </div>
 

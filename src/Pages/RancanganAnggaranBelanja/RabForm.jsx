@@ -120,34 +120,34 @@ const RabForm = () => {
         onPick={handleAddFromUnitPrice}
       />
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Daftar RAB</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Budget (RAB)</h2>
         <div className="flex gap-2">
           <button
-            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded disabled:opacity-50"
-            onClick={handleOpenUnitPriceModal}                  // CHANGED
+            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 disabled:opacity-50"
+            onClick={handleOpenUnitPriceModal}
             disabled={!rabData}
           >
-            Tambah Item dari Harga Satuan
+            Add from Unit Price
           </button>
           <button
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded disabled:opacity-50"
-            disabled={!rabData || items.length === 0 || saving} // NEW
-            onClick={() => dispatch(saveRabAsProject())}        // NEW
+            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50"
+            disabled={!rabData || items.length === 0 || saving}
+            onClick={() => dispatch(saveRabAsProject())}
           >
-            {saving ? 'Menyimpan...' : 'Simpan ke Project'}
+            {saving ? 'Saving...' : 'Save to Projects'}
           </button>
           <button
-            className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-gray-500 hover:bg-gray-600"
             onClick={() => setRabModalOpen(true)}
           >
-            Edit Data RAB
+            Edit RAB
           </button>
           <button
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+            className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-rose-600 hover:bg-rose-700"
             onClick={handleClearRab}
           >
-            Clear RAB
+            Clear
           </button>
         </div>
       </div>
@@ -155,13 +155,13 @@ const RabForm = () => {
       {/* NEW: success banner shown above the table when saved */}
       {saveResult?.type === 'success' && (
         <div className="mb-3 p-3 rounded border border-emerald-300 bg-emerald-50 text-emerald-800">
-          {saveResult?.message || 'Berhasil menyimpan RAB ke Project.'}
+          {saveResult?.message || 'Saved successfully.'}
         </div>
       )}
 
       {/* Tampilkan data RAB jika sudah diisi */}
       {rabData && (
-        <div className="mb-4 bg-gray-50 dark:bg-gray-800 rounded p-3 border border-gray-200 dark:border-gray-700">
+        <div className="mb-4 bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
             <div>
               <div className="text-xs text-gray-500 dark:text-gray-400">Nama RAB</div>
@@ -198,80 +198,84 @@ const RabForm = () => {
           </div>
         </div>
       )}
-      <table className="w-full border dark:border-gray-700 mb-4">
-        <thead>
-          <tr className="bg-gray-100 dark:bg-gray-800">
-            <th className="px-2 py-2 border dark:border-gray-700">No</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Workcode</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Uraian</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Specification</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Satuan</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Qty</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Harga Satuan</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Total Harga</th>
-            <th className="px-2 py-2 border dark:border-gray-700">AACE Class</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Accuracy Low</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Accuracy High</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Tahun</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Lokasi</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Tipe</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Kelompok Detail</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Satuan Volume</th>
-            <th className="px-2 py-2 border dark:border-gray-700">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.length === 0 && (
+      {/* CHANGED: Flowbite-like table wrapper consistent with ProjectTable */}
+      <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800 mb-4">
+        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
             <tr>
-              <td colSpan={17} className="text-center text-gray-400 py-4">Belum ada item.</td>
+              <th className="px-4 py-3">No</th>
+              <th className="px-4 py-3">Workcode</th>
+              <th className="px-4 py-3">Uraian</th>
+              <th className="px-4 py-3">Specification</th>
+              <th className="px-4 py-3">Satuan</th>
+              <th className="px-4 py-3">Qty</th>
+              <th className="px-4 py-3">Harga Satuan</th>
+              <th className="px-4 py-3">Total Harga</th>
+              <th className="px-4 py-3">AACE Class</th>
+              <th className="px-4 py-3">Accuracy Low</th>
+              <th className="px-4 py-3">Accuracy High</th>
+              <th className="px-4 py-3">Tahun</th>
+              <th className="px-4 py-3">Lokasi</th>
+              <th className="px-4 py-3">Tipe</th>
+              <th className="px-4 py-3">Kelompok Detail</th>
+              <th className="px-4 py-3">Satuan Volume</th>
+              <th className="px-4 py-3">Aksi</th>
             </tr>
-          )}
-          {items.map((item, idx) => (
-            <tr key={idx}>
-              <td className="border px-2 py-1">{idx + 1}</td>
-              <td className="border px-2 py-1">{item.workcode || '-'}</td>
-              <td className="border px-2 py-1">{item.uraian}</td>
-              <td className="border px-2 py-1">{item.specification || '-'}</td>
-              <td className="border px-2 py-1">{item.satuan}</td>
-              <td className="border px-2 py-1">
-                <input
-                  type="number"
-                  min={1}
-                  value={item.qty}
-                  onChange={e => handleEditItem(idx, "qty", e.target.value)}
-                  className="w-16 border rounded px-1 py-0.5"
-                />
-              </td>
-              <td className="border px-2 py-1">
-                <input
-                  type="number"
-                  min={0}
-                  value={item.hargaSatuan}
-                  onChange={e => handleEditItem(idx, "hargaSatuan", e.target.value)}
-                  className="w-24 border rounded px-1 py-0.5"
-                />
-              </td>
-              <td className="border px-2 py-1">{(item.qty * item.hargaSatuan).toLocaleString?.() || item.qty * item.hargaSatuan}</td>
-              <td className="border px-2 py-1">{item.aaceClass ?? 5}</td>
-              <td className="border px-2 py-1">{item.accuracyLow ?? 0}</td>
-              <td className="border px-2 py-1">{item.accuracyHigh ?? 0}</td>
-              <td className="border px-2 py-1">{item.tahun ?? rabData?.tahun ?? '-'}</td>
-              <td className="border px-2 py-1">{item.lokasi ?? rabData?.lokasi ?? '-'}</td>
-              <td className="border px-2 py-1">{item.tipe || '-'}</td>
-              <td className="border px-2 py-1">{item.kelompokDetail || '-'}</td>
-              <td className="border px-2 py-1">{item.satuanVolume || '-'}</td>
-              <td className="border px-2 py-1">
-                <button
-                  className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
-                  onClick={() => handleDeleteItem(idx)}
-                >
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items.length === 0 ? (
+              <tr>
+                <td colSpan={17} className="px-4 py-8 text-center text-gray-500">No items.</td>
+              </tr>
+            ) : (
+              items.map((item, idx) => (
+                <tr key={idx} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{idx + 1}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.workcode || '-'}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.uraian}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.specification || '-'}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.satuan}</td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="number"
+                      min={1}
+                      value={item.qty}
+                      onChange={e => handleEditItem(idx, "qty", e.target.value)}
+                      className="w-20 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="number"
+                      min={0}
+                      value={item.hargaSatuan}
+                      onChange={e => handleEditItem(idx, "hargaSatuan", e.target.value)}
+                      className="w-28 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                    />
+                  </td>
+                  <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">{(item.qty * item.hargaSatuan).toLocaleString?.() || item.qty * item.hargaSatuan}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.aaceClass ?? 5}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.accuracyLow ?? 0}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.accuracyHigh ?? 0}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.tahun ?? rabData?.tahun ?? '-'}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.lokasi ?? rabData?.lokasi ?? '-'}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.tipe || '-'}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.kelompokDetail || '-'}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.satuanVolume || '-'}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm text-xs"
+                      onClick={() => handleDeleteItem(idx)}
+                    >
+                      Del
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

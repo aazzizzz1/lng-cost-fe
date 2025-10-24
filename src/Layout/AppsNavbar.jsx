@@ -88,7 +88,7 @@ const AppsNavbar = ({ appsRef: propAppsRef, setCFModalOpen }) => {
                 </div>
               </Link>
               <Link
-                to="/estimasi"
+                to="/opex"
                 className="block p-4 text-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 group"
               >
                 <svg
@@ -112,7 +112,7 @@ const AppsNavbar = ({ appsRef: propAppsRef, setCFModalOpen }) => {
                   />
                 </svg>
                 <div className="text-sm text-gray-900 dark:text-white">
-                  Estimasi
+                  Opex
                 </div>
               </Link>
               <Link

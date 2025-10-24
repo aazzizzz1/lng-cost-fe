@@ -59,7 +59,7 @@ const UnitPriceSidebar = () => {
           />
         </svg>
         <span className="flex-1 ml-3 text-left whitespace-nowrap">
-          Harga Satuan
+          Unit Price
         </span>
         <svg
           aria-hidden="true"

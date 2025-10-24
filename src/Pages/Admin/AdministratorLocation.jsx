@@ -102,7 +102,7 @@ const AdministratorLocation = () => {
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
       {/* Action toolbar */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-base font-semibold text-gray-900 dark:text-white">Daftar CCI Provinsi</h3>
@@ -119,89 +119,80 @@ const AdministratorLocation = () => {
         </button>
       </div>
 
-      <table className="min-w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-100 dark:bg-gray-700">
-            <th className="border px-2 py-1">Kode Provinsi</th>
-            <th className="border px-2 py-1">Provinsi</th>
-            <th className="border px-2 py-1">IKK/CCI</th>
-            {/* <th className="border px-2 py-1">Delivery</th> */}
-            <th className="border px-2 py-1">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {provinces.map((prov) => {
-            const isEditing = editingId === prov.id;
-            return (
-              <tr key={prov.id || prov.code}>
-                <td className="border px-2 py-1">{prov.code}</td>
-                <td className="border px-2 py-1">{prov.name}</td>
-                <td className="border px-2 py-1">
-                  <input
-                    type="number"
-                    step="0.01"
-                    className={`w-24 px-1 py-0.5 border rounded ${!isEditing ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''}`}
-                    value={isEditing ? edits.cci : prov.cci ?? ''}
-                    onChange={(e) => isEditing && setEdits((s) => ({ ...s, cci: e.target.value }))}
-                    disabled={!isEditing}
-                  />
-                </td>
-                {/* <td className="border px-2 py-1">
-                  <input
-                    type="number"
-                    step="0.01"
-                    className={`w-24 px-1 py-0.5 border rounded ${!isEditing ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''}`}
-                    value={isEditing ? edits.delivery : prov.delivery ?? ''}
-                    onChange={(e) => isEditing && setEdits((s) => ({ ...s, delivery: e.target.value }))}
-                    disabled={!isEditing}
-                  />
-                </td> */}
-                <td className="border px-2 py-1">
-                  <div className="flex items-center justify-center gap-1.5">
-                    {!isEditing ? (
+      <div className="overflow-x-auto rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
+        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+            <tr>
+              <th className="px-4 py-3">Kode Provinsi</th>
+              <th className="px-4 py-3">Provinsi</th>
+              <th className="px-4 py-3">IKK/CCI</th>
+              <th className="px-4 py-3">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {provinces.map((prov) => {
+              const isEditing = editingId === prov.id;
+              return (
+                <tr key={prov.id || prov.code} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{prov.code}</td>
+                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{prov.name}</td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="number"
+                      step="0.01"
+                      className={`w-28 px-2 py-1 rounded-md border ${!isEditing ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : 'bg-white dark:bg-gray-900'} border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100`}
+                      value={isEditing ? edits.cci : prov.cci ?? ''}
+                      onChange={(e) => isEditing && setEdits((s) => ({ ...s, cci: e.target.value }))}
+                      disabled={!isEditing}
+                    />
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5">
+                      {!isEditing ? (
+                        <button
+                          aria-label="Edit"
+                          title="Edit"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-600 shadow-sm"
+                          onClick={() => startEdit(prov)}
+                        >
+                          <EditIcon />
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            aria-label="Save"
+                            title="Save"
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-600 shadow-sm"
+                            onClick={() => saveEdit(prov.id)}
+                          >
+                            <CheckIcon />
+                          </button>
+                          <button
+                            aria-label="Cancel"
+                            title="Cancel"
+                            className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-gray-300 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 shadow-sm"
+                            onClick={cancelEdit}
+                          >
+                            <XIcon />
+                          </button>
+                        </>
+                      )}
                       <button
-                        aria-label="Edit"
-                        title="Edit"
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary-700 text-white hover:bg-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-300 dark:focus:ring-primary-600 shadow-sm"
-                        onClick={() => startEdit(prov)}
+                        aria-label="Delete"
+                        title="Delete"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
+                        onClick={() => handleDelete(prov.id)}
                       >
-                        <EditIcon />
+                        <TrashIcon />
                       </button>
-                    ) : (
-                      <>
-                        <button
-                          aria-label="Save"
-                          title="Save"
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 dark:focus:ring-emerald-600 shadow-sm"
-                          onClick={() => saveEdit(prov.id)}
-                        >
-                          <CheckIcon />
-                        </button>
-                        <button
-                          aria-label="Cancel"
-                          title="Cancel"
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-gray-300 text-gray-800 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 shadow-sm"
-                          onClick={cancelEdit}
-                        >
-                          <XIcon />
-                        </button>
-                      </>
-                    )}
-                    <button
-                      aria-label="Delete"
-                      title="Delete"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm"
-                      onClick={() => handleDelete(prov.id)}
-                    >
-                      <TrashIcon />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Add modal */}
       {showAdd && (
