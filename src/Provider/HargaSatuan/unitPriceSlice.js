@@ -117,7 +117,7 @@ export const deleteAllUnitPrices = createAsyncThunk(
   'unitPrice/deleteAllUnitPrices',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.delete(`${api}/unit-prices`, {
+      const response = await axios.delete(`${api}/projects`, { //delete all unitprice data project
         headers: getAuthHeaders(),
       });
       return response.data?.message || "All unit prices deleted.";
