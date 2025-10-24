@@ -140,6 +140,7 @@ const OpexChart = () => {
   );
 
   const isEstimate = !!ds?.isEstimate;
+  const isNonLNG = ui.activeInfra !== "lng-vessel";
 
   return (
     <div className="space-y-6">
@@ -179,7 +180,19 @@ const OpexChart = () => {
         )}
       </div>
 
-      {/* Fleet profile card (LNG Carrier 135–150k) */}
+      {/* Non-LNG messages */}
+      {isNonLNG && (
+        <div className="space-y-2">
+          <div className="p-2 rounded bg-blue-50 dark:bg-blue-900 text-blue-900 dark:text-blue-200 text-xs font-semibold border border-blue-200 dark:border-blue-700">
+            Catatan: Selain data LNG Vessel, jangan di-fetch dari API. Data ditampilkan menggunakan dataset lokal.
+          </div>
+          <div className="p-2 rounded bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs font-semibold border border-gray-200 dark:border-gray-600">
+            Data not yet available.
+          </div>
+        </div>
+      )}
+
+      {/* Fleet profile card */}
       {activeInfra === "lng-vessel" && profileEntries.length > 0 && (
         <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -196,153 +209,156 @@ const OpexChart = () => {
         </div>
       )}
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Daily Operating Cost Breakdown — show all ages in a table */}
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
-            Daily Operating Cost Breakdown — by vessel age (2024)
-          </h3>
+      {/* SHOW DATA ONLY FOR LNG VESSEL */}
+      {activeInfra === "lng-vessel" && (
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Daily Operating Cost Breakdown — table */}
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              Daily Operating Cost Breakdown — by vessel age (2024)
+            </h3>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-xs">
-              <thead>
-                <tr className="text-left text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                  <th className="py-2 pr-3 font-semibold">Cost head</th>
-                  {breakdownTable.ages.map((a) => (
-                    <th key={a} className="py-2 px-2 font-semibold">{a}</th>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs">
+                <thead>
+                  <tr className="text-left text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                    <th className="py-2 pr-3 font-semibold">Cost head</th>
+                    {breakdownTable.ages.map((a) => (
+                      <th key={a} className="py-2 px-2 font-semibold">{a}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {breakdownTable.rows.map((r) => (
+                    <tr key={r.name} className="border-b border-gray-100 dark:border-gray-700">
+                      <td className="py-2 pr-3 text-gray-900 dark:text-white">{r.name}</td>
+                      {r.values.map((v, i) => (
+                        <td key={i} className="py-2 px-2 tabular-nums text-gray-900 dark:text-white">
+                          ${Number(v || 0).toLocaleString()}
+                        </td>
+                      ))}
+                      <td className="py-2 px-2"></td>{/* no row total, match image */}
+                    </tr>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {breakdownTable.rows.map((r) => (
-                  <tr key={r.name} className="border-b border-gray-100 dark:border-gray-700">
-                    <td className="py-2 pr-3 text-gray-900 dark:text-white">{r.name}</td>
-                    {r.values.map((v, i) => (
-                      <td key={i} className="py-2 px-2 tabular-nums text-gray-900 dark:text-white">
+                  <tr className="bg-indigo-50/50 dark:bg-indigo-500/10">
+                    <td className="py-2 pr-3 font-semibold text-gray-900 dark:text-white">Total</td>
+                    {breakdownTable.totals.map((v, i) => (
+                      <td key={i} className="py-2 px-2 font-semibold tabular-nums text-gray-900 dark:text-white">
                         ${Number(v || 0).toLocaleString()}
                       </td>
                     ))}
-                    <td className="py-2 px-2"></td>{/* no row total, match image */}
+                    <td className="py-2 px-2"></td>
                   </tr>
-                ))}
-                <tr className="bg-indigo-50/50 dark:bg-indigo-500/10">
-                  <td className="py-2 pr-3 font-semibold text-gray-900 dark:text-white">Total</td>
-                  {breakdownTable.totals.map((v, i) => (
-                    <td key={i} className="py-2 px-2 font-semibold tabular-nums text-gray-900 dark:text-white">
-                      ${Number(v || 0).toLocaleString()}
-                    </td>
-                  ))}
-                  <td className="py-2 px-2"></td>
-                </tr>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-        {/* Index line */}
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Operating Cost Index (2019–2029)</h3>
-          <Chart
-            options={deepCopy({
-              xaxis: { categories: indexLine.categories, labels: { style: { colors: undefined } } },
-              colors: [palette[0]],
-              stroke: { curve: "smooth", width: 3 },
-              tooltip: { y: { formatter: (v) => v } },
-              dataLabels: { enabled: false },
-              // keterangan di bawah
-              legend: { position: "bottom" },
-            })}
-            series={indexLine.series.map(s => ({ name: s.name, data: [...s.data] }))}
-            type="line"
-            height={320}
-          />
-        </div>
+          {/* Index line */}
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Operating Cost Index (2019–2029)</h3>
+            <Chart
+              options={deepCopy({
+                xaxis: { categories: indexLine.categories, labels: { style: { colors: undefined } } },
+                colors: [palette[0]],
+                stroke: { curve: "smooth", width: 3 },
+                tooltip: { y: { formatter: (v) => v } },
+                dataLabels: { enabled: false },
+                // keterangan di bawah
+                legend: { position: "bottom" },
+              })}
+              series={indexLine.series.map(s => ({ name: s.name, data: [...s.data] }))}
+              type="line"
+              height={320}
+            />
+          </div>
 
-        {/* Category trends */}
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Main Cost Heads (2020–2024)</h3>
-          <Chart
-            options={deepCopy({
-              xaxis: { categories: categoryTrends.categories },
-              colors: palette,
-              legend: { position: "bottom" },
-              chart: { stacked: true },
-              plotOptions: { bar: { horizontal: false, columnWidth: "55%" } },
-              tooltip: { y: { formatter: (v) => `$${Math.round(v).toLocaleString()}` } },
-              yaxis: { labels: { formatter: (v) => `$${v.toLocaleString()}` } },
-              dataLabels: {
-                enabled: true,
-                formatter: (v) => `$${Math.round(v).toLocaleString()}`,
-                style: { fontSize: "10px" },
-              },
-            })}
-            series={categoryTrends.series.map((s) => ({ name: s.name, data: [...s.data] }))}
-            type="bar"
-            height={340}
-          />
-        </div>
-
-        {/* Total costs and YoY % */}
-        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Total Costs and YoY Change (2020–2029)</h3>
-          <Chart
-            options={deepCopy({
-              xaxis: { categories: totalYoY.categories },
-              colors: ["#232c4b", "#d4a72c"],
-              stroke: { width: [0, 3], curve: "smooth" },
-              dataLabels: { enabled: false },
-              chart: { stacked: false },
-              plotOptions: { bar: { columnWidth: "50%", borderRadius: 2 } },
-              grid: { strokeDashArray: 4 },
-              // keterangan di bawah
-              legend: { position: "bottom" },
-              yaxis: [
-                {
-                  title: { text: "$ per day" },
-                  min: 13000,
-                  max: 17500,
-                  tickAmount: 5,
-                  labels: { formatter: (v) => `$${Math.round(v).toLocaleString()}` },
+          {/* Category trends */}
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Main Cost Heads (2020–2024)</h3>
+            <Chart
+              options={deepCopy({
+                xaxis: { categories: categoryTrends.categories },
+                colors: palette,
+                legend: { position: "bottom" },
+                chart: { stacked: true },
+                plotOptions: { bar: { horizontal: false, columnWidth: "55%" } },
+                tooltip: { y: { formatter: (v) => `$${Math.round(v).toLocaleString()}` } },
+                yaxis: { labels: { formatter: (v) => `$${v.toLocaleString()}` } },
+                dataLabels: {
+                  enabled: true,
+                  formatter: (v) => `$${Math.round(v).toLocaleString()}`,
+                  style: { fontSize: "10px" },
                 },
-                {
-                  opposite: true,
-                  title: { text: "%" },
-                  min: 0,
-                  max: 5,
-                  tickAmount: 5,
-                  labels: { formatter: (v) => `${v}%` },
-                },
-              ],
-              annotations: {
-                xaxis: [
+              })}
+              series={categoryTrends.series.map((s) => ({ name: s.name, data: [...s.data] }))}
+              type="bar"
+              height={340}
+            />
+          </div>
+
+          {/* Total costs and YoY % */}
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Total Costs and YoY Change (2020–2029)</h3>
+            <Chart
+              options={deepCopy({
+                xaxis: { categories: totalYoY.categories },
+                colors: ["#232c4b", "#d4a72c"],
+                stroke: { width: [0, 3], curve: "smooth" },
+                dataLabels: { enabled: false },
+                chart: { stacked: false },
+                plotOptions: { bar: { columnWidth: "50%", borderRadius: 2 } },
+                grid: { strokeDashArray: 4 },
+                // keterangan di bawah
+                legend: { position: "bottom" },
+                yaxis: [
                   {
-                    x: 2025,
-                    x2: 2028,
-                    fillColor: "#fde68a",
-                    opacity: 0.2,
-                    borderColor: "transparent",
+                    title: { text: "$ per day" },
+                    min: 13000,
+                    max: 17500,
+                    tickAmount: 5,
+                    labels: { formatter: (v) => `$${Math.round(v).toLocaleString()}` },
+                  },
+                  {
+                    opposite: true,
+                    title: { text: "%" },
+                    min: 0,
+                    max: 5,
+                    tickAmount: 5,
+                    labels: { formatter: (v) => `${v}%` },
                   },
                 ],
-              },
-              tooltip: {
-                shared: true,
-                y: {
-                  formatter: (v, { seriesIndex }) =>
-                    seriesIndex === 1 ? `${v.toFixed(1)}%` : `$${Math.round(v).toLocaleString()}/day`,
+                annotations: {
+                  xaxis: [
+                    {
+                      x: 2025,
+                      x2: 2028,
+                      fillColor: "#fde68a",
+                      opacity: 0.2,
+                      borderColor: "transparent",
+                    },
+                  ],
                 },
-              },
-            })}
-            series={[
-              { name: "Total costs", data: [...(totalYoY.series[0]?.data || [])], type: "column" },
-              { name: "% change y-o-y (right axis)", data: [...(totalYoY.series[1]?.data || [])], type: "line" },
-            ]}
-            type="line"
-            height={340}
-          />
+                tooltip: {
+                  shared: true,
+                  y: {
+                    formatter: (v, { seriesIndex }) =>
+                      seriesIndex === 1 ? `${v.toFixed(1)}%` : `$${Math.round(v).toLocaleString()}/day`,
+                  },
+                },
+              })}
+              series={[
+                { name: "Total costs", data: [...(totalYoY.series[0]?.data || [])], type: "column" },
+                { name: "% change y-o-y (right axis)", data: [...(totalYoY.series[1]?.data || [])], type: "line" },
+              ]}
+              type="line"
+              height={340}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Annual Operating Cost Details — shown for LNG Vessel 135–150k */}
+      {/* Annual Operating Cost Details — LNG Vessel only */}
       {activeInfra === "lng-vessel" && ds?.annual2024 && (
         <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
