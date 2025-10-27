@@ -175,28 +175,13 @@ const RecapProject = () => {
     let runningNo = 1;
 
     groupedData.forEach((g) => {
-      // Group header
-      rows.push({
-        isGroup: true,
-        label: g.group,
-        colSpan: columns.length,
-      });
+      rows.push({ isGroup: true, label: g.group, colSpan: columns.length });
 
       g.subgroups.forEach((sg) => {
-        // Subgroup header
-        rows.push({
-          isSubgroup: true,
-          subgroup: sg.name,
-          colSpan: columns.length,
-        });
+        rows.push({ isSubgroup: true, subgroup: sg.name, colSpan: columns.length });
 
-        // Items
         sg.items.forEach((item) => {
-          const row = {
-            no: runningNo++,
-            kode: item.kode,
-            uraian: item.uraian,
-          };
+          const row = { no: runningNo++, kode: item.kode, uraian: item.uraian };
           selectedProjects.forEach((p) => {
             const cost =
               projectCostMap[p.name][
@@ -207,24 +192,10 @@ const RecapProject = () => {
           });
           rows.push(row);
         });
-
-        // Subgroup subtotal
-        const subtotalRow = {
-          isSubtotal: true,
-          label: `Subtotal ${sg.name}`,
-        };
-        selectedProjects.forEach((p) => {
-          subtotalRow[`usd_${p.id}`] = ""; // no subtotal USD
-          subtotalRow[`idr_${p.id}`] = sumFor(p.name, g.group, sg.name);
-        });
-        rows.push(subtotalRow);
       });
 
-      // Group total
-      const groupTotalRow = {
-        isGroupTotal: true,
-        label: `Total ${g.group}`,
-      };
+      // Group total (IDR only)
+      const groupTotalRow = { isGroupTotal: true, label: `Total ${g.group}` };
       selectedProjects.forEach((p) => {
         groupTotalRow[`usd_${p.id}`] = "";
         groupTotalRow[`idr_${p.id}`] = sumFor(p.name, g.group);
@@ -235,98 +206,118 @@ const RecapProject = () => {
     return rows;
   }, [groupedData, selectedProjects, projectCostMap, columns.length, sumFor]);
 
-  // Export (hierarchical with subtotals)
+  // REPLACED: export to styled HTML Excel mirroring recap table layout
   const handleExportExcel = () => {
-    let rows = [];
-    rows.push([rekapTitle]);
-    rows.push([
-      "No.",
-      "Kode",
-      "Item Pekerjaan",
-      ...selectedProjects.flatMap((p) => [
-        p.name + " (USD)",
-        p.name + " (IDR)",
-      ]),
-    ]);
+    const title = rekapTitle || "Rekapitulasi Perbandingan Project";
 
+    // helpers
+    const th = (label, align = "left") =>
+      `<th style="border:1px solid #e5e7eb;padding:6px 8px;background:#f9fafb;color:#374151;text-align:${align};font-weight:600;">${label}</th>`;
+    const td = (val, align = "left", bold = false, bg = "") =>
+      `<td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;text-align:${align};${bold ? "font-weight:700;" : ""}${bg ? `background:${bg};` : ""}">${val ?? "-"}</td>`;
+    const tdDash = (align = "right", bg = "") => td("-", align, false, bg);
+    const money = (n) => (n ? `Rp${Number(n).toLocaleString()}` : "-");
+
+    // Header columns exactly as UI table
+    const headerHtml = [
+      th("No", "center"),
+      th("Kode", "left"),
+      th("Uraian", "left"),
+      ...selectedProjects.flatMap((p) => [th(`${p.name} (USD)`, "right"), th(`${p.name} (IDR)`, "right")]),
+    ].join("");
+
+    // Body rows
+    let bodyHtml = "";
     let no = 1;
+
     groupedData.forEach((g) => {
-      // Group row
-      rows.push([
-        "",
-        "",
-        g.group.toUpperCase(),
-        ...Array(selectedProjects.length * 2).fill(""),
-      ]);
+      // Group header (blue)
+      bodyHtml += `<tr>${td(` ${g.group.toUpperCase()}`, "left", true, "#dbeafe")}${Array(
+        columns.length - 1
+      )
+        .fill(td("", "left", false, "#dbeafe"))
+        .join("")}</tr>`;
+
       g.subgroups.forEach((sg) => {
-        // Subgroup row
-        rows.push([
-          "",
-          "",
-          sg.name,
-          ...Array(selectedProjects.length * 2).fill(""),
-        ]);
+        // Subgroup header (light blue)
+        bodyHtml += `<tr>${td(` ${sg.name}`, "left", true, "#eff6ff")}${Array(columns.length - 1)
+          .fill(td("", "left", false, "#eff6ff"))
+          .join("")}</tr>`;
+
         // Items
         sg.items.forEach((item) => {
-          rows.push([
-            no++,
-            item.kode,
-            item.uraian,
-            ...selectedProjects.flatMap((p) => {
-              const cost =
-                projectCostMap[p.name][
-                  `${item.kelompok}|${item.kelompokDetail}|${item.kode}|${item.uraian}`
-                ];
-              return [
-                cost && cost.usd ? cost.usd : "",
-                cost ? cost.totalHarga : "",
+          bodyHtml += `<tr>`;
+          bodyHtml += td(no++, "center");
+          bodyHtml += td(item.kode || "");
+          bodyHtml += td(item.uraian || "");
+          selectedProjects.forEach((p) => {
+            const cost =
+              projectCostMap[p.name][
+                `${item.kelompok}|${item.kelompokDetail}|${item.kode}|${item.uraian}`
               ];
-            }),
-          ]);
+            const usd = cost && cost.usd ? cost.usd : "-";
+            const idr = cost && cost.totalHarga ? money(cost.totalHarga) : "-";
+            bodyHtml += td(usd, "right");
+            bodyHtml += td(idr, "right");
+          });
+          bodyHtml += `</tr>`;
         });
-        // Subgroup subtotal
-        rows.push([
-          "",
-          "",
-          `Subtotal ${sg.name}`,
-          ...selectedProjects.flatMap((p) => ["", sumFor(p.name, g.group, sg.name)]),
-        ]);
+
+        // REMOVED: subgroup subtotal row (no row added)
       });
-      // Group total
-      rows.push([
-        "",
-        "",
-        `Total ${g.group}`,
-        ...selectedProjects.flatMap((p) => ["", sumFor(p.name, g.group)]),
-      ]);
+
+      // Group total row (IDR only)
+      bodyHtml += `<tr>`;
+      bodyHtml += td("", "left"); // No
+      bodyHtml += td("", "left"); // Kode
+      bodyHtml += td(`Total ${g.group}`, "right", true, "#fde68a");
+      selectedProjects.forEach((p) => {
+        bodyHtml += td("-", "right", false, "#fde68a");
+        bodyHtml += td(money(sumFor(p.name, g.group)), "right", true, "#fde68a");
+      });
+      bodyHtml += `</tr>`;
     });
 
     // Overall totals
-    rows.push([
-      "",
-      "",
-      "TOTAL",
-      ...projectSummaries.flatMap((p) => ["", p.totalHargaPekerjaan]),
-    ]);
-    rows.push([
-      "",
-      "",
-      "PPN 11%",
-      ...projectSummaries.flatMap((p) => ["", p.ppn]),
-    ]);
-    rows.push([
-      "",
-      "",
-      "GRAND TOTAL TERMASUK PPN",
-      ...projectSummaries.flatMap((p) => ["", p.totalPerkiraan]),
-    ]);
+    const totalsRow = (label, getter, bg) => {
+      let row = `<tr>`;
+      row += td("", "left");
+      row += td("", "left");
+      row += td(label, "center", true, bg);
+      selectedProjects.forEach((p) => {
+        row += tdDash("right", bg);
+        row += td(money(getter(p)), "right", true, bg);
+      });
+      row += `</tr>`;
+      return row;
+    };
 
-    const tsv = rows.map((r) => r.join("\t")).join("\n");
-    const blob = new Blob([tsv], { type: "text/tab-separated-values" });
+    bodyHtml += totalsRow("TOTAL", (p) => projectSummaries.find((x) => x.id === p.id)?.totalHargaPekerjaan || 0, "#fed7aa");
+    bodyHtml += totalsRow("PPN 11%", (p) => projectSummaries.find((x) => x.id === p.id)?.ppn || 0, "#fcd34d");
+    bodyHtml += totalsRow(
+      "GRAND TOTAL TERMASUK PPN",
+      (p) => projectSummaries.find((x) => x.id === p.id)?.totalPerkiraan || 0,
+      "#fb923c"
+    );
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head><meta charset="utf-8"><title>${title}</title></head>
+        <body>
+          <h2 style="font-family:Arial,Helvetica,sans-serif;color:#111827;">${title}</h2>
+          <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
+            <thead><tr>${headerHtml}</tr></thead>
+            <tbody>${bodyHtml}</tbody>
+          </table>
+        </body>
+      </html>`;
+
+    const blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${rekapTitle.replace(/\s+/g, "_")}.xls`;
+    a.download = `${title.replace(/\s+/g, "_")}.xls`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
@@ -425,22 +416,6 @@ const RecapProject = () => {
                       >
                         {row.subgroup}
                       </td>
-                    </tr>
-                  );
-                if (row.isSubtotal)
-                  return (
-                    <tr key={`st-${idx}`} className="bg-yellow-50 dark:bg-yellow-800 font-semibold">
-                      <td colSpan={3} className="px-3 py-2 border dark:border-gray-700 text-right">
-                        {row.label}
-                      </td>
-                      {selectedProjects.map((p) => (
-                        <React.Fragment key={`stc-${p.id}-${idx}`}>
-                          <td className="px-3 py-2 border dark:border-gray-700 text-right">-</td>
-                          <td className="px-3 py-2 border dark:border-gray-700 text-right">
-                            {formatCurrency(row[`idr_${p.id}`])}
-                          </td>
-                        </React.Fragment>
-                      ))}
                     </tr>
                   );
                 if (row.isGroupTotal)

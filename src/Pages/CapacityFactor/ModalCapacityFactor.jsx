@@ -224,9 +224,9 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
           </form>
           <div className="mt-6">
             {result !== null && (
-              <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg">
+              <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg dark:text-white">
                 <div>
-                  <span className="font-semibold">Estimasi Cost:</span> Rp{result}
+                  <span className="font-semibold">Estimasi Cost:</span> Rp{result.toLocaleString('id-ID')}
                   {/* .toLocaleString('id-ID') */}
                 </div>
                 <div>

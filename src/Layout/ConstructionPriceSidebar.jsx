@@ -66,7 +66,7 @@ const ConstructionPriceSidebar = () => {
           />
         </svg>
         <span className="flex-1 ml-3 text-left whitespace-nowrap">
-          Construction Price
+          Construction Cost
         </span>
         <svg
           aria-hidden="true"

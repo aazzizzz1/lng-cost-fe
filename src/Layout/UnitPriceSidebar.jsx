@@ -59,7 +59,7 @@ const UnitPriceSidebar = () => {
           />
         </svg>
         <span className="flex-1 ml-3 text-left whitespace-nowrap">
-          Unit Price
+          Basic Unit Price
         </span>
         <svg
           aria-hidden="true"

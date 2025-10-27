@@ -127,11 +127,6 @@ const DetailCreateProjectConstruction = () => {
     return (recommendedCosts || []).reduce((sum, it) => sum + (Number(it.totalHarga) || 0), 0);
   }, [recommendedCosts]);
 
-  // compute tax/insurance and grand total
-  const ppn = totalRecommended * 0.11;
-  const insurance = totalRecommended * 0.0025; // 2.5‰ = 0.25%
-  const grandTotal = totalRecommended + ppn + insurance;
-
   return (
     <div className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       {/* text gambaran umum judul */}
@@ -177,21 +172,9 @@ const DetailCreateProjectConstruction = () => {
 
       {/* Summary cards (total harga, pajak, asuransi, grand total) */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-2xl p-4 bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800">
+        <div className="rounded-2xl p-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg border border-primary-600">
           <div className="text-xs text-gray-500">Total Rekomendasi</div>
           <div className="text-xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalRecommended)}</div>
-        </div>
-        <div className="rounded-2xl p-4 bg-white/80 dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800">
-          <div className="text-xs text-gray-500">PPN (11%)</div>
-          <div className="text-lg font-semibold text-amber-600 mt-1">{formatCurrency(ppn)}</div>
-        </div>
-        <div className="rounded-2xl p-4 bg-white/80 dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800">
-          <div className="text-xs text-gray-500">Asuransi (2.5‰)</div>
-          <div className="text-lg font-semibold text-fuchsia-600 mt-1">{formatCurrency(insurance)}</div>
-        </div>
-        <div className="rounded-2xl p-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg border border-primary-600">
-          <div className="text-xs opacity-90">Grand Total</div>
-          <div className="text-2xl font-extrabold mt-1">{formatCurrency(grandTotal)}</div>
         </div>
       </div>
 

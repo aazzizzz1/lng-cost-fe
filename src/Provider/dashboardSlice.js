@@ -78,8 +78,8 @@ const dashboardSlice = createSlice({
     ],
     quickActions: [
       { id: "new-estimate", label: "Create Estimate", icon: "➕" },
-      { id: "view-reports", label: "View Opex", icon: "📄" },
-      { id: "cost-analytics", label: "Cost Analytics", icon: "📊" },
+      { id: "view-reports", label: "View OPEX", icon: "📄" },
+      { id: "cost-analytics", label: "Cost Calculator", icon: "📊" },
       { id: "library", label: "Open Library", icon: "🗂️" },
     ],
     recentCapex: [],

@@ -28,10 +28,10 @@ const DashboardPages = () => {
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode min-h-screen">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          Management and Configuration Project
+          Welcome to Project Cost Plan Dashboard
         </p>
         <p className="text-xl text-gray-600 dark:text-white mb-2">
-          Management and Configuration Project Detail
+          Monitor and manage your project estimates effectively.
         </p>
         <Dashboard />
       </div>
