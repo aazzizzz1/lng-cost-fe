@@ -252,7 +252,7 @@ const Preview = () => {
       {currentVariant && (
         <Card>
           <div className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Technical Specification & Drawing</div>
-          <div className="grid lg:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-6"> {/* CHANGED: force 2 columns from md */}
             {/* Parameters */}
             <div className="overflow-x-auto">
               <table className="min-w-full text-xs text-gray-700 dark:text-gray-200">

@@ -13,97 +13,190 @@ try { if (!IMG_LNGBV_10K) IMG_LNGBV_10K = require("../../Assets/Images/Drawing/L
 try { IMG_LNGBV_15K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-15000-M3.jpg"); } catch {}
 try { if (!IMG_LNGBV_15K) IMG_LNGBV_15K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-15000-M3.jpg"); } catch {}
 
-// Helper: build FSRU drawing set per capacity (5k/10k/15k) — SINGLE PNG per cap
-const fsruDrawings = (cap) => {
-  const capNum = String(cap).replace(/[^\d]/g, "");
-  const cbmLabel = capNum ? `${Number(capNum).toLocaleString()} CBM` : cap.toUpperCase();
-  const url =
-    cap === "5k" ? IMG_LNGBV_5K :
-    cap === "10k" ? IMG_LNGBV_10K :
-    cap === "15k" ? IMG_LNGBV_15K :
-    undefined;
-  return [
-    {
-      key: "gl",
-      title: `General Arrangement — LNGBV ${cbmLabel}`,
-      url: url || "", // empty string if image not found
-    },
-  ];
-};
+// ADD: static requires for other infrastructures (seperti LNGBV)
+let IMG_LNGC_20K, IMG_LNGC_18K;
+try { IMG_LNGC_20K = require("../../Assets/Images/Drawing/LNGC/20000.png"); } catch {}
+try { IMG_LNGC_18K = require("../../Assets/Images/Drawing/LNGC/18000.png"); } catch {}
+
+let IMG_SPB_4K, IMG_SPB_1K2;
+try { IMG_SPB_4K = require("../../Assets/Images/Drawing/SPB/4000 m3.png"); } catch {}
+try { IMG_SPB_1K2 = require("../../Assets/Images/Drawing/SPB/1200 m3.png"); } catch {}
+
+let IMG_FSRU_83K;
+try { IMG_FSRU_83K = require("../../Assets/Images/Drawing/FSRU/83000.png"); } catch {}
+
+let IMG_TRUCK_52, IMG_TRUCK_39;
+try { IMG_TRUCK_52 = require("../../Assets/Images/Drawing/LNG Trucking/52.5 m3.png"); } catch {}
+try { IMG_TRUCK_39 = require("../../Assets/Images/Drawing/LNG Trucking/39.6 m3.png"); } catch {}
+
+let IMG_ORU_PFD, IMG_ORF_PID;
+try { IMG_ORU_PFD = require("../../Assets/Images/Drawing/ORU/2.2 MMSCFD.png"); } catch {}
+try { IMG_ORF_PID = require("../../Assets/Images/Drawing/ORF/4.893 m3.png"); } catch {}
+
+let IMG_MINI_LNG_PFD;
+try { IMG_MINI_LNG_PFD = require("../../Assets/Images/Drawing/LNG Plant/2.5 MMSCFD.png"); } catch {}
+
+let IMG_JETTY_LNGBV_2K, IMG_JETTY_LNGBV_3K5, IMG_JETTY_SPB_15K;
+try { IMG_JETTY_LNGBV_2K = require("../../Assets/Images/Drawing/Jetty/2000 m3.png"); } catch {}
+try { IMG_JETTY_LNGBV_3K5 = require("../../Assets/Images/Drawing/Jetty/3500 m3.png"); } catch {}
+try { IMG_JETTY_SPB_15K = require("../../Assets/Images/Drawing/Jetty/15000.png"); } catch {}
+
+// Helper: set gambar tunggal (judul dinamis)
+const singleImageSet = (title, url) => [{ key: "ga", title, url: url || "" }];
 
 /**
- * Simple catalog built from the provided matrix.
- * Keyed by infraGroup and variant keys.
+ * Katalog gambar + parameter per infrastruktur.
+ * Nilai akan ditampilkan apa adanya oleh Preview.jsx (generik).
  */
 const catalog = {
   LNGC: {
-    Rina: {
-      label: "LNGC — Rina",
+    "20k": {
+      label: "LNG Carrier 20,000 m³",
       params: {
-        "Main Dimension": { LOA: "162.5", Breadth: "24.4", Deadweight: "12,500" },
-        "Cargo Tank": { "Type of Cargo Tank": "Cylindrical", "Gas Capacities": "20k" },
-        "Propeller Type": "Azimuth",
-      },
-      drawings: [
-        { key: "ga", title: "General Arrangement", url: "/assets/drawings/lngc/rina/GA.pdf" },
-        { key: "pfd", title: "Process Flow Diagram", url: "/assets/drawings/lngc/rina/PFD.pdf" },
-        { key: "pidi", title: "Piping & Instrumentation", url: "/assets/drawings/lngc/rina/PID.pdf" },
-      ],
-    },
-    Cssc: {
-      label: "LNGC — Cssc",
-      params: {
-        "Main Dimension": { LOA: "159.9", Breadth: "24", Deadweight: "12,300" },
-        "Cargo Tank": { "Type of Cargo Tank": "Bi-Lobe", "Gas Capacities": "20k" },
+        "Main Dimension": { LOA: "159.9 m", Breadth: "24 m", Draught: "8 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "20,000 m³", Quantity: "3" },
         "Propeller Type": "CPP",
       },
-      drawings: [
-        { key: "ga", title: "General Arrangement", url: "/assets/drawings/lngc/cssc/GA.pdf" },
-        { key: "pfd", title: "Process Flow Diagram", url: "/assets/drawings/lngc/cssc/PFD.pdf" },
-        { key: "pidi", title: "Piping & Instrumentation", url: "/assets/drawings/lngc/cssc/PID.pdf" },
-      ],
+      drawings: singleImageSet("General Arrangement — LNGC 20,000 m³", IMG_LNGC_20K),
     },
-    Cimc: {
-      label: "LNGC — Cimc",
+    "18k": {
+      label: "LNG Carrier 18,000 m³",
       params: {
-        "Main Dimension": { LOA: "159.9", Breadth: "25", Deadweight: "12,300" },
-        "Cargo Tank": { "Type of Cargo Tank": "Cylindrical", "Gas Capacities": "20k" },
+        "Main Dimension": { LOA: "143 m", Breadth: "25.2 m", Draught: "6.6 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "18,000 m³", Quantity: "2" },
         "Propeller Type": "CPP",
       },
-      drawings: [
-        { key: "ga", title: "General Arrangement", url: "/assets/drawings/lngc/cimc/GA.pdf" },
-        { key: "pfd", title: "Process Flow Diagram", url: "/assets/drawings/lngc/cimc/PFD.pdf" },
-        { key: "pidi", title: "Piping & Instrumentation", url: "/assets/drawings/lngc/cimc/PID.pdf" },
-      ],
+      drawings: singleImageSet("General Arrangement — LNGC 18,000 m³", IMG_LNGC_18K),
     },
   },
   LNGBV: {
     "5k": {
-      label: "LNGBV — 5k",
+      label: "LNGBV 5,000 m³",
       params: {
-        "Main Dimension": { LOA: "99.5", Breadth: "18", Deadweight: "-" },
-        "Cargo Tank": { "Type of Cargo Tank": "Cylindrical", "Gas Capacities": "5k" },
+        "Main Dimension": { LOA: "≈99.5 m", Breadth: "≈18 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "5,000 m³" },
         "Propeller Type": "CPP",
       },
-      drawings: fsruDrawings("5k"),
+      drawings: singleImageSet("General Arrangement — LNGBV 5,000 m³", IMG_LNGBV_5K),
     },
     "10k": {
-      label: "LNGBV — 10k",
+      label: "LNGBV 10,000 m³",
       params: {
-        "Main Dimension": { LOA: "124.7", Breadth: "21.8", Deadweight: "-" },
-        "Cargo Tank": { "Type of Cargo Tank": "Cylindrical", "Gas Capacities": "10k" },
+        "Main Dimension": { LOA: "≈124.7 m", Breadth: "≈21.8 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "10,000 m³" },
         "Propeller Type": "CPP",
       },
-      drawings: fsruDrawings("10k"),
+      drawings: singleImageSet("General Arrangement — LNGBV 10,000 m³", IMG_LNGBV_10K),
     },
     "15k": {
-      label: "LNGBV — 15k",
+      label: "LNGBV 15,000 m³",
       params: {
-        "Main Dimension": { LOA: "155.5", Breadth: "22", Deadweight: "-" },
-        "Cargo Tank": { "Type of Cargo Tank": "Cylindrical", "Gas Capacities": "15k" },
+        "Main Dimension": { LOA: "≈155.5 m", Breadth: "≈22 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "15,000 m³" },
         "Propeller Type": "CPP",
       },
-      drawings: fsruDrawings("15k"),
+      drawings: singleImageSet("General Arrangement — LNGBV 15,000 m³", IMG_LNGBV_15K),
+    },
+  },
+  SPB: {
+    "4k": {
+      label: "Self-Propelled Barge 4,000 m³",
+      params: {
+        "Main Dimension": { LOA: "75.7 m", Breadth: "20 m", Draught: "3 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "4,000 m³", Quantity: "1" },
+        "Propeller Type": "FPP",
+      },
+      drawings: singleImageSet("General Arrangement — SPB 4,000 m³", IMG_SPB_4K),
+    },
+    "1k2": {
+      label: "Self-Propelled Barge 1,200 m³",
+      params: {
+        "Main Dimension": { LOA: "66.8 m", Breadth: "15 m", Draught: "3 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "1,200 m³", Quantity: "3" },
+        "Propeller Type": "FPP",
+      },
+      drawings: singleImageSet("General Arrangement — SPB 1,200 m³", IMG_SPB_1K2),
+    },
+  },
+  FSRU: {
+    "83k": {
+      label: "FSRU 83,000 m³",
+      params: {
+        "Main Dimension": { LOA: "200 m", Breadth: "39.8 m", Draught: "7.7 m" },
+        "Cargo Tank": { Type: "Cylindrical", Capacity: "83,000 m³", Quantity: "4" },
+        "Propeller Type": "CPP",
+      },
+      drawings: singleImageSet("General Arrangement — FSRU 83,000 m³", IMG_FSRU_83K),
+    },
+  },
+  TRUCK: {
+    "52k": {
+      label: "LNG Truck 52.5 m³",
+      params: {
+        "Main Dimension": { Length: "16.5 m", Width: "2.5 m", Height: "3.88 m" },
+        "Tank": { Capacity: "52.5 m³" },
+      },
+      drawings: singleImageSet("General Arrangement — LNG Truck 52.5 m³", IMG_TRUCK_52),
+    },
+    "39k": {
+      label: "LNG Truck 39.6 m³",
+      params: {
+        "Main Dimension": { Length: "12.98 m", Width: "2.5 m", Height: "3.88 m" },
+        "Tank": { Capacity: "39.6 m³" },
+      },
+      drawings: singleImageSet("General Arrangement — LNG Truck 39.6 m³", IMG_TRUCK_39),
+    },
+  },
+  ORU: {
+    base: {
+      label: "Onshore Regasification Unit (ORU)",
+      params: {
+        "Process": { Capacity: "≈12 MMSCFD", Pressure: "≈15.6 barg" },
+      },
+      drawings: singleImageSet("PFD — ORU (typical)", IMG_ORU_PFD),
+    },
+  },
+  ORF: {
+    base: {
+      label: "Onshore Receiving Facility (ORF)",
+      params: {
+        "Metering & Conditioning": { Pressure: "≈16 barg", Capacity: "≈16.39 MMSCFD" },
+      },
+      drawings: singleImageSet("P&ID — ORF (typical)", IMG_ORF_PID),
+    },
+  },
+  LNG_PLANT: {
+    mini25: {
+      label: "Mini LNG Plant — 2.5 MMSCFD",
+      params: {
+        "Plant Capacity": { Capacity: "2.5 MMSCFD" },
+      },
+      drawings: singleImageSet("PFD — Mini LNG Plant 2.5 MMSCFD", IMG_MINI_LNG_PFD),
+    },
+  },
+  JETTY_LNGBV: {
+    "2k": {
+      label: "Jetty Layout — 2,000 CBM Vessel",
+      params: {
+        "Jetty": { Type: "Type-1", LOA: "≈83 m", Berth: "≈30 m" },
+      },
+      drawings: singleImageSet("Jetty Layout Type-1 (2,000 CBM)", IMG_JETTY_LNGBV_2K),
+    },
+    "3k5": {
+      label: "Jetty Layout — 3,500 CBM Vessel",
+      params: {
+        "Jetty": { Type: "Type-2", LOA: "≈94.4 m", Berth: "≈35 m" },
+      },
+      drawings: singleImageSet("Jetty Layout Type-2 (3,500 CBM)", IMG_JETTY_LNGBV_3K5),
+    },
+  },
+  JETTY_SPB: {
+    "15k": {
+      label: "Jetty Layout — up to 15,000 CBM Vessel",
+      params: {
+        "Jetty": { Type: "Type-3", LOA: "≈131.9 m", Berth: "≈30 m" },
+      },
+      drawings: singleImageSet("Jetty Layout Type-3 (6.5k–15k CBM)", IMG_JETTY_SPB_15K),
     },
   },
 };
@@ -155,26 +248,76 @@ const pickNearestCapacity = (vol, capacities) => {
   return best;
 };
 
-// Resolver: map ANY parsed volume to the nearest LNGBV capacity (5k/10k/15k) — single drawing per volume
+// Resolver: pilih variant berdasarkan infrastruktur + volume terdekat
 export const resolveVariant = (project) => {
   if (!project) return { group: null, variant: null };
 
+  const infraRaw = (project.infrastruktur || project.infrastructure || "").toLowerCase();
   const volRaw = pickProjectVolumeRaw(project);
   const volNum = parseVolumeToNumber(volRaw);
 
+  const byVolume = (group, capsMap) => {
+    const keys = Object.keys(capsMap);
+    const caps = keys.map((k) => capsMap[k]);
+    const chosen = Number.isFinite(volNum) ? pickNearestCapacity(volNum, caps) : null;
+    const matchKey = chosen
+      ? keys.find((k) => capsMap[k] === chosen)
+      : keys[0];
+    return { group, variant: matchKey };
+  };
+
+  // LNGBV first (hindari "bunker vessel" terdeteksi sebagai LNGC)
+  if (/lngbv|bunker/.test(infraRaw)) {
+    return byVolume("LNGBV", { "5k": 5000, "10k": 10000, "15k": 15000 });
+  }
+  // LNGC
+  if (/lngc|carrier|vessel/.test(infraRaw)) {
+    return byVolume("LNGC", { "18k": 18000, "20k": 20000 });
+  }
+  // SPB
+  if (/spb|self[\s-]*propel/.test(infraRaw)) {
+    return byVolume("SPB", { "1k2": 1200, "4k": 4000 });
+  }
+  // FSRU
+  if (/fsru/.test(infraRaw)) {
+    return { group: "FSRU", variant: "83k" };
+  }
+  // Truck
+  if (/truck/.test(infraRaw)) {
+    return byVolume("TRUCK", { "39k": 39600, "52k": 52500 });
+  }
+  // ORU
+  if (/oru|regasification\s*unit/.test(infraRaw)) {
+    return { group: "ORU", variant: "base" };
+  }
+  // ORF
+  if (/orf|receiving\s*facility/.test(infraRaw)) {
+    return { group: "ORF", variant: "base" };
+  }
+  // LNG Plant (onshore/offshore/mini)
+  if (/plant/.test(infraRaw)) {
+    return { group: "LNG_PLANT", variant: "mini25" };
+  }
+  // Jetty for LNGBV
+  if (/jetty.*lngbv|lngbv.*jetty/.test(infraRaw)) {
+    return byVolume("JETTY_LNGBV", { "2k": 2000, "3k5": 3500 });
+  }
+  // Jetty for SPB
+  if (/jetty.*spb|spb.*jetty|dolphin.*spb/.test(infraRaw)) {
+    return { group: "JETTY_SPB", variant: "15k" };
+  }
+
+  // Fallback ke LNGBV terdekat bila volume tersedia
   if (Number.isFinite(volNum)) {
     const capacities = [5000, 10000, 15000];
     const chosen = pickNearestCapacity(volNum, capacities);
-    if (chosen === 5000) return { group: "LNGBV", variant: "5k" };
-    if (chosen === 10000) return { group: "LNGBV", variant: "10k" };
-    return { group: "LNGBV", variant: "15k" };
+    return chosen === 5000
+      ? { group: "LNGBV", variant: "5k" }
+      : chosen === 10000
+      ? { group: "LNGBV", variant: "10k" }
+      : { group: "LNGBV", variant: "15k" };
   }
 
-  // Fallbacks when volume is missing/unparseable
-  const infra = (project.infrastruktur || project.infrastructure || "").toUpperCase().trim();
-  if (infra.includes("LNGBV")) return { group: "LNGBV", variant: "10k" };
-  if (infra.includes("LNGC") || infra.includes("CARRIER") || infra.includes("VESSEL"))
-    return { group: "LNGBV", variant: "15k" }; // prefer closest available asset
   return { group: null, variant: null };
 };
 
@@ -401,9 +544,11 @@ export function generatePreviewExcel({ projectDetails, currentVariant, resolved,
   }, 100);
 }
 
+/* eslint-disable no-unused-vars */
 const previewSlice = createSlice({
   name: "libraryPreview",
   initialState: {
+    // use the capacity-based catalog to enable nearest-volume resolution
     catalog,
     selectedProjectId: null,
     resolved: { group: null, variant: null },
@@ -442,6 +587,7 @@ const previewSlice = createSlice({
       });
   },
 });
+/* eslint-enable no-unused-vars */
 
 export const { setSelectedProjectId, setResolved, resolveFromProject } = previewSlice.actions;
 
