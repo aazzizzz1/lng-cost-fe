@@ -145,31 +145,41 @@ const Preview = () => {
     ];
   }, [currentVariant]);
 
-  // NEW: Kelompok-only grouping + sorted items + totals (mirror ProjectDetail)
-  const groupedKelompok = useMemo(() => {
+  // NEW: kelompok-only grouping + sorted items + totals (mirror ProjectDetail)
+  const groupedTree = useMemo(() => {
     if (!projectDetails || !Array.isArray(projectDetails.constructionCosts)) return [];
-    const groups = {};
+    const structure = {};
     projectDetails.constructionCosts.forEach((item) => {
       const g = item.kelompok || "Lainnya";
-      if (!groups[g]) groups[g] = [];
-      groups[g].push(item);
+      const sg = item.kelompokDetail || "Lainnya";
+      if (!structure[g]) structure[g] = {};
+      if (!structure[g][sg]) structure[g][sg] = [];
+      structure[g][sg].push(item);
     });
-    return Object.keys(groups)
+    return Object.keys(structure)
       .sort((a, b) => a.localeCompare(b))
       .map((group) => {
-        const items = groups[group]
-          .slice()
-          .sort((a, b) => {
-            const ak = a.workcode || a.kode || "";
-            const bk = b.workcode || b.kode || "";
-            if (ak && bk) {
-              const lc = ak.localeCompare(bk, undefined, { numeric: true });
-              if (lc !== 0) return lc;
-            }
-            return (a.uraian || "").localeCompare(b.uraian || "");
+        const subgroups = Object.keys(structure[group])
+          .sort((a, b) => a.localeCompare(b))
+          .map((sgName) => {
+            const items = structure[group][sgName]
+              .slice()
+              .sort((a, b) => {
+                const ak = a.workcode || a.kode || "";
+                const bk = b.workcode || b.kode || "";
+                if (ak && bk) {
+                  const lc = ak.localeCompare(bk, undefined, { numeric: true });
+                  if (lc !== 0) return lc;
+                }
+                return (a.uraian || "").localeCompare(b.uraian || "");
+              });
+            return { name: sgName, items };
           });
-        const groupTotal = items.reduce((s, it) => s + (it.totalHarga || 0), 0);
-        return { group, items, groupTotal };
+        const groupTotal = subgroups.reduce(
+          (s, sg) => s + sg.items.reduce((t, it) => t + (it.totalHarga || 0), 0),
+          0
+        );
+        return { group, subgroups, groupTotal };
       });
   }, [projectDetails]);
 
@@ -192,10 +202,10 @@ const Preview = () => {
 
   const formatCurrency = (value) => (value ? `Rp${Number(value).toLocaleString()}` : '-');
 
-  // NEW: overall total like ProjectDetail
+  // NEW: overall total from subgrouped structure
   const overallTotal = useMemo(
-    () => groupedKelompok.reduce((s, g) => s + (g.groupTotal || 0), 0),
-    [groupedKelompok]
+    () => groupedTree.reduce((s, g) => s + (g.groupTotal || 0), 0),
+    [groupedTree]
   );
 
   // ADD BACK: used in CAPEX summary card
@@ -363,7 +373,7 @@ const Preview = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {groupedKelompok.map((g) => (
+                  {groupedTree.map((g) => (
                     <React.Fragment key={g.group}>
                       {/* Kelompok header (biru) */}
                       <tr className="bg-blue-100 dark:bg-blue-900">
@@ -372,18 +382,29 @@ const Preview = () => {
                         </td>
                       </tr>
 
-                      {/* Items */}
-                      {g.items.map((cost, idx) => (
-                        <tr key={`${g.group}-${idx}`} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
-                          {costColumns.map((col) => (
-                            <td
-                              key={col.key}
-                              className={`px-3 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 ${col.className || ''}`}
-                            >
-                              {col.isCurrency ? formatCurrency(cost[col.key]) : (cost[col.key] ?? '-')}
+                      {/* Subgroup header + items */}
+                      {g.subgroups.map((sg) => (
+                        <React.Fragment key={`${g.group}-${sg.name}`}>
+                          <tr className="bg-blue-50 dark:bg-blue-800">
+                            <td colSpan={costColumns.length} className="font-semibold text-gray-900 dark:text-white py-2 px-4">
+                              {sg.name}
                             </td>
+                          </tr>
+                          {sg.items.map((cost, idx) => (
+                            <tr key={`${g.group}-${sg.name}-${idx}`} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
+                              {costColumns.map((col) => (
+                                <td
+                                  key={col.key}
+                                  className={`px-3 py-2 border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 ${col.className || ''}`}
+                                >
+                                  {col.isCurrency
+                                    ? formatCurrency(cost[col.key])
+                                    : (cost[col.key] ?? '-')}
+                                </td>
+                              ))}
+                            </tr>
                           ))}
-                        </tr>
+                        </React.Fragment>
                       ))}
 
                       {/* Total per kelompok */}
@@ -414,12 +435,14 @@ const Preview = () => {
               </table>
             </div>
           ) : (
-            <div className="text-gray-400 dark:text-gray-300">Tidak ada construction cost.</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">
+              No construction cost details available for this project.
+            </div>
           )}
         </Card>
       )}
 
-      {/* OPEX */}
+      {/* OPEX (restored) */}
       <Card>
         <div className="text-lg font-semibold text-gray-900 dark:text-white mb-2">OPEX</div>
         <OpexChart />
