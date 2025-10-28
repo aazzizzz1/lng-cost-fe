@@ -2,15 +2,47 @@ import React, { useState } from 'react';
 import Spinner from '../../Components/Spinner/Spinner';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUnitPrice, deleteUnitPrice, setFilters, setPagination, exportUnitPricesExcel } from '../../Provider/HargaSatuan/unitPriceSlice';
+// NEW: direct fetch for export-all
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-// Kolom yang ingin ditampilkan
-const columns = [
+const api = process.env.REACT_APP_API;
+const getAuthHeaders = () => {
+  const token = Cookies.get('accessToken');
+  const headers = {
+    'Cache-Control': 'no-cache',
+    Pragma: 'no-cache',
+    Expires: '0',
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+};
+
+// Kolom untuk export (tetap lengkap)
+const exportColumns = [
   { key: "workcode", label: "Workcode" },
   { key: "uraian", label: "Uraian" },
   { key: "satuan", label: "Satuan" },
   { key: "qty", label: "Qty" },
   { key: "hargaSatuan", label: "Harga Satuan" },
   { key: "totalHarga", label: "Total Harga" },
+  { key: "aaceClass", label: "AACE Class" },
+  { key: "tahun", label: "Tahun" },
+  { key: "proyek", label: "Proyek" },
+  { key: "lokasi", label: "Lokasi" },
+  { key: "kelompok", label: "Kelompok" },
+  { key: "infrastruktur", label: "Infrastruktur" },
+  { key: "volume", label: "Volume" },
+  { key: "satuanVolume", label: "Satuan Volume" },
+  { key: "tipe", label: "Tipe" },
+];
+
+// Kolom untuk tabel (hide Qty & Total Harga)
+const tableColumns = [
+  { key: "workcode", label: "Workcode" },
+  { key: "uraian", label: "Uraian" },
+  { key: "satuan", label: "Satuan" },
+  { key: "hargaSatuan", label: "Harga Satuan" },
   { key: "aaceClass", label: "AACE Class" },
   { key: "tahun", label: "Tahun" },
   { key: "proyek", label: "Proyek" },
@@ -63,19 +95,36 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
     dispatch(setPagination({ page: 1 }));
   };
 
-  // NEW: export via slice helper
-  const onExport = () => {
-    exportUnitPricesExcel({
-      rows: data,
-      columns,
-      filename: `unit_price_page_${page}.xls`,
-    });
+  // NEW: export all rows (ignore current page)
+  const onExport = async () => {
+    try {
+      const params = {
+        page: 1,
+        limit: 100000, // fetch all
+        sort: filters.sort || undefined,
+        order: filters.order || undefined,
+        search: filters.search || undefined,
+        tipe: filters.tipe || undefined,
+        infrastruktur: filters.infrastruktur || undefined,
+        kelompok: filters.kelompok || undefined,
+        volume: filters.volume || undefined,
+      };
+      const res = await axios.get(`${api}/unit-prices`, { params, headers: getAuthHeaders() });
+      const rows = res.data?.data || [];
+      exportUnitPricesExcel({
+        rows,
+        columns: exportColumns,
+        filename: `unit_prices_all.xls`,
+      });
+    } catch {
+      // optional: show toast
+    }
   };
 
   const startEdit = (row) => {
     setEditingId(row.id);
     setEdited(
-      columns.reduce((acc, c) => {
+      exportColumns.reduce((acc, c) => {
         acc[c.key] = row[c.key] ?? '';
         return acc;
       }, {})
@@ -96,7 +145,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
 
   const saveEdit = async (row) => {
     // Build payload from current edited values
-    const payload = columns.reduce((acc, c) => {
+    const payload = exportColumns.reduce((acc, c) => {
       const v = edited[c.key];
       acc[c.key] = v === '' ? null : v;
       return acc;
@@ -125,6 +174,10 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
       // optional: show toast
     }
   };
+
+  const isAll = String(limit).toLowerCase() === 'all';
+  const startIdx = isAll ? (total > 0 ? 1 : 0) : Math.min((page - 1) * Number(limit) + 1, total);
+  const endIdx = isAll ? total : Math.min(page * Number(limit), total);
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900 py-6">
@@ -163,7 +216,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
             <button
               type="button"
               onClick={onExport}
-              disabled={loading || !data || data.length === 0}
+              disabled={loading}
               className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-md bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -185,7 +238,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
               <thead className="text-xs uppercase bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-gray-300">
                 <tr className="border-b border-gray-200/70 dark:border-gray-700/60">
                   <th scope="col" className="px-6 py-4 sticky top-0 z-10 bg-inherit font-semibold">No</th>
-                  {columns.map((col) => (
+                  {tableColumns.map((col) => (
                     <th
                       key={col.key}
                       scope="col"
@@ -208,7 +261,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {!data || data.length === 0 ? (
                   <tr>
-                    <td colSpan={columns.length + 2} className="text-center py-10 text-gray-500 dark:text-gray-400">
+                    <td colSpan={1 + tableColumns.length + (user?.role === 'admin' ? 1 : 0)} className="text-center py-10 text-gray-500 dark:text-gray-400">
                       Tidak ada data.
                     </td>
                   </tr>
@@ -219,9 +272,9 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                       className="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-800 dark:even:bg-gray-900 hover:bg-primary-50/60 dark:hover:bg-gray-700 transition-colors"
                     >
                       <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-700 dark:text-gray-200">
-                        {index + 1 + (page - 1) * limit}
+                        {index + 1 + (isAll ? 0 : (page - 1) * Number(limit))}
                       </td>
-                      {columns.map((col) => (
+                      {tableColumns.map((col) => (
                         <td key={col.key} className="px-6 py-4 whitespace-nowrap">
                           {editingId === row.id ? (
                             <input
@@ -232,7 +285,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                               className="w-40 px-2 py-1 border rounded-md bg-white dark:bg-gray-900 dark:border-gray-700"
                             />
                           ) : (
-                            col.key === "hargaSatuan" || col.key === "totalHarga"
+                            col.key === "hargaSatuan"
                               ? row[col.key]
                                 ? `Rp${Number(row[col.key]).toLocaleString()}`
                                 : ""
@@ -295,7 +348,7 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
           <span className="text-sm text-gray-600 dark:text-gray-300">
             Showing
             <span className="mx-1 font-semibold text-gray-900 dark:text-white">
-              {Math.min((page - 1) * limit + 1, total)}-{Math.min(page * limit, total)}
+              {startIdx}-{endIdx}
             </span>
             of
             <span className="ml-1 font-semibold text-gray-900 dark:text-white">
@@ -304,8 +357,11 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
           </span>
           <div className="flex items-center gap-4">
             <select
-              value={limit}
-              onChange={(e) => onLimitChange(Number(e.target.value))}
+              value={String(limit)}
+              onChange={(e) => {
+                const v = e.target.value;
+                onLimitChange(v === 'all' ? 'all' : Number(v));
+              }}
               className="px-3 py-2 border rounded-md text-sm text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
             >
               {[10, 20, 30, 40, 50].map((option) => (
@@ -313,71 +369,74 @@ const UnitPriceTable = ({ data, loading, pagination, onPageChange, onLimitChange
                   {option} per page
                 </option>
               ))}
+              <option value="all">Semua</option>
             </select>
-            <ul className="inline-flex items-stretch">
-              <li>
-                <button
-                  disabled={page === 1}
-                  onClick={() => onPageChange(page - 1)}
-                  className="flex items-center justify-center h-9 px-3 text-sm rounded-l-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                >
-                  <span className="sr-only">Previous</span>
-                  <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </li>
-              {[...Array(totalPages)].map((_, index) => {
-                const pageNumber = index + 1;
-                if (
-                  pageNumber === 1 ||
-                  pageNumber === totalPages ||
-                  (pageNumber >= page - 2 && pageNumber <= page + 2)
-                ) {
-                  return (
-                    <li key={pageNumber}>
-                      <button
-                        onClick={() => onPageChange(pageNumber)}
-                        className={`h-9 px-3 text-sm border-t border-b ${
-                          page === pageNumber
-                            ? "bg-primary-600 text-white border-primary-600 hover:bg-primary-700"
-                            : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100 hover:text-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
-                        } focus:outline-none focus:ring-2 focus:ring-primary-400`}
-                      >
-                        {pageNumber}
-                      </button>
-                    </li>
-                  );
-                }
-                if (
-                  pageNumber === page - 3 ||
-                  pageNumber === page + 3 ||
-                  (pageNumber === 2 && page > 5) ||
-                  (pageNumber === totalPages - 1 && page < totalPages - 4)
-                ) {
-                  return (
-                    <li key={pageNumber}>
-                      <span className="h-9 px-3 inline-flex items-center justify-center text-sm border-t border-b bg-white text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400">
-                        ...
-                      </span>
-                    </li>
-                  );
-                }
-                return null;
-              })}
-              <li>
-                <button
-                  disabled={page === totalPages}
-                  onClick={() => onPageChange(page + 1)}
-                  className="flex items-center justify-center h-9 px-3 text-sm rounded-r-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                >
-                  <span className="sr-only">Next</span>
-                  <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4-4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </button>
-              </li>
-            </ul>
+            {!isAll && totalPages > 1 && (
+              <ul className="inline-flex items-stretch">
+                <li>
+                  <button
+                    disabled={page === 1}
+                    onClick={() => onPageChange(page - 1)}
+                    className="flex items-center justify-center h-9 px-3 text-sm rounded-l-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  >
+                    <span className="sr-only">Previous</span>
+                    <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </li>
+                {[...Array(totalPages)].map((_, index) => {
+                  const pageNumber = index + 1;
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === totalPages ||
+                    (pageNumber >= page - 2 && pageNumber <= page + 2)
+                  ) {
+                    return (
+                      <li key={pageNumber}>
+                        <button
+                          onClick={() => onPageChange(pageNumber)}
+                          className={`h-9 px-3 text-sm border-t border-b ${
+                            page === pageNumber
+                              ? "bg-primary-600 text-white border-primary-600 hover:bg-primary-700"
+                              : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100 hover:text-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
+                          } focus:outline-none focus:ring-2 focus:ring-primary-400`}
+                        >
+                          {pageNumber}
+                        </button>
+                      </li>
+                    );
+                  }
+                  if (
+                    pageNumber === page - 3 ||
+                    pageNumber === page + 3 ||
+                    (pageNumber === 2 && page > 5) ||
+                    (pageNumber === totalPages - 1 && page < totalPages - 4)
+                  ) {
+                    return (
+                      <li key={pageNumber}>
+                        <span className="h-9 px-3 inline-flex items-center justify-center text-sm border-t border-b bg-white text-gray-500 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400">
+                          ...
+                        </span>
+                      </li>
+                    );
+                  }
+                  return null;
+                })}
+                <li>
+                  <button
+                    disabled={page === totalPages}
+                    onClick={() => onPageChange(page + 1)}
+                    className="flex items-center justify-center h-9 px-3 text-sm rounded-r-md border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  >
+                    <span className="sr-only">Next</span>
+                    <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4-4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </li>
+              </ul>
+            )}
           </div>
         </nav>
       </div>

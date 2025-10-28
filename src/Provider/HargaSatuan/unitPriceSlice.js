@@ -52,7 +52,12 @@ export const fetchTransportData = createAsyncThunk(
   'unitPrice/fetchTransportData',
   async ({ page = 1, limit = 10, sort, order, search, tipe = '', infrastruktur = '', kelompok = '', volume = '' } = {}, { rejectWithValue }) => {
     try {
-      const params = { page, limit, tipe, infrastruktur, kelompok };
+      // Support "all" as unlimited page size by mapping to a large number
+      const isAll = String(limit).toLowerCase() === 'all';
+      const safeLimit = isAll ? 100000 : limit;
+      const safePage = isAll ? 1 : page;
+
+      const params = { page: safePage, limit: safeLimit, tipe, infrastruktur, kelompok };
       if (sort) params.sort = sort;
       if (order) params.order = order;
       if (search) params.search = search;
@@ -342,13 +347,17 @@ const unitPriceSlice = createSlice({
       .addCase(fetchTransportData.fulfilled, (state, action) => {
         state.transport.loading = false;
         state.transport.data = action.payload.data;
+        // Preserve "all" selection for limit and normalize pagination
+        const prevLimit = state.transport.pagination.limit;
+        const isAll = String(prevLimit).toLowerCase() === 'all';
+        const incoming = action.payload.pagination || {};
         state.transport.pagination = {
           ...state.transport.pagination,
-          total: action.payload.pagination.totalData,
-          totalPages: action.payload.pagination.totalPages,
-          page: action.payload.pagination.currentPage,
-          limit: action.payload.pagination.limit,
-        }; // Update pagination data
+          total: incoming.totalData,
+          totalPages: isAll ? 1 : incoming.totalPages,
+          page: isAll ? 1 : incoming.currentPage,
+          limit: isAll ? 'all' : incoming.limit,
+        };
         // NEW: derive volume options from current rows (accumulate + dedupe)
         try {
           const existing = Array.isArray(state.filterOptions.volume) ? state.filterOptions.volume : [];
@@ -357,7 +366,6 @@ const unitPriceSlice = createSlice({
             .filter(v => v !== null && v !== undefined && v !== '')
             .map(v => String(v));
           const set = new Set([...existing, ...fromRows]);
-          // sort numerically when possible, fallback to string
           const sorted = Array.from(set).sort((a, b) => {
             const na = Number(a), nb = Number(b);
             const fa = Number.isFinite(na), fb = Number.isFinite(nb);

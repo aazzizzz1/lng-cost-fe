@@ -488,28 +488,38 @@ export function generateProjectDetailExcel({ project, columns: passedColumns } =
         { key: 'tipe', label: 'Tipe' },
       ];
 
-  // Group by kelompok only (mirror UI)
+  // Group by kelompok -> kelompokDetail (mirror Recap)
   const groupsMap = {};
   costs.forEach((it) => {
     const g = it.kelompok || 'Lainnya';
-    if (!groupsMap[g]) groupsMap[g] = [];
-    groupsMap[g].push(it);
+    const sg = it.kelompokDetail || 'Lainnya';
+    if (!groupsMap[g]) groupsMap[g] = {};
+    if (!groupsMap[g][sg]) groupsMap[g][sg] = [];
+    groupsMap[g][sg].push(it);
   });
 
   const groups = Object.keys(groupsMap)
     .sort((a, b) => a.localeCompare(b))
     .map((g) => {
-      const items = groupsMap[g].slice().sort((a, b) => {
-        const ak = a.workcode || a.kode || '';
-        const bk = b.workcode || b.kode || '';
-        if (ak && bk) {
-          const lc = ak.localeCompare(bk, undefined, { numeric: true });
-          if (lc !== 0) return lc;
-        }
-        return (a.uraian || '').localeCompare(b.uraian || '');
-      });
-      const total = items.reduce((s, it) => s + (Number(it.totalHarga) || 0), 0);
-      return { name: g, items, total };
+      const subgroups = Object.keys(groupsMap[g])
+        .sort((a, b) => a.localeCompare(b))
+        .map((sg) => {
+          const items = groupsMap[g][sg].slice().sort((a, b) => {
+            const ak = a.workcode || a.kode || '';
+            const bk = b.workcode || b.kode || '';
+            if (ak && bk) {
+              const lc = ak.localeCompare(bk, undefined, { numeric: true });
+              if (lc !== 0) return lc;
+            }
+            return (a.uraian || '').localeCompare(b.uraian || '');
+          });
+          return { name: sg, items };
+        });
+      const total = subgroups.reduce(
+        (s, sg) => s + sg.items.reduce((t, it) => t + (Number(it.totalHarga) || 0), 0),
+        0
+      );
+      return { name: g, subgroups, total };
     });
 
   const overallTotal = groups.reduce((s, g) => s + g.total, 0);
@@ -533,43 +543,58 @@ export function generateProjectDetailExcel({ project, columns: passedColumns } =
     })
     .join('');
 
+  // Build HTML with subgroup headers (no subgroup totals)
   const groupsHtml = groups
     .map((g) => {
-      const header = `
+      const groupHeader = `
         <tr>
           <td colspan="${columns.length}" style="background:#dbeafe;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-transform:uppercase;">
             ${g.name}
           </td>
         </tr>`;
-      const rows = g.items
-        .map(
-          (item) => `
-        <tr>
-          ${columns
-            .map((c) => {
-              const align = c.className?.includes('text-right')
-                ? 'right'
-                : c.className?.includes('text-center')
-                ? 'center'
-                : 'left';
-              const valRaw = item[c.key];
-              const v = c.isCurrency
-                ? valRaw
-                  ? `Rp${Number(valRaw).toLocaleString()}`
-                  : '-'
-                : valRaw ?? '-';
-              return `<td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;text-align:${align};">${v}</td>`;
-            })
-            .join('')}
-        </tr>`
-        )
+
+      const subgroupsHtml = g.subgroups
+        .map((sg) => {
+          const sgHeader = `
+            <tr>
+              <td colspan="${columns.length}" style="background:#eff6ff;color:#111827;padding:8px 10px;font-weight:600;border:1px solid #e5e7eb;">
+                ${sg.name}
+              </td>
+            </tr>`;
+          const rows = sg.items
+            .map(
+              (item) => `
+            <tr>
+              ${columns
+                .map((c) => {
+                  const align = c.className?.includes('text-right')
+                    ? 'right'
+                    : c.className?.includes('text-center')
+                    ? 'center'
+                    : 'left';
+                  const valRaw = item[c.key];
+                  const v = c.isCurrency
+                    ? valRaw
+                      ? `Rp${Number(valRaw).toLocaleString()}`
+                      : '-'
+                    : valRaw ?? '-';
+                  return `<td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;text-align:${align};">${v}</td>`;
+                })
+                .join('')}
+            </tr>`
+            )
+            .join('');
+          return sgHeader + rows;
+        })
         .join('');
-      const total = `
+
+      const groupTotal = `
         <tr>
           <td colspan="${columns.length - 1}" style="background:#fef3c7;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Total ${g.name}</td>
           <td style="background:#fef3c7;color:#111827;padding:8px 10px;font-weight:700;border:1px solid #e5e7eb;text-align:right;">Rp${Number(g.total).toLocaleString()}</td>
         </tr>`;
-      return header + rows + total;
+
+      return groupHeader + subgroupsHtml + groupTotal;
     })
     .join('');
 

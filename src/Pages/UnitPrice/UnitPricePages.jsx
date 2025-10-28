@@ -55,7 +55,13 @@ const UnitPricePages = () => {
     dispatch(setFilters(params));
     dispatch(fetchTransportData(params)).then((response) => {
       if (response.payload && response.payload.pagination) {
-        dispatch(setPagination(response.payload.pagination));
+        // Preserve "all" selection on limit
+        const server = response.payload.pagination;
+        const currentLimit = pagination.limit;
+        dispatch(setPagination({
+          ...server,
+          limit: String(currentLimit).toLowerCase() === 'all' ? 'all' : server.limit,
+        }));
       }
     });
   }, [

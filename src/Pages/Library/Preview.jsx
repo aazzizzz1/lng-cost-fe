@@ -20,7 +20,7 @@ const parseVol = (vol) => {
   if (!m) return NaN;
   const num = parseFloat(m[1]);
   if (!Number.isFinite(num)) return NaN;
-  const hasK = !!m[2] || s.includes("k");
+  const hasK = !!m[2] || s.includes("k"); 
   if (hasK || num <= 100) return Math.round(num * 1000);
   return Math.round(num);
 };
