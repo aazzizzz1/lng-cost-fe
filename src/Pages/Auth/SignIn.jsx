@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, setInputLogin } from "../../Provider/AuthSlice";
 import SuccessToastAuth from "../../Components/Toast/SucessToastAuth";
@@ -96,7 +96,7 @@ const SignIn = () => {
                 >
                   Sign in
                 </button>
-                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                {/* <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account yet?{" "}
                   <Link
                     to="/signup"
@@ -104,7 +104,7 @@ const SignIn = () => {
                   >
                     Sign up
                   </Link>
-                </p>
+                </p> */}
               </form>
             </div>
           </div>

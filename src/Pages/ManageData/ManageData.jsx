@@ -59,22 +59,66 @@ const ManageData = () => {
     }
   };
 
+  // NEW: template headers
+  const unitPriceHeaders = ["Work code","Item","Specification","Qty","Satuan","Cost","Total Cost","Group 1","Group 1.1","AACE Class","Low","High","Year","Infrastructure","Volume","Satuan Volume","Project","Location","Type"];
+  const calculatorHeaders = ["Infrastructure","Volume","Unit","Total Cost","Year","Location","Low","High","information"];
+
+  // NEW: tiny XLS template generator
+  const downloadTemplateXLS = (filename, headers) => {
+    const th = headers.map(h => `<th style="border:1px solid #e5e7eb;padding:6px 8px;background:#111827;color:#f9fafb;text-align:left;font-weight:600;">${h}</th>`).join('');
+    const html = `
+      <!DOCTYPE html><html><head><meta charset="utf-8"><title>${filename}</title></head>
+      <body>
+        <table cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;font-family:Arial,Helvetica,sans-serif;font-size:12px;">
+          <thead><tr>${th}</tr></thead>
+          <tbody><tr>${headers.map(() => `<td style="border:1px solid #e5e7eb;padding:6px 8px;color:#111827;"></td>`).join('')}</tr></tbody>
+        </table>
+      </body></html>`;
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename.endsWith('.xls') ? filename : `${filename}.xls`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  };
+
   return (
-    <div className="p-4 dark:bg-darkmode mb-2">
-      <div className="w-full"> {/* CHANGED: was max-w-5xl mx-auto */}
+    <div className="dark:bg-darkmode mb-2">
+      <div className="w-full">
+        {/* Header CHANGED */}
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Management and Configuration Project
+          Master Data Management
         </h1>
         <p className="text-xl text-gray-600 dark:text-white mb-8">
-          Management and Configuration Project Detail
+          Manage, update, and configure master datasets that serve as the primary reference for CAPEX estimation and project analysis.
         </p>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* UNIT PRICE SECTION */}
+          {/* CAPEX REFERENCE DATABASE */}
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col gap-6 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
-              Unit Price
-            </h2>
+            {/* Title + Download format */}
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold text-blue-700 dark:text-blue-300 mb-1 flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                  CAPEX Reference Database
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Upload or update CAPEX reference data.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="shrink-0 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-3 py-1.5 rounded text-xs"
+                onClick={() => downloadTemplateXLS('capex_reference_format.xls', unitPriceHeaders)}
+                title="Download format Excel"
+              >
+                DOWNLOAD FORMAT EXCEL
+              </button>
+            </div>
+
             {/* Informasi format Excel */}
             <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 dark:from-blue-900 dark:via-blue-800 dark:to-blue-900 border border-blue-300 dark:border-blue-700 rounded-lg p-4 text-sm text-blue-900 dark:text-blue-100 mb-2 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
@@ -146,12 +190,29 @@ const ManageData = () => {
               </div>
             )}
           </section>
-          {/* CAPACITY FACTOR SECTION */}
+          {/* CAPEX CALCULATOR DATABASE */}
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col gap-6 border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-green-700 dark:text-green-300 mb-2 flex items-center gap-2">
-              <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
-              Calculator
-            </h2>
+            {/* Title + Download format */}
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold text-green-700 dark:text-green-300 mb-1 flex items-center gap-2">
+                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                  CAPEX Calculator Database
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  Upload the CAPEX calculator dataset
+                </p>
+              </div>
+              <button
+                type="button"
+                className="shrink-0 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-3 py-1.5 rounded text-xs"
+                onClick={() => downloadTemplateXLS('capex_calculator_format.xls', calculatorHeaders)}
+                title="Download format Excel"
+              >
+                DOWNLOAD FORMAT EXCEL
+              </button>
+            </div>
+
             {/* Informasi format Excel Capacity Factor */}
             <div className="bg-gradient-to-r from-green-50 via-green-100 to-green-50 dark:from-green-900 dark:via-green-800 dark:to-green-900 border border-green-300 dark:border-green-700 rounded-lg p-4 text-sm text-green-900 dark:text-green-100 mb-2 shadow-sm">
               <div className="flex items-center gap-2 mb-2">

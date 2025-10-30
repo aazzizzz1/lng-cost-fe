@@ -3,14 +3,22 @@ import { useSelector, useDispatch } from 'react-redux';
 import { fetchSubTypeInfra } from '../../Provider/HargaSatuan/unitPriceSlice'; // Import fetchSubTypeInfra
 
 const satuanByJenis = {
-  "Onshore LNG Plant": "MTPA",
-  "Offshore LNG Plant": "MTPA",
-  "LNG Carrier": "m³",
-  "LNG Trucking": "CBM",
-  FSRU: "m³ / MMSCFD",
-  ORF: "MMSCFD",
-  OTS: "MMSCFD",
-  ORU: "m³ / MMSCFD",
+  "LNGBV": "m³/CBM",
+  "Onshore LNG Plant": "MMSCFD",
+  "Offshore LNG Plant": "MMSCFD",
+  "LNGC": "m³/CBM",
+  "LNG Carrier": "m³/CBM", // alias
+  "LNG Trucking": "m³/CBM",
+  "FSRU": "m³/CBM",
+  "Onshore Receiving Facility (ORF)": "MMSCFD",
+  "OTS": "m³/CBM",
+  "Onshore Regasification Unit (ORU)": "MMSCFD",
+  "Self-Propelled Barge (SPB)": "m³/CBM",
+  "Self-Propelled Barge": "m³/CBM",
+  "Dolphin SPB Infrastructure": "m³/CBM",
+  "Dolphin LNGBV Infrastructure": "m³/CBM",
+  "Jetty SPB Infrastructure": "m³/CBM",
+  "Jetty LNGBV Infrastructure": "m³/CBM",
 };
 
 const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
@@ -46,7 +54,7 @@ const CreateRabModal = ({ isOpen, onClose, onSubmit, initialData }) => {
       <section className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] overflow-y-auto ring-1 ring-black/5">
         <div className="p-6 md:p-8">
           <h2 className="mb-4 text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
-            Create RAB
+            Create Project Cost Plan (RAB)
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Fill RAB details to proceed.</p>
           <form onSubmit={handleSubmit}>

@@ -28,10 +28,13 @@ const OpexPages = () => {
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          Management and Configuration Opex
+          Operational Expenditure (OPEX) Data Overview
         </p>
         <p className="text-xl text-gray-600 dark:text-white mb-2">
-          Management Opex
+          Access reference-based operational cost data to support performance analysis and budget planning.
+        </p>
+        <p className="text-xs text-gray-600 dark:text-gray-300 mb-4">
+          Disclaimer: The data presented are indicative and based on reference operational records. Actual OPEX may vary depending on site conditions, asset performance, and market dynamics.
         </p>
         <Opex />
       </div>

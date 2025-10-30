@@ -140,7 +140,8 @@ const OpexChart = () => {
   );
 
   const isEstimate = !!ds?.isEstimate;
-  const isNonLNG = ui.activeInfra !== "lng-vessel";
+  // Show full charts only for LNG Carrier (LNGC)
+  const isNonLNG = ui.activeInfra !== "lng-carrier";
 
   return (
     <div className="space-y-6">
@@ -175,7 +176,7 @@ const OpexChart = () => {
         </div>
         {isEstimate && (
           <div className="mt-3 p-2 rounded bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-200 text-xs font-semibold border border-yellow-300 dark:border-yellow-700">
-            Data pada kategori ini merupakan hasil estimasi, bukan data aktual. Mohon gunakan dengan kehati-hatian.
+            Notice : This dataset is generated through interpolation or extrapolation and for indicative purposes only.
           </div>
         )}
       </div>
@@ -183,9 +184,6 @@ const OpexChart = () => {
       {/* Non-LNG messages */}
       {isNonLNG && (
         <div className="space-y-2">
-          <div className="p-2 rounded bg-blue-50 dark:bg-blue-900 text-blue-900 dark:text-blue-200 text-xs font-semibold border border-blue-200 dark:border-blue-700">
-            Catatan: Selain data LNG Vessel, jangan di-fetch dari API. Data ditampilkan menggunakan dataset lokal.
-          </div>
           <div className="p-2 rounded bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs font-semibold border border-gray-200 dark:border-gray-600">
             Data not yet available.
           </div>

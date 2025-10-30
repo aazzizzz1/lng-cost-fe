@@ -28,10 +28,10 @@ const RabPages = () => {
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode min-h-screen">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          Management and Configuration Project
+          Management and Configuration Project Cost Plan (RAB)
         </p>
         <p className="text-xl text-gray-600 dark:text-white mb-2">
-          Management and Configuration Project Detail
+          Management and Configuration Project Cost Plan (RAB) Detail
         </p>
         <RabForm />
       </div>

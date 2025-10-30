@@ -2930,13 +2930,13 @@ const initialState = {
 		},
 		{
 			id: "storage-tank",
-			label: "Storage Tank",
+			label: "LNGBV",
 			desc: "Cryogenic tank storing LNG at -162°C prior to handling.",
 			tabs: [{ id: "overview", label: "Overview", datasetKey: "storage" }],
 		},
 		{
 			id: "orf-terminal",
-			label: "ORF Receiving Terminal",
+			label: "ORF",
 			desc: "Onshore receiving facility with storage and send-out systems.",
 			tabs: [{ id: "overview", label: "Overview", datasetKey: "orf" }],
 		},
@@ -2948,7 +2948,7 @@ const initialState = {
 		},
 		{
 			id: "gas-pipeline",
-			label: "Gas Pipeline",
+			label: "ORU",
 			desc: "High-pressure transmission delivering regasified natural gas.",
 			tabs: [{ id: "overview", label: "Overview", datasetKey: "pipeline" }],
 		},

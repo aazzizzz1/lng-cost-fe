@@ -4,17 +4,27 @@ import { setInput, calculateCostAPI, fetchReferenceData } from '../../Provider/C
 import { fetchProvinces } from '../../Provider/administratorSlice';
 
 const satuanByJenis = {
-  "LNG Plant": "MTPA",
-  "Offshore LNG Plant": "MTPA",
-  "LNG Carrier": "m³",
-  "LNG Trucking": "CBM",
-  "FSRU": "m³ / MMSCFD",
-  "ORF": "MMSCFD",
-  "OTS": "MMSCFD",
-  "ORU": "m³ / MMSCFD",
-  "LNGBV": "m³",
-  "Mini LNG Plant": "MMscfd",
-  "LNGC": "m³",
+  LNGBV: "m³/CBM",
+  "Onshore LNG Plant": "MMSCFD",
+  "Offshore LNG Plant": "MMSCFD",
+  LNGC: "m³/CBM",
+  "LNG Carrier": "m³/CBM", // alias
+  "LNG Trucking": "m³/CBM",
+  FSRU: "m³/CBM",
+  "Onshore Receiving Facility (ORF)": "MMSCFD",
+  ORF: "MMSCFD", // alias
+  OTS: "m³/CBM",
+  "Onshore Regasification Unit (ORU)": "MMSCFD",
+  ORU: "MMSCFD", // alias
+  "Self-Propelled Barge (SPB)": "m³/CBM",
+  "Self-Propelled Barge": "m³/CBM",
+  "Dolphin SPB Infrastructure": "m³/CBM",
+  "Dolphin LNGBV Infrastructure": "m³/CBM",
+  "Jetty SPB Infrastructure": "m³/CBM",
+  "Jetty LNGBV Infrastructure": "m³/CBM",
+  // backward compatibility
+  "LNG Plant": "MMSCFD",
+  "Mini LNG Plant": "MMSCFD",
 };
 
 const methodOptions = [
@@ -85,16 +95,20 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 backdrop-blur-sm">
       <section className="bg-white dark:bg-gray-900 rounded-lg shadow-lg min-w-[32rem] max-h-[40rem] overflow-y-auto">
         <div className="p-6">
-          <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            Kalkulasi Cepat Estimasi Infrastruktur LNG
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            CAPEX Estimation Calculator for LNG Infrastructure
           </h2>
+          <p className="mt-2 text-[11px] leading-snug text-red-500 mb-4">
+            Disclaimer: This estimation is generated based on reference project data and adjustment factors.
+            The results are indicative and should be reviewed and validated according to specific project requirements.
+          </p>
           {loading && <div className="mb-2 text-blue-600">Loading data...</div>}
           {error && <div className="mb-2 text-red-600">{error}</div>}
           <form onSubmit={handleCalculate}>
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 sm:gap-6 w-full">
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Infrastruktur
+                  Infrastructure
                 </label>
                 <select
                   value={input.type}
@@ -102,7 +116,7 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   required
                 >
-                  <option value="" disabled>Pilih tipe</option>
+                  <option value="" disabled>Select type</option>
                   {jenisOptions.map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
@@ -122,36 +136,36 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
                   ))}
                 </select>
               </div>
-              {/* Tahun */}
+              {/* Year */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Tahun
+                  Year
                 </label>
                 <input
                   type="number"
                   value={tahun}
                   onChange={(e) => setTahun(e.target.value)}
-                  placeholder="Tahun"
+                  placeholder="Year"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 />
               </div>
-              {/* Inflasi */}
+              {/* Inflation */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Asumsi Inflasi (%)
+                  Inflation Assumption (%)
                 </label>
                 <input
                   type="number"
                   value={inflasi}
                   onChange={(e) => setInflasi(e.target.value)}
-                  placeholder="5%"
+                  placeholder="5"
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 />
               </div>
-              {/* Lokasi */}
+              {/* Location */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Lokasi
+                  Location
                 </label>
                 <select
                   value={lokasi}
@@ -159,7 +173,7 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   required
                 >
-                  <option value="">Pilih Lokasi</option>
+                  <option value="">Select Location</option>
                   {provinces.map((prov) => (
                     <option key={prov.code} value={prov.name}>
                       {prov.name}
@@ -167,10 +181,10 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
                   ))}
                 </select>
               </div>
-              {/* Information */}
+              {/* Additional Information */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Information (Opsional)
+                  Additional Information (Optional)
                 </label>
                 <select
                   value={information}
@@ -178,7 +192,7 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   disabled={informationOptions.length === 0}
                 >
-                  <option value="">Pilih Information (opsional)</option>
+                  <option value="">Select Additional Information (optional)</option>
                   {informationOptions.map((info, idx) => (
                     <option key={idx} value={info}>{info}</option>
                   ))}
@@ -186,18 +200,18 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
               </div>
               <div className="sm:col-span-2">
                 <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Kapasitas yang Diinginkan
+                  Desired Capacity
                 </label>
                 <div className="flex flex-row gap-2">
                   <input
                     type="number"
                     value={input.capacity}
                     onChange={e => handleChange('capacity', e.target.value)}
-                    placeholder="Masukkan kapasitas"
+                    placeholder="Enter capacity"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     required
                   />
-                  <div className="text-sm text-light bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                  <div className="text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     <span className="text-gray-500 dark:text-gray-400">
                       {input.type && satuanByJenis[input.type] ? satuanByJenis[input.type] : "-"}
                     </span>
@@ -226,14 +240,13 @@ const ModalCapacityFactor = ({ isOpen, onClose }) => {
             {result !== null && (
               <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg dark:text-white">
                 <div>
-                  <span className="font-semibold">Estimasi Cost:</span> Rp{result.toLocaleString('id-ID')}
-                  {/* .toLocaleString('id-ID') */}
+                  <span className="font-semibold">Estimated Cost:</span> Rp{result.toLocaleString('id-ID')}
                 </div>
                 <div>
                   <span className="font-semibold">R²:</span> {r2}
                 </div>
                 <div>
-                  <span className="font-semibold">Interpretasi R²:</span> {r2Interpretation}
+                  <span className="font-semibold">R² Interpretation:</span> {r2Interpretation}
                 </div>
               </div>
             )}

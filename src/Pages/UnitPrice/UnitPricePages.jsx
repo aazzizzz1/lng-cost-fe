@@ -90,7 +90,7 @@ const UnitPricePages = () => {
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
         <p className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Unit Price - Harga Satuan
+          Basic Unit Price - Harga Satuan
         </p>
 
         {/* Table with header controls inside */}

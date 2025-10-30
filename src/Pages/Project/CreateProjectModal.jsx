@@ -7,15 +7,21 @@ import { setItems } from "../../Provider/Project/detailCreateProjectConstruction
 
 // Mapping satuan berdasarkan jenis project
 const satuanByJenis = {
-  "LNGBV": "CBM",
-  "Onshore LNG Plant": "MTPA",
-  "Offshore LNG Plant": "MTPA",
-  "LNGC": "m³",
-  "LNG Trucking": "CBM",
-  FSRU: "m³ / MMSCFD",
+  "LNGBV": "m³/CBM",
+  "Onshore LNG Plant": "MMSCFD",
+  "Offshore LNG Plant": "MMSCFD",
+  "LNGC": "m³/CBM",
+  "LNG Trucking": "m³/CBM",
+  FSRU: "m³/CBM",
   "Onshore Receiving Facility (ORF)": "MMSCFD",
-  OTS: "MMSCFD",
-  "Onshore Regasification Unit (ORU)": "m³ / MMSCFD",
+  OTS: "m³/CBM",
+  "Onshore Regasification Unit (ORU)": "MMSCFD",
+  "Self-Propelled Barge (SPB)": "m³/CBM",
+  "Self-Propelled Barge": "m³/CBM",
+  "Dolphin SPB Infrastructure": "m³/CBM",
+  "Dolphin LNGBV Infrastructure": "m³/CBM",
+  "Jetty SPB Infrastructure": "m³/CBM",
+  "Jetty LNGBV Infrastructure": "m³/CBM",
 };
 
 const CreateProjectModal = ({ isOpen, onClose }) => {
@@ -167,14 +173,14 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
       <section className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] overflow-y-auto ring-1 ring-black/5">
         <div className="p-6 md:p-8">
           <h2 className="mb-4 text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
-            Add a new Project
+            Add New Project
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Isi detail project dan dapatkan rekomendasi construction cost yang sesuai.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Enter project details to generate recommended construction cost estimates</p>
            <form onSubmit={handleSubmit}>
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 sm:gap-6 w-full">
                <div className="sm:col-span-2">
                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                   Nama Project
+                   Project Name
                  </label>
                  <input
                    type="text"
@@ -187,7 +193,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                </div>
                <div>
                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                   Infrastruktur
+                   Infrastructure
                  </label>
                  <select
                    value={infrastruktur}
@@ -224,7 +230,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                </div>
                <div>
                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                   Kategori
+                   Category
                  </label>
                  <input
                    type="text"
@@ -237,7 +243,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                </div>
                <div>
                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                   Lokasi
+                   Location
                  </label>
                  <select
                    value={lokasi}
@@ -245,7 +251,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                    className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                    required
                  >
-                   <option value="">Pilih Lokasi</option>
+                   <option value="">Select Location</option>
                    {provinces.map((prov) => (
                      <option key={prov.code} value={prov.name}>
                        {prov.name}
@@ -255,7 +261,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                </div>
                <div>
                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                   Tahun
+                   Year
                  </label>
                  <input
                    type="number"
@@ -267,7 +273,7 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                </div>
                <div>
                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                   Asumsi Inflasi (%)
+                   Inflation Rate (%)
                  </label>
                  <input
                    type="number"
@@ -281,14 +287,14 @@ const CreateProjectModal = ({ isOpen, onClose }) => {
                {availableProyek.length > 0 && (
                  <div>
                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                     Proyek Technology (Referensi)
+                      Reference Project Technology
                    </label>
                    <select
                      value={proyek}
                      onChange={(e) => setProyek(e.target.value)}
                      className="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full p-3 focus:ring-2 focus:ring-primary-200 focus:border-primary-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                    >
-                     <option value="">Pilih Proyek Referensi</option>
+                     <option value="">Select Reference Project</option>
                      {availableProyek.map((p, idx) => (
                        <option key={idx} value={p}>{p}</option>
                      ))}

@@ -2,6 +2,26 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios'; // NEW
 import Cookies from 'js-cookie'; // NEW
 
+// NEW: unit map for project.satuan
+const UNIT_BY_JENIS = {
+  "LNGBV": "m³/CBM",
+  "Onshore LNG Plant": "MMSCFD",
+  "Offshore LNG Plant": "MMSCFD",
+  "LNGC": "m³/CBM",
+  "LNG Carrier": "m³/CBM", // alias
+  "LNG Trucking": "m³/CBM",
+  "FSRU": "m³/CBM",
+  "Onshore Receiving Facility (ORF)": "MMSCFD",
+  "OTS": "m³/CBM",
+  "Onshore Regasification Unit (ORU)": "MMSCFD",
+  "Self-Propelled Barge (SPB)": "m³/CBM",
+  "Self-Propelled Barge": "m³/CBM",
+  "Dolphin SPB Infrastructure": "m³/CBM",
+  "Dolphin LNGBV Infrastructure": "m³/CBM",
+  "Jetty SPB Infrastructure": "m³/CBM",
+  "Jetty LNGBV Infrastructure": "m³/CBM",
+};
+
 const initialState = {
   rabData: null, // { namaRab, tahun, inflasi, lokasi, jenis, volume }
   items: [],     // array of item RAB
@@ -38,8 +58,8 @@ export const saveRabAsProject = createAsyncThunk(
         tahun: Number(rabData.tahun) || new Date().getFullYear(),
         volume: Number(rabData.volume) || 0,
         inflasi: rabData.inflasi === '' || rabData.inflasi === undefined ? null : Number(rabData.inflasi),
-        // optional: satuan can be left empty or derived by backend
-        satuan: '',
+        // NEW: set project unit from jenis mapping
+        satuan: UNIT_BY_JENIS[rabData.jenis] || '',
         constructionCosts: items.map((it) => ({
           workcode: it.workcode || '',
           uraian: it.uraian || '',

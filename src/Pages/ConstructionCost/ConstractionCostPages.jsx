@@ -52,10 +52,10 @@ const ConstractionCostPages = () => {
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          Management and Configuration Harga Konstruksi
+          Management and Configuration Construction Cost
         </p>
         <p className="text-xl text-gray-600 dark:text-white mb-2">
-          Management and Configuration Harga Konstruksi Detail
+          Management and Configuration Construction Cost Detail
         </p>
         <ConstractionCostTable />
       </div>

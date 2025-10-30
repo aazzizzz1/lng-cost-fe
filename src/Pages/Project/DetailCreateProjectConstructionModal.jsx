@@ -87,7 +87,12 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList,
 
   // Helper untuk ambil nilai dengan fallback ke recommendedItem
   const getCellValue = (row, key) => {
-    if (key === "recommendedPrice") return row.recommendedPrice ?? "-";
+    if (key === "recommendedPrice") {
+      const raw = row.recommendedPrice ?? row.hargaSatuan;
+      if (raw === null || raw === undefined || raw === "") return "-";
+      const num = Number(raw);
+      return Number.isFinite(num) ? `Rp${num.toLocaleString('id-ID')}` : "-";
+    }
     if (key === "spesifikasi") {
       return row.spesifikasi || row.specification || row.recommendedItem?.specification || row.recommendedItem?.spesifikasi || "-";
     }
@@ -331,7 +336,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList,
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 max-w-4xl w-full p-6 transition-all duration-200">
         <div className="flex justify-between items-center mb-2 border-b border-gray-200 dark:border-gray-700 pb-2">
           <div className="font-bold text-lg text-gray-900 dark:text-white">
-            Pilih Harga Satuan
+            Select Basic Unit 
           </div>
           <button
             className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white text-2xl px-2 transition"
@@ -346,7 +351,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList,
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-3 py-2 border rounded text-sm"
+            className="px-3 py-2 border rounded text-sm bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 dark:focus:ring-primary-400/40 dark:focus:border-primary-400"
           >
             <option value="">Pilih Tipe</option>
             {types.map((type) => (
@@ -358,7 +363,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList,
           <select
             value={selectedInfra}
             onChange={(e) => setSelectedInfra(e.target.value)}
-            className="px-3 py-2 border rounded text-sm"
+            className="px-3 py-2 border rounded text-sm bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 dark:focus:ring-primary-400/40 dark:focus:border-primary-400"
             disabled={!selectedType}
           >
             <option value="">Semua Infrastruktur</option>
@@ -369,7 +374,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList,
           <select
             value={selectedKelompok}
             onChange={(e) => setSelectedKelompok(e.target.value)}
-            className="px-3 py-2 border rounded text-sm"
+            className="px-3 py-2 border rounded text-sm bg-white text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 dark:focus:ring-primary-400/40 dark:focus:border-primary-400"
             disabled={!selectedType}
           >
             <option value="">Semua Kelompok</option>
@@ -379,7 +384,7 @@ const DetailCreateProjectConstructionModal = ({ project, provinces, inflasiList,
           </select>
           <input
             type="text"
-            className="flex-1 px-3 py-2 border rounded text-sm"
+            className="flex-1 px-3 py-2 border rounded text-sm bg-white text-gray-900 border-gray-300 placeholder-gray-400 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500 dark:focus:ring-primary-400/40 dark:focus:border-primary-400"
             placeholder="Cari..."
             value={search}
             onChange={(e) => dispatch(setModalSearch(e.target.value))}

@@ -8,6 +8,35 @@ import DetailCreateProjectConstructionModal from '../Project/DetailCreateProject
 import { openModal, closeModal } from '../../Provider/Project/detailCreateProjectConstructionSlice'; // NEW
 // import { useNavigate } from 'react-router-dom'; // REMOVED
 
+// NEW: unit map to render unit beside volume
+const satuanByJenis = {
+  "LNGBV": "m³/CBM",
+  "Onshore LNG Plant": "MMSCFD",
+  "Offshore LNG Plant": "MMSCFD",
+  "LNGC": "m³/CBM",
+  "LNG Carrier": "m³/CBM", // alias
+  "LNG Trucking": "m³/CBM",
+  "FSRU": "m³/CBM",
+  "Onshore Receiving Facility (ORF)": "MMSCFD",
+  "OTS": "m³/CBM",
+  "Onshore Regasification Unit (ORU)": "MMSCFD",
+  "Self-Propelled Barge (SPB)": "m³/CBM",
+  "Self-Propelled Barge": "m³/CBM",
+  "Dolphin SPB Infrastructure": "m³/CBM",
+  "Dolphin LNGBV Infrastructure": "m³/CBM",
+  "Jetty SPB Infrastructure": "m³/CBM",
+  "Jetty LNGBV Infrastructure": "m³/CBM",
+};
+
+// NEW: Static kelompok list to support add-by-dropdown
+const DEFAULT_KELOMPOK = [
+  'General & Finalization',
+  'Construction and Installation',
+  'Material & Equipment',
+  'Engineering & Management',
+  'Testing & Commissioning',
+];
+
 const RabForm = () => {
   const dispatch = useDispatch();
   // const navigate = useNavigate(); // REMOVED
@@ -96,6 +125,39 @@ const RabForm = () => {
     setRabModalOpen(true);
   };
 
+  // NEW: manual add to group states (dropdown + optional custom)
+  const [newGroup, setNewGroup] = React.useState(DEFAULT_KELOMPOK[0]);
+  const [customGroup, setCustomGroup] = React.useState('');
+  const unitLabel = rabData ? (satuanByJenis[rabData.jenis] || '-') : '-';
+
+  // NEW: add one empty item under a group (manual input)
+  const handleAddManualItemToGroup = () => {
+    const kelompokVal = newGroup === '__custom__' ? (customGroup || '').trim() : newGroup;
+    if (!kelompokVal) return;
+    dispatch(addRabItem({
+      workcode: '',
+      uraian: '',
+      specification: '',
+      satuan: '',
+      qty: 1,
+      hargaSatuan: 0,
+      totalHarga: 0,
+      aaceClass: 5,
+      accuracyLow: 0,
+      accuracyHigh: 0,
+      tahun: Number(rabData?.tahun) || new Date().getFullYear(),
+      lokasi: rabData?.lokasi || '',
+      infrastruktur: rabData?.jenis || '',
+      volume: Number(rabData?.volume) || 0,
+      satuanVolume: '',
+      kelompok: kelompokVal,
+      kelompokDetail: '',
+      tipe: '',
+    }));
+    // reset custom only
+    setCustomGroup('');
+  };
+
   return (
     <div>
       {/* Modal input data RAB */}
@@ -121,7 +183,7 @@ const RabForm = () => {
       />
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">Budget (RAB)</h2>
+        <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 dark:text-white">CAPEX Cost Plan (RAB)</h2>
         <div className="flex gap-2">
           <button
             className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 disabled:opacity-50"
@@ -152,6 +214,44 @@ const RabForm = () => {
         </div>
       </div>
 
+      {/* NEW: quick manual input like Edit Project (add group + one empty row) */}
+      {rabData && (
+        <div className="mb-3 rounded-lg border border-gray-200 dark:border-gray-800 p-3 bg-white dark:bg-gray-900">
+          <div className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Manual Construction Items</div>
+          <div className="flex flex-row flex-wrap items-center gap-2">
+            <select
+              value={newGroup}
+              onChange={e => setNewGroup(e.target.value)}
+              className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 w-64 shrink-0"
+            >
+              {DEFAULT_KELOMPOK.map(k => (
+                <option key={k} value={k}>{k}</option>
+              ))}
+              <option value="__custom__">Custom…</option>
+            </select>
+
+            <button
+              className="px-3 py-2 rounded-md bg-primary-600 text-white text-sm font-semibold disabled:opacity-60 shrink-0 z-10"
+              disabled={newGroup === '__custom__' && !customGroup.trim()}
+              onClick={handleAddManualItemToGroup}
+              title="Add item to selected Kelompok"
+            >
+              Add
+            </button>
+
+            {newGroup === '__custom__' && (
+              <input
+                type="text"
+                value={customGroup}
+                onChange={e => setCustomGroup(e.target.value)}
+                placeholder="Custom Kelompok…"
+                className="px-3 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-900 dark:text-gray-100 w-64"
+              />
+            )}
+          </div>
+        </div>
+      )}
+
       {/* NEW: success banner shown above the table when saved */}
       {saveResult?.type === 'success' && (
         <div className="mb-3 p-3 rounded border border-emerald-300 bg-emerald-50 text-emerald-800">
@@ -159,7 +259,7 @@ const RabForm = () => {
         </div>
       )}
 
-      {/* Tampilkan data RAB jika sudah diisi */}
+      {/* RAB summary with unit beside volume */}
       {rabData && (
         <div className="mb-4 bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
@@ -187,7 +287,9 @@ const RabForm = () => {
             </div>
             <div>
               <div className="text-xs text-gray-500 dark:text-gray-400">Volume</div>
-              <div className="font-semibold text-gray-900 dark:text-white">{rabData.volume}</div>
+              <div className="font-semibold text-gray-900 dark:text-white">
+                {rabData.volume} {unitLabel}
+              </div>
             </div>
             <div>
               <div className="text-xs text-gray-500 dark:text-gray-400">Total Harga</div>
@@ -211,12 +313,14 @@ const RabForm = () => {
               <th className="px-4 py-3">Qty</th>
               <th className="px-4 py-3">Harga Satuan</th>
               <th className="px-4 py-3">Total Harga</th>
+              <th className="px-4 py-3">Project</th>
               <th className="px-4 py-3">AACE Class</th>
               <th className="px-4 py-3">Accuracy Low</th>
               <th className="px-4 py-3">Accuracy High</th>
               <th className="px-4 py-3">Tahun</th>
               <th className="px-4 py-3">Lokasi</th>
               <th className="px-4 py-3">Tipe</th>
+              <th className="px-4 py-3">Kelompok</th> {/* NEW: ensure column visible */}
               <th className="px-4 py-3">Kelompok Detail</th>
               <th className="px-4 py-3">Satuan Volume</th>
               <th className="px-4 py-3">Aksi</th>
@@ -225,53 +329,150 @@ const RabForm = () => {
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={17} className="px-4 py-8 text-center text-gray-500">No items.</td>
+                <td colSpan={18} className="px-4 py-8 text-center text-gray-500">No items.</td>
               </tr>
             ) : (
-              items.map((item, idx) => (
-                <tr key={idx} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{idx + 1}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.workcode || '-'}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.uraian}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.specification || '-'}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.satuan}</td>
-                  <td className="px-4 py-3">
-                    <input
-                      type="number"
-                      min={1}
-                      value={item.qty}
-                      onChange={e => handleEditItem(idx, "qty", e.target.value)}
-                      className="w-20 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <input
-                      type="number"
-                      min={0}
-                      value={item.hargaSatuan}
-                      onChange={e => handleEditItem(idx, "hargaSatuan", e.target.value)}
-                      className="w-28 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-                    />
-                  </td>
-                  <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">{(item.qty * item.hargaSatuan).toLocaleString?.() || item.qty * item.hargaSatuan}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.aaceClass ?? 5}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.accuracyLow ?? 0}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.accuracyHigh ?? 0}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.tahun ?? rabData?.tahun ?? '-'}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.lokasi ?? rabData?.lokasi ?? '-'}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.tipe || '-'}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.kelompokDetail || '-'}</td>
-                  <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.satuanVolume || '-'}</td>
-                  <td className="px-4 py-3">
-                    <button
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm text-xs"
-                      onClick={() => handleDeleteItem(idx)}
-                    >
-                      Del
-                    </button>
-                  </td>
-                </tr>
-              ))
+              items.map((item, idx) => {
+                const isCustomKelompok = item.kelompok && !DEFAULT_KELOMPOK.includes(item.kelompok);
+                const selectValue = isCustomKelompok ? '__custom__' : (item.kelompok || '');
+                return (
+                  <tr key={idx} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{idx + 1}</td>
+                    <td className="px-4 py-3">
+                      <input
+                        value={item.workcode || ''}
+                        onChange={e => handleEditItem(idx, "workcode", e.target.value)}
+                        className="w-28 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        value={item.uraian || ''}
+                        onChange={e => handleEditItem(idx, "uraian", e.target.value)}
+                        className="w-full px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        value={item.specification || ''}
+                        onChange={e => handleEditItem(idx, "specification", e.target.value)}
+                        className="w-full px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        value={item.satuan || ''}
+                        onChange={e => handleEditItem(idx, "satuan", e.target.value)}
+                        className="w-24 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number" min={1}
+                        value={item.qty}
+                        onChange={e => handleEditItem(idx, "qty", e.target.value)}
+                        className="w-20 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number" min={0}
+                        value={item.hargaSatuan}
+                        onChange={e => handleEditItem(idx, "hargaSatuan", e.target.value)}
+                        className="w-28 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">{(item.qty * item.hargaSatuan).toLocaleString?.() || item.qty * item.hargaSatuan}</td>
+                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.proyek || '-'}</td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number" min={1} max={5}
+                        value={item.aaceClass ?? 5}
+                        onChange={e => handleEditItem(idx, "aaceClass", e.target.value)}
+                        className="w-16 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number" step="any"
+                        value={item.accuracyLow ?? 0}
+                        onChange={e => handleEditItem(idx, "accuracyLow", e.target.value)}
+                        className="w-20 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number" step="any"
+                        value={item.accuracyHigh ?? 0}
+                        onChange={e => handleEditItem(idx, "accuracyHigh", e.target.value)}
+                        className="w-20 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.tahun ?? rabData?.tahun ?? '-'}</td>
+                    <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{item.lokasi ?? rabData?.lokasi ?? '-'}</td>
+                    <td className="px-4 py-3">
+                      <input
+                        value={item.tipe || ''}
+                        onChange={e => handleEditItem(idx, "tipe", e.target.value)}
+                        className="w-28 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-2">
+                        <select
+                          value={selectValue}
+                          onChange={e => {
+                            const v = e.target.value;
+                            if (v === '__custom__') {
+                              // temporarily clear kelompok, show input
+                              dispatch(setRabItems(items.map((it, i) => i === idx ? { ...it, kelompok: '' } : it)));
+                            } else {
+                              handleEditItem(idx, "kelompok", v);
+                            }
+                          }}
+                          className="w-48 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                        >
+                          <option value="">Select Kelompok</option>
+                          {DEFAULT_KELOMPOK.map(k => (
+                            <option key={k} value={k}>{k}</option>
+                          ))}
+                          <option value="__custom__">Custom…</option>
+                        </select>
+                        {selectValue === '__custom__' && (
+                          <input
+                            value={item.kelompok || ''}
+                            onChange={e => handleEditItem(idx, "kelompok", e.target.value)}
+                            placeholder="Custom Kelompok…"
+                            className="w-48 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                          />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        value={item.kelompokDetail || ''}
+                        onChange={e => handleEditItem(idx, "kelompokDetail", e.target.value)}
+                        className="w-40 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        value={item.satuanVolume || ''}
+                        onChange={e => handleEditItem(idx, "satuanVolume", e.target.value)}
+                        className="w-32 px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-600 shadow-sm text-xs"
+                        onClick={() => handleDeleteItem(idx)}
+                      >
+                        Del
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -279,5 +480,4 @@ const RabForm = () => {
     </div>
   )
 }
-
 export default RabForm

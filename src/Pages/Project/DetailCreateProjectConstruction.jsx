@@ -130,14 +130,15 @@ const DetailCreateProjectConstruction = () => {
   return (
     <div className="p-6 md:p-8 bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-900 dark:text-gray-100">
       {/* text gambaran umum judul */}
-      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
-        Gambaran Umum Project
+      <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight">
+        Construction Cost Recommendation
       </h1>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Review and manage construction cost recommendations according to User needs</p>
       {/* Gambaran Umum Project */}
       <div className="mb-6 bg-gradient-to-r from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Nama Project</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Project Name</div>
             <div className="font-semibold text-gray-900 dark:text-white">{project?.name || "-"}</div>
           </div>
           <div>
@@ -147,36 +148,32 @@ const DetailCreateProjectConstruction = () => {
             </div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Kategori</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Category</div>
             <div className="font-semibold text-gray-900 dark:text-white">{project?.kategori || "-"}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Lokasi</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Location</div>
             <div className="font-semibold text-gray-900 dark:text-white">{project?.lokasi || "-"}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Tahun</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Year</div>
             <div className="font-semibold text-gray-900 dark:text-white">{project?.tahun || "-"}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Asumsi Inflasi (%)</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Inflation Rate (%)</div>
             <div className="font-semibold text-gray-900 dark:text-white">{inflasi !== "" ? inflasi : "-"}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">Infrastruktur</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Infrastructure</div>
             <div className="font-semibold text-gray-900 dark:text-white">{project?.infrastruktur || "-"}</div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Total Recommendation Cost</div>
+            <div className="font-semibold text-gray-900 dark:text-white">{formatCurrency(totalRecommended)}</div>
           </div>
         </div>
       </div>
       {/* END Gambaran Umum Project */}
-
-      {/* Summary cards (total harga, pajak, asuransi, grand total) */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-2xl p-4 bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-lg border border-primary-600">
-          <div className="text-xs text-gray-500">Total Rekomendasi</div>
-          <div className="text-xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalRecommended)}</div>
-        </div>
-      </div>
 
       <form
         onSubmit={(e) => {
@@ -233,7 +230,7 @@ const DetailCreateProjectConstruction = () => {
                       <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b text-right">Total Harga</th>
                       <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">AACE Class</th>
                       <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Kelompok Detail</th>
-                      <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Satuan Volume</th>
+                      {/* <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 border-b">Satuan Volume</th> */}
                     </tr>
                   </thead>
 
@@ -256,7 +253,7 @@ const DetailCreateProjectConstruction = () => {
                           <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b text-right">{item.totalHarga != null ? `Rp${Number(item.totalHarga).toLocaleString()}` : '-'}</td>
                           <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.aaceClass ?? '-'}</td>
                           <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.kelompokDetail || '-'}</td>
-                          <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.satuanVolume || '-'}</td>
+                          {/* <td className="px-3 py-2 text-xs text-gray-900 dark:text-white border-b">{item.satuanVolume || '-'}</td> */}
                         </tr>
                       );
                     })}
