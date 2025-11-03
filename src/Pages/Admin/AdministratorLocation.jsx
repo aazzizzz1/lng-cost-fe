@@ -105,7 +105,7 @@ const AdministratorLocation = () => {
     <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800">
       {/* Action toolbar */}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-base font-semibold text-gray-900 dark:text-white">Daftar CCI Provinsi</h3>
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white">List of Provincial CCI</h3>
         <button
           type="button"
           onClick={openAdd}
@@ -123,10 +123,10 @@ const AdministratorLocation = () => {
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
             <tr>
-              <th className="px-4 py-3">Kode Provinsi</th>
-              <th className="px-4 py-3">Provinsi</th>
+              <th className="px-4 py-3">Code Province</th>
+              <th className="px-4 py-3">Province</th>
               <th className="px-4 py-3">IKK/CCI</th>
-              <th className="px-4 py-3">Aksi</th>
+              <th className="px-4 py-3">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -211,7 +211,7 @@ const AdministratorLocation = () => {
             <div className="p-5 grid grid-cols-1 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Kode Provinsi
+                  Code Province
                 </label>
                 <input
                   type="number"
@@ -223,7 +223,7 @@ const AdministratorLocation = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Provinsi
+                  Province
                 </label>
                 <input
                   type="text"

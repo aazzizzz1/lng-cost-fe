@@ -52,7 +52,7 @@ const LibraryPages = () => {
       <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">Project Library</p>
         <p className="text-xl text-gray-600 dark:text-white mb-4">
-          Pilih project untuk melihat CAPEX, OPEX, dan Drawing
+          Select a project to view CAPEX, OPEX, and Drawings
         </p>
 
         {/* Cards */}
@@ -77,9 +77,9 @@ const LibraryPages = () => {
                     <span className="text-gray-500 dark:text-gray-400">{p.tahun || "-"}</span>
                   </div>
                   <ul className="mt-3 space-y-1 text-sm text-gray-700 dark:text-gray-300">
-                    <li>Infra: <span className="font-medium">{p.infrastruktur || "-"}</span></li>
+                    <li>Infrastructure: <span className="font-medium">{p.infrastruktur || "-"}</span></li>
                     <li>Volume: <span className="font-medium">{p.volume || "-"}</span></li>
-                    <li>Lokasi: <span className="font-medium">{p.lokasi || "-"}</span></li>
+                    <li>Location: <span className="font-medium">{p.lokasi || "-"}</span></li>
                   </ul>
                   <div className="mt-4 flex items-center justify-between gap-4">
                     <div />

@@ -41,7 +41,7 @@ const RecapModal = ({ isOpen, onClose, onAdd, selectedIds = [] }) => {
       <section className="bg-white dark:bg-gray-900 rounded-lg shadow-lg min-w-[28rem] max-h-[32rem] overflow-y-auto">
         <div className="p-6">
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            Pilih Project untuk Ditambahkan ke Rekap
+            Choose Projects to Add
           </h2>
           <div className="mb-4">
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -70,7 +70,7 @@ const RecapModal = ({ isOpen, onClose, onAdd, selectedIds = [] }) => {
               onClick={handleAdd}
               disabled={checkedIds.length === 0}
             >
-              Tambah
+              Add
             </button>
             <button
               type="button"
@@ -80,7 +80,7 @@ const RecapModal = ({ isOpen, onClose, onAdd, selectedIds = [] }) => {
                 onClose();
               }}
             >
-              Tutup
+              Close
             </button>
           </div>
         </div>

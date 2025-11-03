@@ -28,10 +28,10 @@ const RecapitulationPages = () => {
     <ErrorBoundary>
       <div className="p-4 dark:bg-darkmode md:h-screen dark:overflow-auto">
         <p className="text-3xl font-bold text-gray-900 dark:text-white">
-          Management and Configuration Project
+          Management and Configuration Recapitulation Project
         </p>
         <p className="text-xl text-gray-600 dark:text-white mb-2">
-          Management and Configuration Project Detail
+          Management and Configuration Recapitulation Project Detail
         </p>
         <RecapProject />
       </div>

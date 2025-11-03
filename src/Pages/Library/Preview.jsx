@@ -136,12 +136,33 @@ const Preview = () => {
   // Parameters for table
   const parameterRows = useMemo(() => {
     if (!currentVariant) return [];
-    const md = currentVariant.params["Main Dimension"] || {};
-    const ct = currentVariant.params["Cargo Tank"] || {};
+    const md =
+      currentVariant.params["Main Dimension"] ||
+      currentVariant.params["DIMENSION"] ||
+      {};
+    const ct =
+      currentVariant.params["Cargo Tank"] ||
+      currentVariant.params["TANK"] ||
+      {};
     return [
-      { group: "Main Dimension", items: [{ k: "LOA (Length Over All)", v: md.LOA }, { k: "Breadth", v: md.Breadth }, { k: "Deadweight", v: md.Deadweight }] },
-      { group: "Cargo Tank", items: [{ k: "Type of Cargo Tank", v: ct["Type of Cargo Tank"] }, { k: "Gas Capacities", v: ct["Gas Capacities"] }] },
-      { group: "Propeller Type", items: [{ k: "Propeller Type", v: currentVariant.params["Propeller Type"] }] },
+      {
+        group: "Main Dimension",
+        items: [
+          { k: "LOA (Length Over All)", v: md["Length Over All (LOA)"] ?? md.LOA },
+          { k: "Breadth (B)", v: md["Breadth (B)"] ?? md.Breadth },
+          { k: "Draught (T)", v: md["Draught (T)"] ?? md.Draught },
+          { k: "Deadweight (DWT)", v: md["Deadweight (DWT)"] ?? md.Deadweight },
+        ],
+      },
+      {
+        group: "Cargo Tank",
+        items: [
+          { k: "Type", v: ct["Type of Cargo Tank"] ?? ct.Type },
+          { k: "Capacity", v: ct["Gas Capacities"] ?? ct.Capacity },
+          { k: "Quantity", v: ct.Quantity },
+        ],
+      },
+      { group: "Propeller Type", items: [{ k: "Propeller Type", v: currentVariant.params["Propulsion Type"] ?? currentVariant.params["Propeller Type"] }] },
     ];
   }, [currentVariant]);
 

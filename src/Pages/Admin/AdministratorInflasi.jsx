@@ -21,8 +21,8 @@ const AdministratorInflasi = () => {
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
             <tr>
-              <th className="px-4 py-3">Tahun</th>
-              <th className="px-4 py-3">Inflasi (%)</th>
+              <th className="px-4 py-3">Year</th>
+              <th className="px-4 py-3">Inflation (%)</th>
             </tr>
           </thead>
           <tbody>

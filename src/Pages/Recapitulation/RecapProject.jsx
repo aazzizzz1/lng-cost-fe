@@ -341,7 +341,7 @@ const RecapProject = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
         <div className="flex-1">
           <label className="block text-lg font-bold text-gray-900 dark:text-white mb-2">
-            Judul Rekapitulasi
+            Title Recaptulation
           </label>
           <input
             type="text"
@@ -356,7 +356,7 @@ const RecapProject = () => {
             className="bg-primary-700 hover:bg-primary-800 text-white px-4 py-2 rounded font-semibold shadow transition dark:bg-primary-600 dark:hover:bg-primary-700"
             onClick={() => setModalOpen(true)}
           >
-            Tambah Project ke Rekap
+            Add Project to Recap
           </button>
           <button
             type="button"
@@ -364,7 +364,7 @@ const RecapProject = () => {
             onClick={handleExportExcel}
             disabled={selectedProjects.length === 0}
           >
-            Export ke Excel
+            Export to Excel
           </button>
         </div>
       </div>
@@ -390,7 +390,7 @@ const RecapProject = () => {
                   colSpan={columns.length}
                   className="text-center py-6 text-gray-400 dark:text-gray-500"
                 >
-                  Pilih project untuk menampilkan rekapitulasi.
+                  Select a project to display the recap.
                 </td>
               </tr>
             )}
@@ -484,7 +484,7 @@ const RecapProject = () => {
             </tr>
             <tr className="bg-orange-300 dark:bg-orange-800 font-bold">
               <td className="px-3 py-2 border dark:border-gray-700 text-center" colSpan={3}>
-                GRAND TOTAL TERMASUK PPN
+                GRAND TOTAL
               </td>
               {projectSummaries.map((p, idx) => (
                 <React.Fragment key={p.id || idx}>
