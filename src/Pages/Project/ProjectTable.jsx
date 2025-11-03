@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import CreateProjectModal from "./CreateProjectModal";
-import { deleteProject, updateProjectApproval, fetchProjectFilters, fetchProjectsPaged, setProjectFilters, setProjectPagination } from "../../Provider/Project/ProjectSlice";
+import { deleteProject, updateProjectApproval, fetchProjectFilters, fetchProjectsPaged, setProjectFilters, setProjectPagination, setFilterOpen } from "../../Provider/Project/ProjectSlice";
 import { useNavigate } from "react-router-dom";
 import DeleteModal from '../../Components/Modal/DeleteModal';
 
@@ -37,13 +37,32 @@ const ProjectTable = ({ variant = "manual" }) => {
   const isAdmin = typeof user?.role === 'string' && user.role.toLowerCase() === 'admin';
 
   // NEW: list state from store
-  const { projects, loading, filters, pagination, filterOptions } = useSelector((s) => s.projects);
+  const { projects, loading, filters, pagination, filterOptions, filterOpen } = useSelector((s) => s.projects);
 
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  // NEW: UI state for filter dropdown
-  const [openFilter, setOpenFilter] = useState(false);
+  // REMOVED local openFilter state; use slice instead
+  const dropdownRef = useRef(null); // NEW: for click-outside
+
+  // Close on click-outside and Escape
+  useEffect(() => {
+    const handleDocClick = (e) => {
+      if (!filterOpen) return;
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        dispatch(setFilterOpen(false));
+      }
+    };
+    const handleKey = (e) => {
+      if (e.key === 'Escape') dispatch(setFilterOpen(false));
+    };
+    document.addEventListener('mousedown', handleDocClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleDocClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [filterOpen, dispatch]);
 
   // Load initial filter options
   useEffect(() => {
@@ -145,13 +164,13 @@ const ProjectTable = ({ variant = "manual" }) => {
             </button>
             <div className="flex items-center w-full space-x-3 md:w-auto">
               {/* Filter button + dropdown */}
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <button
                   type="button"
-                  onClick={() => setOpenFilter((v) => !v)}
-                  className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg md:w-auto hover:bg-gray-100 hover:text-primary-700 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                  onClick={() => dispatch(setFilterOpen(!filterOpen))}
+                  className="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg md:w-auto hover:bg-gray-100 hover:text-primary-700 focus:ring-4 focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="w-4 h-4 mr-2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="w-4 h-4 mr-2 text-gray-400 dark:text-white" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
                   </svg>
                   Filter
@@ -159,16 +178,16 @@ const ProjectTable = ({ variant = "manual" }) => {
                     <path clipRule="evenodd" fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                   </svg>
                 </button>
-                {openFilter && (
+                {filterOpen && (
                   <div className="absolute right-0 z-10 mt-2 w-64 p-3 bg-white rounded-lg shadow dark:bg-gray-700">
                     <h6 className="mb-3 text-sm font-medium text-gray-900 dark:text-white">Filters</h6>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs mb-1 text-gray-600 dark:text-gray-300">Infrastruktur</label>
+                        <label className="block text-xs mb-1 text-gray-600 dark:text-white">Infrastruktur</label>
                         <select
                           value={filters.infrastruktur}
                           onChange={onInfraChange}
-                          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm dark:text-white"
                         >
                           <option value="">Semua Infrastruktur</option>
                           {(filterOptions.infrastruktur || []).map((opt) => (
@@ -177,11 +196,11 @@ const ProjectTable = ({ variant = "manual" }) => {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs mb-1 text-gray-600 dark:text-gray-300">Volume</label>
+                        <label className="block text-xs mb-1 text-gray-600 dark:text-white">Volume</label>
                         <select
                           value={filters.volume}
                           onChange={onVolumeChange}
-                          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm"
+                          className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm dark:text-white"
                         >
                           <option value="">Semua Volume</option>
                           {(filterOptions.volume || []).map((opt) => (
@@ -195,14 +214,15 @@ const ProjectTable = ({ variant = "manual" }) => {
                           onClick={() => {
                             dispatch(setProjectFilters({ infrastruktur: '', volume: '' }));
                             dispatch(setProjectPagination({ page: 1 }));
+                            dispatch(setFilterOpen(false));
                           }}
-                          className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                          className="px-3 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white"
                         >
                           Reset
                         </button>
                         <button
                           type="button"
-                          onClick={() => setOpenFilter(false)}
+                          onClick={() => dispatch(setFilterOpen(false))}
                           className="px-3 py-1 text-xs rounded bg-primary-600 text-white hover:bg-primary-700"
                         >
                           Apply

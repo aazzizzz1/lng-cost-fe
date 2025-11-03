@@ -201,16 +201,18 @@ const catalog = {
     c1a6: {
       label: "ORU — Type C1A, 6 M3/HR",
       params: {
-        "Storage Capacity": { Each: "5,00 M3", Total: "2.000 M3" },
+        "Storage Capacity": { Each: "5.00 M3", Total: "2.000 M3" },
         "Send Out System": { Capacity: "6 M3/HR", Pressure: "15,8 BARG" },
+        "Engineering Spec": { "Storage Tank Technology": "", "Vaporizer Technology": "" },
       },
       drawings: singleImageSet("ORU Type C1A — typical", IMG_ORU_PFD),
     },
     c1b12: {
       label: "ORU — Type C1B, 12 M3/HR",
       params: {
-        "Storage Capacity": { Each: "5,00 M3", Total: "2.000 M3" },
+        "Storage Capacity": { Each: "5.00 M3", Total: "2.000 M3" },
         "Send Out System": { Capacity: "12 M3/HR", Pressure: "15,8 BARG" },
+        "Engineering Spec": { "Storage Tank Technology": "", "Vaporizer Technology": "" },
       },
       drawings: singleImageSet("ORU Type C1B — typical", IMG_ORU_PFD),
     },
@@ -238,7 +240,7 @@ const catalog = {
     mini25: {
       label: "Mini LNG Plant — 2.5 MMSCFD",
       params: {
-        "Send Out System": { Capacity: "2,5 MMSCFD", Pressure: "- BARG" },
+        "Send Out System": { Capacity: "2.5 MMSCFD", Pressure: "- BARG" },
       },
       drawings: singleImageSet("PFD — Mini LNG Plant 2.5 MMSCFD", IMG_MINI_LNG_PFD),
     },

@@ -134,6 +134,7 @@ const initialState = {
   loadingRecommendedCosts: false,
   detailCache: {}, // NEW: cache project details by id
   uniqueInfrastrukturProyek: {}, // NEW: hasil fetch unique infrastruktur & proyek
+  filterOpen: false, // NEW: UI state for filter dropdown
 };
 
 const projectSlice = createSlice({
@@ -184,6 +185,9 @@ const projectSlice = createSlice({
       const newTotal = Math.max(0, Number(p.total || 0) - 1);
       const newTotalPages = Math.max(1, Math.ceil(newTotal / (p.limit || 10)));
       state.pagination = { ...p, total: newTotal, totalPages: newTotalPages };
+    },
+    setFilterOpen: (state, action) => { // NEW
+      state.filterOpen = !!action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -252,6 +256,7 @@ export const {
   setSelectedProjectDetails,
   setProjectDetailCache,
   deleteProjectById,
+  setFilterOpen, // NEW
 } = projectSlice.actions;
 
 const getAuthHeaders = () => {

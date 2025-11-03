@@ -136,6 +136,7 @@ const Preview = () => {
   // Parameters for table
   const parameterRows = useMemo(() => {
     if (!currentVariant) return [];
+
     const md =
       currentVariant.params["Main Dimension"] ||
       currentVariant.params["DIMENSION"] ||
@@ -144,7 +145,8 @@ const Preview = () => {
       currentVariant.params["Cargo Tank"] ||
       currentVariant.params["TANK"] ||
       {};
-    return [
+
+    const rows = [
       {
         group: "Main Dimension",
         items: [
@@ -164,6 +166,20 @@ const Preview = () => {
       },
       { group: "Propeller Type", items: [{ k: "Propeller Type", v: currentVariant.params["Propulsion Type"] ?? currentVariant.params["Propeller Type"] }] },
     ];
+
+    // Fallback: if nothing meaningful in standard groups, render all available groups dynamically
+    const hasAny = rows.some(r => r.items?.some(it => it?.v !== undefined && it?.v !== null && String(it.v).trim() !== ""));
+    if (hasAny) return rows;
+
+    const allGroups = Object.entries(currentVariant.params || {}).flatMap(([gName, gVal]) => {
+      if (gVal && typeof gVal === "object" && !Array.isArray(gVal)) {
+        const items = Object.entries(gVal).map(([k, v]) => ({ k, v }));
+        return [{ group: gName, items }];
+      }
+      return [];
+    });
+
+    return allGroups;
   }, [currentVariant]);
 
   // NEW: kelompok-only grouping + sorted items + totals (mirror ProjectDetail)

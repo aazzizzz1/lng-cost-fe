@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import ModalCapacityFactor from "../Pages/CapacityFactor/ModalCapacityFactor";
 import ProfileNavbar from "./ProfileNavbar";
 import AppsNavbar from "./AppsNavbar";
-import NotificationNavbar from "./NotificationNavbar";
+// import NotificationNavbar from "./NotificationNavbar";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -193,7 +193,7 @@ const Navbar = () => {
             )}
           </button>
           {/* Notifications */}
-          <NotificationNavbar/>
+          {/* <NotificationNavbar/> */}
           {/* Apps */}
           <AppsNavbar setCFModalOpen={setCFModalOpen} />
           {/* profile */}
