@@ -22,6 +22,7 @@ import OpexPages from "../Pages/Opex/OpexPages"; // NEW
 import LibraryPages from "../Pages/Library/LibraryPages"; // NEW
 import Preview from "../Pages/Library/Preview"; // NEW
 import UserManagementPages from "../Pages/Admin/UserManagementPages";
+import PublicRoute from "./PublicRoute"; // NEW
 
 const PrivateRoute = ({ children }) => {
   const dispatch = useDispatch();
@@ -48,6 +49,33 @@ const RouteComponents = () => {
     <BrowserRouter>
       <GlobalProvider>
         <Routes>
+          {/* Public routes: sign-in (and alias "/") and sign-up */}
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <SignIn />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/signin"
+            element={
+              <PublicRoute>
+                <SignIn />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <PublicRoute>
+                <SignUp />
+              </PublicRoute>
+            }
+          />
+
+          {/* Protected routes: require valid/refreshable session */}
           <Route
             path="/dashboard"
             element={
@@ -61,105 +89,131 @@ const RouteComponents = () => {
           <Route
             path="/project"
             element={
-              <LayoutPages>
-                <ProjectPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <ProjectPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/rekap"
             element={
-              <LayoutPages>
-                <RecapitulationPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <RecapitulationPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/rab"
             element={
-              <LayoutPages>
-                <RabPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <RabPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/manage-data"
             element={
-              <LayoutPages>
-                <ManageDataPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <ManageDataPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/construction-cost"
             element={
-              <LayoutPages>
-                <ConstractionCostPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <ConstractionCostPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/project/:id/detail-construction"
             element={
-              <LayoutPages>
-                <DetailCreateProjectConstruction />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <DetailCreateProjectConstruction />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/unitprice"
             element={
-              <LayoutPages>
-                <TransportPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <TransportPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/administrator"
             element={
-              <LayoutPages>
-                <AdministratorPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <AdministratorPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/opex"
             element={
-              <LayoutPages>
-                <OpexPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <OpexPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/library"
             element={
-              <LayoutPages>
-                <LibraryPages />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <LibraryPages />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/library/:id"
             element={
-              <LayoutPages>
-                <Preview />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <Preview />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/project/:id/detail"
             element={
-              <LayoutPages>
-                <ProjectDetail />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <ProjectDetail />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
             path="/project/:id/edit"
             element={
-              <LayoutPages>
-                <EditProjectConstruction />
-              </LayoutPages>
+              <PrivateRoute>
+                <LayoutPages>
+                  <EditProjectConstruction />
+                </LayoutPages>
+              </PrivateRoute>
             }
           />
           <Route
@@ -172,15 +226,8 @@ const RouteComponents = () => {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/"
-            element={
-              <SignIn />
-              // <Dashboard />
-            }
-          />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+
+          {/* Fallback */}
           <Route path="/*" element={<ErrorPage />} />
         </Routes>
       </GlobalProvider>
