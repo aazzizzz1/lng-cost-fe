@@ -48,9 +48,12 @@ export const loginUser = createAsyncThunk(
       const user = response.data?.data?.user || response.data?.user || null;
       // Ensure latest user/role
       dispatch(fetchCurrentUser());
+      console.log('Login successful, user fetched:', user);
       return { user };
     } catch (error) {
+      console.log('Login error caught in thunk', error);
       const errorMessage = error.response?.data?.error || 'Login failed';
+      console.error('Login error:', error);
       return rejectWithValue(errorMessage);
     }
   }
