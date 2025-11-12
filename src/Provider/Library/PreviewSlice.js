@@ -6,12 +6,12 @@ import Cookies from "js-cookie";
 
 // Resolve LNGBV images from src (support a couple of common filename variants)
 let IMG_LNGBV_5K, IMG_LNGBV_10K, IMG_LNGBV_15K;
-try { IMG_LNGBV_5K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-5000-M3.jpg"); } catch {}
-try { if (!IMG_LNGBV_5K) IMG_LNGBV_5K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-5000-M3.jpg"); } catch {}
-try { IMG_LNGBV_10K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-10000-M3.jpg"); } catch {}
-try { if (!IMG_LNGBV_10K) IMG_LNGBV_10K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-10000-M3.jpg"); } catch {}
-try { IMG_LNGBV_15K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-15000-M3.jpg"); } catch {}
-try { if (!IMG_LNGBV_15K) IMG_LNGBV_15K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-15000-M3.jpg"); } catch {}
+try { IMG_LNGBV_5K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-5000-M3.png"); } catch {}
+try { if (!IMG_LNGBV_5K) IMG_LNGBV_5K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-5000-M3.png"); } catch {}
+try { IMG_LNGBV_10K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-10000-M3.png"); } catch {}
+try { if (!IMG_LNGBV_10K) IMG_LNGBV_10K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-10000-M3.png"); } catch {}
+try { IMG_LNGBV_15K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-15000-M3.png"); } catch {}
+try { if (!IMG_LNGBV_15K) IMG_LNGBV_15K = require("../../Assets/Images/Drawing/LNGBV/GA-LNGBV-15000-M3.png"); } catch {}
 
 // ADD: static requires for other infrastructures (seperti LNGBV)
 let IMG_LNGC_20K, IMG_LNGC_18K;
@@ -114,7 +114,7 @@ const catalog = {
         "Main Dimension": {
           "Length Over All (LOA)": "155,5 M",
           "Breadth (B)": "22 M",
-          "Draught (T)": "8,0 M",
+          "Draught (T)": "8,40 M",
           "Deadweight (DWT)": "- TON",
         },
         "Cargo Tank": { Capacity: "15.000 M3", Type: "CIRCULAR", Quantity: "2 PCS" },
@@ -133,7 +133,7 @@ const catalog = {
           "Draught (T)": "3 M",
           "Deadweight (DWT)": "800 TON",
         },
-        "Cargo Tank": { Capacity: "1.200 M3", Type: "CIRCULAR", Quantity: "4 PCS" },
+        "Cargo Tank": { Capacity: "1.200 M3", Type: "CIRCULAR", Quantity: "3 PCS" },
         "Propulsion Type": "FPP",
       },
       drawings: singleImageSet("General Arrangement — SPB 1,200 M3", IMG_SPB_1K2),
@@ -171,38 +171,38 @@ const catalog = {
   },
   TRUCK: {
     "40k": {
-      label: "LNG Trucking 40k (39.600 M3)",
+      label: "LNG Trucking 40k (39600 M3)",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "12.980 MM",
-          "Width": "2.500 MM",
-          "Height": "3.880 MM",
-          "Deadweight (DWT)": "18.370 KG",
+          "Length Over All (LOA)": "12980 MM",
+          "Width": "2500 MM",
+          "Height": "3880 MM",
+          "Deadweight (DWT)": "18370 KG",
         },
-        "Tank": { Capacity: "39.600 M3" },
+        "Tank": { Capacity: "39600 M3" },
       },
-      drawings: singleImageSet("General Arrangement — LNG Truck 39.600 M3", IMG_TRUCK_39),
+      drawings: singleImageSet("General Arrangement — LNG Truck 39600 M3", IMG_TRUCK_39),
     },
     "52k": {
-      label: "LNG Trucking 52k (52.500 M3)",
+      label: "LNG Trucking 52k (52500 M3)",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "16.500 MM",
-          "Width": "2.500 MM",
-          "Height": "3.880 MM",
-          "Deadweight (DWT)": "21.715 KG",
+          "Length Over All (LOA)": "16500 MM",
+          "Width": "2500 MM",
+          "Height": "3880 MM",
+          "Deadweight (DWT)": "21715 KG",
         },
-        "Tank": { Capacity: "52.500 M3" },
+        "Tank": { Capacity: "52500 M3" },
       },
-      drawings: singleImageSet("General Arrangement — LNG Truck 52.500 M3", IMG_TRUCK_52),
+      drawings: singleImageSet("General Arrangement — LNG Truck 52500 M3", IMG_TRUCK_52),
     },
   },
   ORU: {
     c1a6: {
-      label: "ORU — Type C1A, 6 M3/HR",
+      label: "ORU — Type C1A, 12 M3/HR",
       params: {
-        "Storage Capacity": { Each: "5.00 M3", Total: "2.000 M3" },
-        "Send Out System": { Capacity: "6 M3/HR", Pressure: "15,8 BARG" },
+        "Storage Capacity": { Each: "500 M3", Total: "2000 M3" },
+        "Send Out System": { Capacity: "12 M3/HR", Pressure: "15,8 BARG" },
         "Engineering Spec": { "Storage Tank Technology": "", "Vaporizer Technology": "" },
       },
       drawings: singleImageSet("ORU Type C1A — typical", IMG_ORU_PFD),

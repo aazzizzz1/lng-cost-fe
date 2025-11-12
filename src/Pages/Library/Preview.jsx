@@ -137,50 +137,67 @@ const Preview = () => {
   const parameterRows = useMemo(() => {
     if (!currentVariant) return [];
 
+    const isTruck = (resolved?.group === "TRUCK");
+
     const md =
       currentVariant.params["Main Dimension"] ||
       currentVariant.params["DIMENSION"] ||
       {};
+    // accept both "Cargo Tank", "TANK", and "Tank" (for trucking)
     const ct =
       currentVariant.params["Cargo Tank"] ||
       currentVariant.params["TANK"] ||
+      currentVariant.params["Tank"] ||
       {};
 
-    const rows = [
-      {
-        group: "Main Dimension",
-        items: [
-          { k: "LOA (Length Over All)", v: md["Length Over All (LOA)"] ?? md.LOA },
-          { k: "Breadth (B)", v: md["Breadth (B)"] ?? md.Breadth },
-          { k: "Draught (T)", v: md["Draught (T)"] ?? md.Draught },
-          { k: "Deadweight (DWT)", v: md["Deadweight (DWT)"] ?? md.Deadweight },
-        ],
-      },
-      {
-        group: "Cargo Tank",
-        items: [
-          { k: "Type", v: ct["Type of Cargo Tank"] ?? ct.Type },
-          { k: "Capacity", v: ct["Gas Capacities"] ?? ct.Capacity },
-          { k: "Quantity", v: ct.Quantity },
-        ],
-      },
-      { group: "Propeller Type", items: [{ k: "Propeller Type", v: currentVariant.params["Propulsion Type"] ?? currentVariant.params["Propeller Type"] }] },
-    ];
+    // Build items per group with truck-aware fields
+    const mainDimItems = [
+      { k: "LOA (Length Over All)", v: md["Length Over All (LOA)"] ?? md.LOA },
+      // Trucking specific: Width/Height
+      ...(isTruck ? [
+        { k: "Width", v: md["Width"] },
+        { k: "Height", v: md["Height"] },
+      ] : [
+        { k: "Breadth (B)", v: md["Breadth (B)"] ?? md.Breadth },
+        { k: "Draught (T)", v: md["Draught (T)"] ?? md.Draught },
+      ]),
+      { k: "Deadweight (DWT)", v: md["Deadweight (DWT)"] ?? md.Deadweight },
+    ].filter(it => it.v !== undefined && it.v !== null && String(it.v).trim() !== "");
 
-    // Fallback: if nothing meaningful in standard groups, render all available groups dynamically
-    const hasAny = rows.some(r => r.items?.some(it => it?.v !== undefined && it?.v !== null && String(it.v).trim() !== ""));
+    const tankLabel = isTruck ? "Tank" : "Cargo Tank";
+    const tankItems = [
+      // Type may not exist for trucking; include when available
+      { k: "Type", v: ct["Type of Cargo Tank"] ?? ct.Type },
+      { k: "Capacity", v: ct["Gas Capacities"] ?? ct.Capacity },
+      { k: "Quantity", v: ct.Quantity },
+    ].filter(it => it.v !== undefined && it.v !== null && String(it.v).trim() !== "");
+
+    // Propeller appears only for vessels
+    const propVal = currentVariant.params["Propulsion Type"] ?? currentVariant.params["Propeller Type"];
+    const propItems = propVal ? [{ k: "Propeller Type", v: propVal }] : [];
+
+    const rows = [
+      { group: "Main Dimension", items: mainDimItems },
+      { group: tankLabel, items: tankItems },
+      ...(propItems.length ? [{ group: "Propeller Type", items: propItems }] : []),
+    ].filter(r => r.items && r.items.length);
+
+    // Fallback: render all groups dynamically when no standard fields found
+    const hasAny = rows.some(r => r.items?.length);
     if (hasAny) return rows;
 
     const allGroups = Object.entries(currentVariant.params || {}).flatMap(([gName, gVal]) => {
       if (gVal && typeof gVal === "object" && !Array.isArray(gVal)) {
-        const items = Object.entries(gVal).map(([k, v]) => ({ k, v }));
-        return [{ group: gName, items }];
+        const items = Object.entries(gVal)
+          .map(([k, v]) => ({ k, v }))
+          .filter(it => it.v !== undefined && it.v !== null && String(it.v).trim() !== "");
+        return items.length ? [{ group: gName, items }] : [];
       }
       return [];
     });
 
     return allGroups;
-  }, [currentVariant]);
+  }, [currentVariant, resolved]);
 
   // NEW: kelompok-only grouping + sorted items + totals (mirror ProjectDetail)
   const groupedTree = useMemo(() => {
