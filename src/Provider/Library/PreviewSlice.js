@@ -29,9 +29,10 @@ let IMG_TRUCK_52, IMG_TRUCK_39;
 try { IMG_TRUCK_52 = require("../../Assets/Images/Drawing/LNG Trucking/52.5 m3.png"); } catch {}
 try { IMG_TRUCK_39 = require("../../Assets/Images/Drawing/LNG Trucking/39.6 m3.png"); } catch {}
 
-let IMG_ORU_PFD, IMG_ORF_PID;
+let IMG_ORU_PFD, IMG_ORF_PID_4893, IMG_ORF_PID_1639;
 try { IMG_ORU_PFD = require("../../Assets/Images/Drawing/ORU/2.2 MMSCFD.png"); } catch {}
-try { IMG_ORF_PID = require("../../Assets/Images/Drawing/ORF/4.893 m3.png"); } catch {}
+try { IMG_ORF_PID_4893 = require("../../Assets/Images/Drawing/ORF/4.893 m3.png"); } catch {}
+try { IMG_ORF_PID_1639 = require("../../Assets/Images/Drawing/ORF/16.39 m3.png"); } catch {}
 
 let IMG_MINI_LNG_PFD;
 try { IMG_MINI_LNG_PFD = require("../../Assets/Images/Drawing/LNG Plant/2.5 MMSCFD.png"); } catch {}
@@ -55,11 +56,11 @@ const catalog = {
       params: {
         "Main Dimension": {
           "Length Over All (LOA)": "143 M",
-          "Breadth (B)": "25,2 M",
-          "Draught (T)": "6,6 M",
+          "Breadth (B)": "25.2 M",
+          "Draught (T)": "6.6 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "18.000 M3", Type: "CIRCULAR", Quantity: "2 PCS" },
+        "Cargo Tank": { Capacity: "18,000 M3", Type: "CIRCULAR", Quantity: "2 PCS" },
         "Propulsion Type": "CPP",
       },
       drawings: singleImageSet("General Arrangement — LNGC 18,000 M3", IMG_LNGC_18K),
@@ -68,12 +69,12 @@ const catalog = {
       label: "LNG Carrier 20,000 M3",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "159,9 M",
+          "Length Over All (LOA)": "159.9 M",
           "Breadth (B)": "24 M",
           "Draught (T)": "8 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "20.000 M3", Type: "CIRCULAR", Quantity: "3 PCS" },
+        "Cargo Tank": { Capacity: "20,000 M3", Type: "CIRCULAR", Quantity: "3 PCS" },
         "Propulsion Type": "CPP",
       },
       drawings: singleImageSet("General Arrangement — LNGC 20,000 M3", IMG_LNGC_20K),
@@ -81,137 +82,137 @@ const catalog = {
   },
   LNGBV: {
     "5k": {
-      label: "LNGBV 5,000 M3",
+      label: "LNGBV 5,000 m³",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "99,90 M",
+          "Length Over All (LOA)": "99.90 M",
           "Breadth (B)": "18 M",
-          "Draught (T)": "4,10 M",
+          "Draught (T)": "4.10 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "5.000 M3", Type: "CIRCULAR", Quantity: "2 PCS" },
+        "Cargo Tank": { Capacity: "5,000 m³", Type: "CIRCULAR", Quantity: "2 PCS" },
         "Propulsion Type": "CPP",
       },
-      drawings: singleImageSet("General Arrangement — LNGBV 5,000 M3", IMG_LNGBV_5K),
+      drawings: singleImageSet("General Arrangement — LNGBV 5,000 m³", IMG_LNGBV_5K),
     },
     "10k": {
-      label: "LNGBV 10,000 M3",
+      label: "LNGBV 10,000 m³",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "124,7 M",
-          "Breadth (B)": "21,8 M",
-          "Draught (T)": "5,6 M",
+          "Length Over All (LOA)": "124.7 M",
+          "Breadth (B)": "21.8 M",
+          "Draught (T)": "5.6 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "10.000 M3", Type: "CIRCULAR", Quantity: "2 PCS" },
+        "Cargo Tank": { Capacity: "10,000 m³", Type: "CIRCULAR", Quantity: "2 PCS" },
         "Propulsion Type": "CPP",
       },
-      drawings: singleImageSet("General Arrangement — LNGBV 10,000 M3", IMG_LNGBV_10K),
+      drawings: singleImageSet("General Arrangement — LNGBV 10,000 m³", IMG_LNGBV_10K),
     },
     "15k": {
-      label: "LNGBV 15,000 M3",
+      label: "LNGBV 15,000 m³",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "155,5 M",
+          "Length Over All (LOA)": "155.5 M",
           "Breadth (B)": "22 M",
-          "Draught (T)": "8,40 M",
+          "Draught (T)": "8.40 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "15.000 M3", Type: "CIRCULAR", Quantity: "2 PCS" },
+        "Cargo Tank": { Capacity: "15,000 m³", Type: "CIRCULAR", Quantity: "2 PCS" },
         "Propulsion Type": "CPP",
       },
-      drawings: singleImageSet("General Arrangement — LNGBV 15,000 M3", IMG_LNGBV_15K),
+      drawings: singleImageSet("General Arrangement — LNGBV 15,000 m³", IMG_LNGBV_15K),
     },
   },
   SPB: {
     "1k2": {
-      label: "Self-Propelled Barge 1,200 M3",
+      label: "Self-Propelled Barge 1,200 m³",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "66,80 M",
+          "Length Over All (LOA)": "66.80 M",
           "Breadth (B)": "15 M",
           "Draught (T)": "3 M",
           "Deadweight (DWT)": "800 TON",
         },
-        "Cargo Tank": { Capacity: "1.200 M3", Type: "CIRCULAR", Quantity: "3 PCS" },
+        "Cargo Tank": { Capacity: "1,200 m³", Type: "CIRCULAR", Quantity: "3 PCS" },
         "Propulsion Type": "FPP",
       },
-      drawings: singleImageSet("General Arrangement — SPB 1,200 M3", IMG_SPB_1K2),
+      drawings: singleImageSet("General Arrangement — SPB 1,200 m³", IMG_SPB_1K2),
     },
     "4k": {
-      label: "Self-Propelled Barge 4,000 M3",
+      label: "Self-Propelled Barge 4,000 m³",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "75,70 M",
+          "Length Over All (LOA)": "75.70 M",
           "Breadth (B)": "20 M",
           "Draught (T)": "3 M",
-          "Deadweight (DWT)": "2.300 TON",
+          "Deadweight (DWT)": "2,300 TON",
         },
-        "Cargo Tank": { Capacity: "4.000 M3", Type: "CIRCULAR", Quantity: "1 PCS" },
+        "Cargo Tank": { Capacity: "4,000 m³", Type: "CIRCULAR", Quantity: "1 PCS" },
         "Propulsion Type": "FPP",
       },
-      drawings: singleImageSet("General Arrangement — SPB 4,000 M3", IMG_SPB_4K),
+      drawings: singleImageSet("General Arrangement — SPB 4,000 m³", IMG_SPB_4K),
     },
   },
   FSRU: {
     "83k": {
-      label: "FSRU 83,000 M3",
+      label: "FSRU 83,000 m³",
       params: {
         "Main Dimension": {
           "Length Over All (LOA)": "200 M",
-          "Breadth (B)": "39,80 M",
-          "Draught (T)": "7,70 M",
+          "Breadth (B)": "39.80 M",
+          "Draught (T)": "7.70 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "83.000 M3", Type: "CIRCULAR", Quantity: "4 PCS" },
+        "Cargo Tank": { Capacity: "83,000 m³", Type: "CIRCULAR", Quantity: "4 PCS" },
         "Propulsion Type": "CPP",
       },
-      drawings: singleImageSet("General Arrangement — FSRU 83,000 M3", IMG_FSRU_83K),
+      drawings: singleImageSet("General Arrangement — FSRU 83,000 m³", IMG_FSRU_83K),
     },
   },
   TRUCK: {
     "40k": {
-      label: "LNG Trucking 40k (39600 M3)",
+      label: "LNG Trucking 40k (39.6 m³)",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "12980 MM",
-          "Width": "2500 MM",
-          "Height": "3880 MM",
-          "Deadweight (DWT)": "18370 KG",
+          "Length Over All (LOA)": "12,980 MM",
+          "Width": "2,500 MM",
+          "Height": "3,880 MM",
+          "Deadweight (DWT)": "18,370 KG",
         },
-        "Tank": { Capacity: "39600 M3" },
+        "Tank": { Capacity: "39.6 m³" },
       },
-      drawings: singleImageSet("General Arrangement — LNG Truck 39600 M3", IMG_TRUCK_39),
+      drawings: singleImageSet("General Arrangement — LNG Truck 39.6 m³", IMG_TRUCK_39),
     },
     "52k": {
-      label: "LNG Trucking 52k (52500 M3)",
+      label: "LNG Trucking 52k (52.5 m³)",
       params: {
         "Main Dimension": {
-          "Length Over All (LOA)": "16500 MM",
-          "Width": "2500 MM",
-          "Height": "3880 MM",
-          "Deadweight (DWT)": "21715 KG",
+          "Length Over All (LOA)": "16,500 MM",
+          "Width": "2,500 MM",
+          "Height": "3,880 MM",
+          "Deadweight (DWT)": "21,715 KG",
         },
-        "Tank": { Capacity: "52500 M3" },
+        "Tank": { Capacity: "52.5 m³" },
       },
-      drawings: singleImageSet("General Arrangement — LNG Truck 52500 M3", IMG_TRUCK_52),
+      drawings: singleImageSet("General Arrangement — LNG Truck 52.5 m³", IMG_TRUCK_52),
     },
   },
   ORU: {
     c1a6: {
-      label: "ORU — Type C1A, 12 M3/HR",
+      label: "ORU — Type C1A, 6 m³/HR",
       params: {
-        "Storage Capacity": { Each: "500 M3", Total: "2000 M3" },
-        "Send Out System": { Capacity: "12 M3/HR", Pressure: "15,8 BARG" },
+        "Storage Capacity": { Each: "5 m³", Total: "2,000 m³" },
+        "Send Out System": { Capacity: "6 m³/HR", Pressure: "15.8 BARG" },
         "Engineering Spec": { "Storage Tank Technology": "", "Vaporizer Technology": "" },
       },
       drawings: singleImageSet("ORU Type C1A — typical", IMG_ORU_PFD),
     },
     c1b12: {
-      label: "ORU — Type C1B, 12 M3/HR",
+      label: "ORU — Type C1B, 12 m³/HR",
       params: {
-        "Storage Capacity": { Each: "5.00 M3", Total: "2.000 M3" },
-        "Send Out System": { Capacity: "12 M3/HR", Pressure: "15,8 BARG" },
+        "Storage Capacity": { Each: "5 m³", Total: "2,000 m³" },
+        "Send Out System": { Capacity: "12 m³/HR", Pressure: "15.8 BARG" },
         "Engineering Spec": { "Storage Tank Technology": "", "Vaporizer Technology": "" },
       },
       drawings: singleImageSet("ORU Type C1B — typical", IMG_ORU_PFD),
@@ -219,14 +220,14 @@ const catalog = {
   },
   ORF: {
     v5: {
-      label: "ORF — 5 M3/HR",
-      params: { "Parameter": { Capacity: "4.893 M3/HR", Pressure: "16 BARG" } },
-      drawings: singleImageSet("P&ID — ORF 5", IMG_ORF_PID),
+      label: "ORF — 5 m³/HR",
+      params: { "Parameter": { Capacity: "4.893 m³/HR", Pressure: "16 BARG" } },
+      drawings: singleImageSet("P&ID — ORF 5", IMG_ORF_PID_4893),
     },
     v16: {
-      label: "ORF — 16 M3/HR",
-      params: { "Parameter": { Capacity: "16,39 M3/HR", Pressure: "16 BARG" } },
-      drawings: singleImageSet("P&ID — ORF 16", IMG_ORF_PID),
+      label: "ORF — 16 m³/HR",
+      params: { "Parameter": { Capacity: "16.39 m³/HR", Pressure: "16 BARG" } },
+      drawings: singleImageSet("P&ID — ORF 16", IMG_ORF_PID_1639),
     },
   },
   LNG_PLANT: {
@@ -235,7 +236,7 @@ const catalog = {
       params: {
         "Send Out System": { Capacity: "2 MMSCFD", Pressure: "- BARG" },
       },
-      drawings: [], // no image available
+      drawings: singleImageSet("PFD — Mini LNG Plant 2.5 MMSCFD", IMG_MINI_LNG_PFD),
     },
     mini25: {
       label: "Mini LNG Plant — 2.5 MMSCFD",
@@ -249,14 +250,14 @@ const catalog = {
     "2k": {
       label: "Jetty — 2k",
       params: {
-        "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2.000 CBM" },
+        "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2,000 CBM" },
       },
       drawings: singleImageSet("Jetty 2k", IMG_JETTY_LNGBV_2K),
     },
     "3k5": {
       label: "Jetty — 3.5k",
       params: {
-        "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2.000 CBM" },
+        "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2,000 CBM" },
       },
       drawings: singleImageSet("Jetty 3.5k", IMG_JETTY_LNGBV_3K5),
     },
@@ -265,7 +266,7 @@ const catalog = {
     "15k": {
       label: "Jetty — 15k",
       params: {
-        "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2.000 CBM" },
+        "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2,000 CBM" },
       },
       drawings: singleImageSet("Jetty 15k", IMG_JETTY_SPB_15K),
     },
