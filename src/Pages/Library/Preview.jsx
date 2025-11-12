@@ -228,12 +228,13 @@ const Preview = () => {
     { key: 'satuan', label: 'Satuan' },
     { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', isCurrency: true },
     { key: 'totalHarga', label: 'Total Harga', className: 'text-right', isCurrency: true },
-    { key: 'aaceClass', label: 'AACE Class' },
-    { key: 'accuracyLow', label: 'Accuracy Low', className: 'text-right' },
-    { key: 'accuracyHigh', label: 'Accuracy High', className: 'text-right' },
+    // HIDDEN on request:
+    // { key: 'aaceClass', label: 'AACE Class' },
+    // { key: 'accuracyLow', label: 'Accuracy Low', className: 'text-right' },
+    // { key: 'accuracyHigh', label: 'Accuracy High', className: 'text-right' },
     { key: 'tahun', label: 'Tahun', className: 'text-center' },
     { key: 'lokasi', label: 'Lokasi' },
-    { key: 'satuanVolume', label: 'Satuan Volume' },
+    // { key: 'satuanVolume', label: 'Satuan Volume' },
     { key: 'tipe', label: 'Tipe' },
   ];
 
@@ -249,6 +250,55 @@ const Preview = () => {
   const totalHarga =
     projectDetails?.totalConstructionCost?.toLocaleString?.() ??
     (projectDetails?.harga?.toLocaleString?.() ?? "-");
+
+  // NEW: OPEX infra mapping and availability flag
+  const [opexAvailable, setOpexAvailable] = useState(false);
+
+  // Helper map: resolved.group -> opex infra id/tab
+  const mapGroupToOpexTarget = (group, vol) => {
+    switch (group) {
+      case "LNGC":
+      case "LNGBV":
+      case "SPB": {
+        return { infraId: "lng-vessel", tabId: pickNearestTabId(vol) };
+      }
+      case "FSRU":
+        return { infraId: "fsru", tabId: "overview" };
+      case "LNG_PLANT":
+        return { infraId: "onshore-lng-plant", tabId: "overview" };
+      case "TRUCK":
+        return { infraId: "lng-trucking", tabId: "overview" };
+      case "ORF":
+        return { infraId: "orf-terminal", tabId: "overview" };
+      case "ORU":
+        return { infraId: "gas-pipeline", tabId: "overview" };
+      // Jetty and others: no OPEX dataset
+      default:
+        return null;
+    }
+  };
+
+  // OPEX: set infra and tab according to resolved group; fallback to "not available"
+  useEffect(() => {
+    // Prefer detailed record if available for accurate volume
+    const p =
+      (projectDetails && String(projectDetails.id) === String(id) && projectDetails) ||
+      projects.find((x) => String(x.id) === String(id)) ||
+      {};
+    const vol = parseVol(p.volume);
+    if (!resolved?.group) {
+      setOpexAvailable(false);
+      return;
+    }
+    const target = mapGroupToOpexTarget(resolved.group, vol);
+    if (target?.infraId && target?.tabId) {
+      dispatch(setActiveInfra(target.infraId));
+      dispatch(setActiveTab({ infraId: target.infraId, tabId: target.tabId }));
+      setOpexAvailable(true);
+    } else {
+      setOpexAvailable(false);
+    }
+  }, [dispatch, resolved, projects, id, projectDetails]);
 
   return (
     <div className="space-y-6" ref={pdfRef}>
@@ -374,6 +424,16 @@ const Preview = () => {
               <div className="text-[10px] uppercase text-gray-500 dark:text-gray-400">Estimated Total</div>
               <div className="font-semibold text-gray-900 dark:text-white">Rp{totalHarga}</div>
             </div>
+            {/* NEW: AACE Class */}
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <div className="text-[10px] uppercase text-gray-500 dark:text-gray-400">AACE Class</div>
+              <div className="font-semibold text-gray-900 dark:text-white">{projectDetails.levelAACE ?? "-"}</div>
+            </div>
+            {/* NEW: Satuan Volume */}
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <div className="text-[10px] uppercase text-gray-500 dark:text-gray-400">Satuan Volume</div>
+              <div className="font-semibold text-gray-900 dark:text-white">{projectDetails.satuan ?? "-"}</div>
+            </div>
           </div>
         </Card>
       )}
@@ -482,7 +542,13 @@ const Preview = () => {
       {/* OPEX (restored) */}
       <Card>
         <div className="text-lg font-semibold text-gray-900 dark:text-white mb-2">OPEX</div>
-        <OpexChart />
+        {opexAvailable ? (
+          <OpexChart />
+        ) : (
+          <div className="text-sm text-gray-600 dark:text-gray-300 py-4">
+            OPEX data not yet available for this infrastructure.
+          </div>
+        )}
       </Card>
     </div>
   );

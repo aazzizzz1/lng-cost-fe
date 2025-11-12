@@ -63,13 +63,13 @@ const ProjectDetail = () => {
     { key: 'satuan', label: 'Satuan' },
     { key: 'hargaSatuan', label: 'Harga Satuan', className: 'text-right', isCurrency: true },
     { key: 'totalHarga', label: 'Total Harga', className: 'text-right', isCurrency: true },
-    { key: 'aaceClass', label: 'AACE Class' },
-    // NEW: more complete fields
-    { key: 'accuracyLow', label: 'Accuracy Low', className: 'text-right' },
-    { key: 'accuracyHigh', label: 'Accuracy High', className: 'text-right' },
+    // HIDDEN on request:
+    // { key: 'aaceClass', label: 'AACE Class' },
+    // { key: 'accuracyLow', label: 'Accuracy Low', className: 'text-right' },
+    // { key: 'accuracyHigh', label: 'Accuracy High', className: 'text-right' },
     { key: 'tahun', label: 'Tahun', className: 'text-center' },
     { key: 'lokasi', label: 'Lokasi' },
-    { key: 'satuanVolume', label: 'Satuan Volume' },
+    // { key: 'satuanVolume', label: 'Satuan Volume' },
     { key: 'tipe', label: 'Tipe' },
   ];
 
@@ -101,6 +101,13 @@ const ProjectDetail = () => {
             <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Tahun {project.tahun}</span>
             <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Lokasi: {project.lokasi}</span>
             <span className="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">Inflasi: {project.inflasi ?? "-"}</span>
+            {/* NEW: AACE Class & Satuan Volume */}
+            <span className="text-xs px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-800 text-gray-700 dark:text-gray-200">
+              AACE Class: {project.levelAACE ?? "-"}
+            </span>
+            <span className="text-xs px-2 py-1 rounded bg-indigo-100 dark:bg-indigo-800 text-gray-700 dark:text-gray-200">
+              Satuan Volume: {project.satuan ?? "-"}
+            </span>
           </div>
         </div>
         <div className="text-right text-sm text-gray-600 dark:text-gray-300">

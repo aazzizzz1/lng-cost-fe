@@ -143,6 +143,17 @@ const OpexChart = () => {
   // Show full charts only for LNG Carrier (LNGC)
   const isNonLNG = ui.activeInfra !== "lng-carrier";
 
+  if (!ds) {
+    return (
+      <div className="text-sm text-gray-600 dark:text-gray-300 py-4">
+        OPEX data not yet available for this infrastructure.
+      </div>
+    );
+  }
+
+  // const profile = ds.profile || {};
+  // const byAge = ds.byAgeDaily || { labels: [], items: [], totals: [] };
+
   return (
     <div className="space-y-6">
       <div className={

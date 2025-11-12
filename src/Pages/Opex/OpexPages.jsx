@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Opex from './Opex'
+import OpexChart from './OpexChart'
 
 class ErrorBoundary extends Component{
   constructor(props) {
@@ -37,6 +38,7 @@ const OpexPages = () => {
           Disclaimer: The data presented are indicative and based on reference operational records. Actual OPEX may vary depending on site conditions, asset performance, and market dynamics.
         </p>
         <Opex />
+        <OpexChart />
       </div>
     </ErrorBoundary>
   )
