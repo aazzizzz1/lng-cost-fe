@@ -52,7 +52,7 @@ const singleImageSet = (title, url) => [{ key: "ga", title, url: url || "" }];
 const catalog = {
   LNGC: {
     "18k": {
-      label: "LNG Carrier 18,000 M3",
+      label: "LNG Carrier 18,000 m³",
       params: {
         "Main Dimension": {
           "Length Over All (LOA)": "143 M",
@@ -60,13 +60,13 @@ const catalog = {
           "Draught (T)": "6.6 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "18,000 M3", Type: "CIRCULAR", Quantity: "2 PCS" },
+        "Cargo Tank": { Capacity: "18,000 m³", Type: "CIRCULAR", Quantity: "2 PCS" },
         "Propulsion Type": "CPP",
       },
-      drawings: singleImageSet("General Arrangement — LNGC 18,000 M3", IMG_LNGC_18K),
+      drawings: singleImageSet("General Arrangement — LNGC 18,000 m³", IMG_LNGC_18K),
     },
     "20k": {
-      label: "LNG Carrier 20,000 M3",
+      label: "LNG Carrier 20,000 m³",
       params: {
         "Main Dimension": {
           "Length Over All (LOA)": "159.9 M",
@@ -74,10 +74,10 @@ const catalog = {
           "Draught (T)": "8 M",
           "Deadweight (DWT)": "- TON",
         },
-        "Cargo Tank": { Capacity: "20,000 M3", Type: "CIRCULAR", Quantity: "3 PCS" },
+        "Cargo Tank": { Capacity: "20,000 m³", Type: "CIRCULAR", Quantity: "3 PCS" },
         "Propulsion Type": "CPP",
       },
-      drawings: singleImageSet("General Arrangement — LNGC 20,000 M3", IMG_LNGC_20K),
+      drawings: singleImageSet("General Arrangement — LNGC 20,000 m³", IMG_LNGC_20K),
     },
   },
   LNGBV: {
@@ -200,10 +200,10 @@ const catalog = {
   },
   ORU: {
     c1a6: {
-      label: "ORU — Type C1A, 6 m³/HR",
+      label: "ORU — Type C1A, 12 m³/HR",
       params: {
-        "Storage Capacity": { Each: "5 m³", Total: "2,000 m³" },
-        "Send Out System": { Capacity: "6 m³/HR", Pressure: "15.8 BARG" },
+        "Storage Capacity": { Each: "500 m³", Total: "2,000 m³" },
+        "Send Out System": { Capacity: "12 m³/HR", Pressure: "15.8 BARG" },
         "Engineering Spec": { "Storage Tank Technology": "", "Vaporizer Technology": "" },
       },
       drawings: singleImageSet("ORU Type C1A — typical", IMG_ORU_PFD),
@@ -211,7 +211,7 @@ const catalog = {
     c1b12: {
       label: "ORU — Type C1B, 12 m³/HR",
       params: {
-        "Storage Capacity": { Each: "5 m³", Total: "2,000 m³" },
+        "Storage Capacity": { Each: "500 m³", Total: "2,000 m³" },
         "Send Out System": { Capacity: "12 m³/HR", Pressure: "15.8 BARG" },
         "Engineering Spec": { "Storage Tank Technology": "", "Vaporizer Technology": "" },
       },
@@ -232,9 +232,9 @@ const catalog = {
   },
   LNG_PLANT: {
     onshore2: {
-      label: "Onshore LNG Plant — 2 MMSCFD",
+      label: "Onshore LNG Plant — 2.5 MMSCFD",
       params: {
-        "Send Out System": { Capacity: "2 MMSCFD", Pressure: "- BARG" },
+        "Send Out System": { Capacity: "2.5 MMSCFD", Pressure: "- BARG" },
       },
       drawings: singleImageSet("PFD — Mini LNG Plant 2.5 MMSCFD", IMG_MINI_LNG_PFD),
     },
@@ -327,6 +327,7 @@ export const resolveVariant = (project) => {
   const infraRaw = (project.infrastruktur || project.infrastructure || "").toLowerCase();
   const volRaw = pickProjectVolumeRaw(project);
   const volNum = parseVolumeToNumber(volRaw);
+  const volStr = String(volRaw || "").toLowerCase();
 
   const byVolume = (group, capsMap) => {
     const keys = Object.keys(capsMap);
@@ -351,9 +352,40 @@ export const resolveVariant = (project) => {
     return { group: "ORU", variant: "c1a6" };
   }
 
-  // ORF
+  // ORF: pilih 16.39 atau 4.893 berdasarkan pola eksplisit atau pendekatan numerik
   if (/orf|receiving\s*facility/.test(infraRaw)) {
-    if (/\b16\b/.test(infraRaw)) return { group: "ORF", variant: "v16" };
+    // Explicit pattern checks on infra and volume strings (prioritas tertinggi)
+    const is16 =
+      /(16[\s.,]?39)\b/.test(infraRaw) ||
+      /(16[\s.,]?39)\b/.test(volStr) ||
+      /\b16\b/.test(infraRaw) ||
+      /\b16\b/.test(volStr);
+    const is4893 =
+      /(4[\s.,]?893)\b/.test(infraRaw) ||
+      /(4[\s.,]?893)\b/.test(volStr) ||
+      /\b4\b/.test(infraRaw) ||
+      /\b4\b/.test(volStr);
+
+    if (is16) return { group: "ORF", variant: "v16" };
+    if (is4893) return { group: "ORF", variant: "v5" };
+
+    // NEW: nearest-volume pick when angka kecil (<= 100) tersedia di volume string
+    const numFrom = (s) => {
+      const m = String(s || "").match(/(\d+[.,]?\d*)/);
+      return m ? parseFloat(m[1].replace(",", ".")) : NaN;
+    };
+    const vDec = Number.isFinite(numFrom(volStr)) ? numFrom(volStr) : NaN;
+
+    if (Number.isFinite(vDec) && vDec <= 100) {
+      const diff4893 = Math.abs(vDec - 4.893);
+      const diff1639 = Math.abs(vDec - 16.39);
+      return { group: "ORF", variant: diff1639 < diff4893 ? "v16" : "v5" };
+    }
+
+    // Fallback: gunakan volNum heuristik (>=10 -> 16.39; selain itu -> 4.893)
+    if (Number.isFinite(volNum)) {
+      return { group: "ORF", variant: volNum >= 10 ? "v16" : "v5" };
+    }
     return { group: "ORF", variant: "v5" };
   }
 
@@ -648,7 +680,6 @@ const previewSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // ...existing code...
     // NEW: reducers for approved library projects
     builder
       .addCase(fetchApprovedLibraryProjects.pending, (state) => {
@@ -666,7 +697,6 @@ const previewSlice = createSlice({
       });
   },
 });
-/* eslint-enable no-unused-vars */
 
 export const { setSelectedProjectId, setResolved, resolveFromProject } = previewSlice.actions;
 
