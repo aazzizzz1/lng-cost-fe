@@ -10,8 +10,12 @@ const Card = ({ children }) => (
 );
 
 const iconForInfra = (infra = "") => {
+  if (/JETTY\s*LNGBV/i.test(infra)) return "🏗️⚓"; // Jetty LNGBV
+  if (/JETTY\s*SPB/i.test(infra)) return "🏗️📦";   // Jetty SPB
+  if (/JETTY/i.test(infra)) return "🏗️";          // generic Jetty
   if (/LNGBV/i.test(infra)) return "⚓";
   if (/CARRIER|VESSEL|LNGC/i.test(infra)) return "🚢";
+  if (/SPB/i.test(infra)) return "📦";
   if (/FSRU/i.test(infra)) return "🛳️";
   if (/PLANT|LNG\s*PLANT/i.test(infra)) return "🏭";
   if (/PIPE|PIPELINE/i.test(infra)) return "🛤️";

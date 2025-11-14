@@ -250,14 +250,14 @@ const catalog = {
   },
   JETTY_LNGBV: {
     "2k": {
-      label: "Jetty — 2k",
+      label: "Jetty LNGBV — 2k",
       params: {
         "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2,000 CBM" },
       },
       drawings: singleImageSet("Jetty 2k", IMG_JETTY_LNGBV_2K),
     },
     "3k5": {
-      label: "Jetty — 3.5k",
+      label: "Jetty LNGBV — 3.5k",
       params: {
         "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2,000 CBM" },
       },
@@ -266,7 +266,7 @@ const catalog = {
   },
   JETTY_SPB: {
     "15k": {
-      label: "Jetty — 15k",
+      label: "Jetty SPB — 15k",
       params: {
         "Jetty": { Type: "CARGO", "Size (LOA)": "83 M", Deadweight: "- TON", Capacity: "2,000 CBM" },
       },
@@ -329,14 +329,19 @@ const pickNearestCapacity = (vol, capacities) => {
 export const resolveVariant = (project) => {
   if (!project) return { group: null, variant: null };
 
-  const infraRaw = (project.infrastruktur || project.infrastructure || "").toLowerCase();
+  // CHANGED: stronger normalization for infra string
+  const rawInfra = (project.infrastruktur || project.infrastructure || "");
+  const infraNorm = rawInfra
+    .toLowerCase()
+    .replace(/[_-]+/g, " ")           // unify separators (removed needless escape)
+    .replace(/\s+/g, " ")              // collapse spaces
+    .trim();
 
-  // ADD: volume parsing (hilang sebelumnya)
+  // volume parsing (unchanged)
   const volRaw = pickProjectVolumeRaw(project);
   const volNum = parseVolumeToNumber(volRaw);
   const volStr = String(volRaw || "").toLowerCase();
 
-  // ADD: helper byVolume (hilang sebelumnya)
   const byVolume = (group, capsMap) => {
     const keys = Object.keys(capsMap);
     const caps = keys.map(k => capsMap[k]);
@@ -345,24 +350,50 @@ export const resolveVariant = (project) => {
     return { group, variant: matchKey };
   };
 
-  // Plant
-  if (/plant/.test(infraRaw)) {
-    if (/mini/.test(infraRaw)) return { group: "LNG_PLANT", variant: "mini25" };
-    if (/onshore/.test(infraRaw)) return { group: "LNG_PLANT", variant: "onshore2" };
+  // --- NEW: unified jetty token logic (early return) ---
+  const hasJetty = /\bjetty\b/.test(infraNorm);
+  const hasLngbv = /\blngbv\b/.test(infraNorm);
+  const hasSpb = /\bspb\b/.test(infraNorm) || /\bself\s*propelled\s*barge\b/.test(infraNorm);
+
+  if (hasJetty && hasLngbv) {
+    if (Number.isFinite(volNum)) {
+      const chosen = pickNearestCapacity(volNum, [2000, 3500]);
+      return { group: "JETTY_LNGBV", variant: chosen === 3500 ? "3k5" : "2k" };
+    }
+    return { group: "JETTY_LNGBV", variant: "2k" };
+  }
+
+  if (hasJetty && hasSpb) {
+    return { group: "JETTY_SPB", variant: "15k" };
+  }
+
+  // If explicitly a jetty without qualifier (avoid falling to LNGBV/SPB)
+  if (hasJetty) {
+    // Heuristic: choose LNGBV or SPB jetty based on volume or keywords
+    if (hasLngbv) return { group: "JETTY_LNGBV", variant: "2k" };
+    if (hasSpb) return { group: "JETTY_SPB", variant: "15k" };
+    // Fallback: treat as LNGBV jetty small
+    return { group: "JETTY_LNGBV", variant: "2k" };
+  }
+
+  // Specific plant resolution
+  if (/plant/.test(infraNorm)) {
+    if (/mini/.test(infraNorm)) return { group: "LNG_PLANT", variant: "mini25" };
+    if (/onshore/.test(infraNorm)) return { group: "LNG_PLANT", variant: "onshore2" };
     return { group: "LNG_PLANT", variant: "mini25" };
   }
 
   // ORU
-  if (/oru|regasification\s*unit/.test(infraRaw)) {
-    if (/c1a/.test(infraRaw)) return { group: "ORU", variant: "c1a6" };
-    if (/c1b/.test(infraRaw) || /\b12\b/.test(infraRaw)) return { group: "ORU", variant: "c1b12" };
+  if (/oru|regasification\s*unit/.test(infraNorm)) {
+    if (/c1a/.test(infraNorm)) return { group: "ORU", variant: "c1a6" };
+    if (/c1b/.test(infraNorm) || /\b12\b/.test(infraNorm)) return { group: "ORU", variant: "c1b12" };
     return { group: "ORU", variant: "c1a6" };
   }
 
-  // ORF (nearest antara 4.893 & 16.39)
-  if (/orf|receiving\s*facility/.test(infraRaw)) {
-    const has1639 = /(16[\s.,]?39)\b/.test(infraRaw) || /(16[\s.,]?39)\b/.test(volStr);
-    const has4893 = /(4[\s.,]?893)\b/.test(infraRaw) || /(4[\s.,]?893)\b/.test(volStr);
+  // ORF
+  if (/orf|receiving\s*facility/.test(infraNorm)) {
+    const has1639 = /(16[\s.,]?39)\b/.test(infraNorm) || /(16[\s.,]?39)\b/.test(volStr);
+    const has4893 = /(4[\s.,]?893)\b/.test(infraNorm) || /(4[\s.,]?893)\b/.test(volStr);
     if (has1639) return { group: "ORF", variant: "v16" };
     if (has4893) return { group: "ORF", variant: "v5" };
     if (Number.isFinite(volNum)) {
@@ -372,39 +403,30 @@ export const resolveVariant = (project) => {
     return { group: "ORF", variant: "v5" };
   }
 
-  // LNGBV
-  if (/lngbv|bunker/.test(infraRaw)) {
+  // LNGBV vessel
+  if (/lngbv|bunker/.test(infraNorm)) {
     return byVolume("LNGBV", { "5k": 5000, "10k": 10000, "15k": 15000 });
   }
+
   // LNGC
-  if (/lngc|carrier|vessel/.test(infraRaw)) {
+  if (/lngc|carrier|vessel/.test(infraNorm)) {
     return byVolume("LNGC", { "18k": 18000, "20k": 20000 });
   }
+
   // SPB
-  if (/spb|self[\s-]*propel/.test(infraRaw)) {
+  if (/spb|self\s*propel/.test(infraNorm)) {
     return byVolume("SPB", { "1k2": 1200, "4k": 4000 });
   }
+
   // FSRU
-  if (/fsru/.test(infraRaw)) return { group: "FSRU", variant: "83k" };
+  if (/fsru/.test(infraNorm)) return { group: "FSRU", variant: "83k" };
+
   // Truck
-  if (/truck/.test(infraRaw)) {
+  if (/truck/.test(infraNorm)) {
     return byVolume("TRUCK", { "40k": 39600, "52k": 52500 });
   }
 
-  // Jetty LNGBV
-  if (/\bjetty\b.*\blngbv\b|\blngbv\b.*\bjetty\b|\bjetty lngbv infrastructure\b|\bjetty\b.*\binfrastruktur\b.*\blngbv\b|\blngbv\b.*\binfrastruktur\b.*\bjetty\b/i.test(infraRaw)) {
-    if (Number.isFinite(volNum)) {
-      const chosen = pickNearestCapacity(volNum, [2000, 3500]);
-      return { group: "JETTY_LNGBV", variant: chosen === 3500 ? "3k5" : "2k" };
-    }
-    return { group: "JETTY_LNGBV", variant: "2k" };
-  }
-  // Jetty SPB
-  if (/\bjetty\b.*\bspb\b|\bspb\b.*\bjetty\b|\bjetty spb infrastructure\b|dolphin.*spb|\bjetty\b.*\binfrastruktur\b.*\bspb\b|\bspb\b.*\binfrastruktur\b.*\bjetty\b/i.test(infraRaw)) {
-    return { group: "JETTY_SPB", variant: "15k" };
-  }
-
-  // Fallback ke LNGBV berdasarkan volume
+  // Volume-only fallback to LNGBV
   if (Number.isFinite(volNum)) {
     const capacities = [5000, 10000, 15000];
     const chosen = pickNearestCapacity(volNum, capacities);
@@ -680,7 +702,6 @@ const previewSlice = createSlice({
       });
   },
 });
-/* eslint-enable no-unused-vars */
 
 export const { setSelectedProjectId, setResolved, resolveFromProject } = previewSlice.actions;
 export const selectLibraryState = (s) => s.libraryPreview;

@@ -137,6 +137,18 @@ const Preview = () => {
   const parameterRows = useMemo(() => {
     if (!currentVariant) return [];
 
+    const isJetty = resolved?.group && /^JETTY_/.test(resolved.group);
+    if (isJetty) {
+      const jetty = currentVariant.params?.Jetty || {};
+      const items = [
+        { k: "Type", v: jetty.Type },
+        { k: "Size (LOA)", v: jetty["Size (LOA)"] },
+        { k: "Deadweight (DWT)", v: jetty.Deadweight },
+        { k: "Capacity", v: jetty.Capacity },
+      ].filter(it => it.v !== undefined && it.v !== null && String(it.v).trim() !== "");
+      return items.length ? [{ group: "Jetty", items }] : [];
+    }
+
     const isTruck = (resolved?.group === "TRUCK");
 
     const md =
