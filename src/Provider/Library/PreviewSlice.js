@@ -219,15 +219,17 @@ const catalog = {
     },
   },
   ORF: {
+    // CHANGED: label uses 4.893
     v5: {
-      label: "ORF — 5 m³/HR",
+      label: "ORF — 4.893 m³/HR",
       params: { "Parameter": { Capacity: "4.893 m³/HR", Pressure: "16 BARG" } },
-      drawings: singleImageSet("P&ID — ORF 5", IMG_ORF_PID_4893),
+      drawings: singleImageSet("P&ID — ORF 4.893", IMG_ORF_PID_4893),
     },
+    // CHANGED: label uses 16.39
     v16: {
-      label: "ORF — 16 m³/HR",
+      label: "ORF — 16.39 m³/HR",
       params: { "Parameter": { Capacity: "16.39 m³/HR", Pressure: "16 BARG" } },
-      drawings: singleImageSet("P&ID — ORF 16", IMG_ORF_PID_1639),
+      drawings: singleImageSet("P&ID — ORF 16.39", IMG_ORF_PID_1639),
     },
   },
   LNG_PLANT: {
@@ -286,7 +288,10 @@ const pickProjectVolumeRaw = (project) =>
 // Helpers: parse volume and pick nearest capacity with tie going upward
 const parseVolumeToNumber = (vol) => {
   if (vol === null || vol === undefined) return NaN;
-  if (typeof vol === "number" && Number.isFinite(vol)) return vol;
+  if (typeof vol === "number") {
+    // CHANGED: treat any numeric <= 100 as 'k' (thousands)
+    return Number.isFinite(vol) ? (vol <= 100 ? Math.round(vol * 1000) : Math.round(vol)) : NaN;
+  }
 
   // Normalize string: remove unit labels, keep digits, dots and commas for later normalization
   const raw = String(vol).toLowerCase().replace(/(cbm|m3|m\u00b3|meter\s?kubik|kapasitas|capacity)/g, "").trim();
@@ -325,19 +330,22 @@ export const resolveVariant = (project) => {
   if (!project) return { group: null, variant: null };
 
   const infraRaw = (project.infrastruktur || project.infrastructure || "").toLowerCase();
+
+  // ADD: volume parsing (hilang sebelumnya)
   const volRaw = pickProjectVolumeRaw(project);
   const volNum = parseVolumeToNumber(volRaw);
   const volStr = String(volRaw || "").toLowerCase();
 
+  // ADD: helper byVolume (hilang sebelumnya)
   const byVolume = (group, capsMap) => {
     const keys = Object.keys(capsMap);
-    const caps = keys.map((k) => capsMap[k]);
+    const caps = keys.map(k => capsMap[k]);
     const chosen = Number.isFinite(volNum) ? pickNearestCapacity(volNum, caps) : null;
-    const matchKey = chosen ? keys.find((k) => capsMap[k] === chosen) : keys[0];
+    const matchKey = chosen ? keys.find(k => capsMap[k] === chosen) : keys[0];
     return { group, variant: matchKey };
   };
 
-  // Specific plant resolution
+  // Plant
   if (/plant/.test(infraRaw)) {
     if (/mini/.test(infraRaw)) return { group: "LNG_PLANT", variant: "mini25" };
     if (/onshore/.test(infraRaw)) return { group: "LNG_PLANT", variant: "onshore2" };
@@ -347,49 +355,24 @@ export const resolveVariant = (project) => {
   // ORU
   if (/oru|regasification\s*unit/.test(infraRaw)) {
     if (/c1a/.test(infraRaw)) return { group: "ORU", variant: "c1a6" };
-    if (/c1b/.test(infraRaw)) return { group: "ORU", variant: "c1b12" };
-    if (/\b12\b/.test(infraRaw)) return { group: "ORU", variant: "c1b12" };
+    if (/c1b/.test(infraRaw) || /\b12\b/.test(infraRaw)) return { group: "ORU", variant: "c1b12" };
     return { group: "ORU", variant: "c1a6" };
   }
 
-  // ORF: pilih 16.39 atau 4.893 berdasarkan pola eksplisit atau pendekatan numerik
+  // ORF (nearest antara 4.893 & 16.39)
   if (/orf|receiving\s*facility/.test(infraRaw)) {
-    // Explicit pattern checks on infra and volume strings (prioritas tertinggi)
-    const is16 =
-      /(16[\s.,]?39)\b/.test(infraRaw) ||
-      /(16[\s.,]?39)\b/.test(volStr) ||
-      /\b16\b/.test(infraRaw) ||
-      /\b16\b/.test(volStr);
-    const is4893 =
-      /(4[\s.,]?893)\b/.test(infraRaw) ||
-      /(4[\s.,]?893)\b/.test(volStr) ||
-      /\b4\b/.test(infraRaw) ||
-      /\b4\b/.test(volStr);
-
-    if (is16) return { group: "ORF", variant: "v16" };
-    if (is4893) return { group: "ORF", variant: "v5" };
-
-    // NEW: nearest-volume pick when angka kecil (<= 100) tersedia di volume string
-    const numFrom = (s) => {
-      const m = String(s || "").match(/(\d+[.,]?\d*)/);
-      return m ? parseFloat(m[1].replace(",", ".")) : NaN;
-    };
-    const vDec = Number.isFinite(numFrom(volStr)) ? numFrom(volStr) : NaN;
-
-    if (Number.isFinite(vDec) && vDec <= 100) {
-      const diff4893 = Math.abs(vDec - 4.893);
-      const diff1639 = Math.abs(vDec - 16.39);
-      return { group: "ORF", variant: diff1639 < diff4893 ? "v16" : "v5" };
-    }
-
-    // Fallback: gunakan volNum heuristik (>=10 -> 16.39; selain itu -> 4.893)
+    const has1639 = /(16[\s.,]?39)\b/.test(infraRaw) || /(16[\s.,]?39)\b/.test(volStr);
+    const has4893 = /(4[\s.,]?893)\b/.test(infraRaw) || /(4[\s.,]?893)\b/.test(volStr);
+    if (has1639) return { group: "ORF", variant: "v16" };
+    if (has4893) return { group: "ORF", variant: "v5" };
     if (Number.isFinite(volNum)) {
-      return { group: "ORF", variant: volNum >= 10 ? "v16" : "v5" };
+      const chosen = pickNearestCapacity(volNum, [4893, 16390]);
+      return { group: "ORF", variant: chosen === 16390 ? "v16" : "v5" };
     }
     return { group: "ORF", variant: "v5" };
   }
 
-  // LNGBV first
+  // LNGBV
   if (/lngbv|bunker/.test(infraRaw)) {
     return byVolume("LNGBV", { "5k": 5000, "10k": 10000, "15k": 15000 });
   }
@@ -402,23 +385,26 @@ export const resolveVariant = (project) => {
     return byVolume("SPB", { "1k2": 1200, "4k": 4000 });
   }
   // FSRU
-  if (/fsru/.test(infraRaw)) {
-    return { group: "FSRU", variant: "83k" };
-  }
+  if (/fsru/.test(infraRaw)) return { group: "FSRU", variant: "83k" };
   // Truck
   if (/truck/.test(infraRaw)) {
     return byVolume("TRUCK", { "40k": 39600, "52k": 52500 });
   }
-  // Jetty for LNGBV
-  if (/jetty.*lngbv|lngbv.*jetty/.test(infraRaw)) {
-    return byVolume("JETTY_LNGBV", { "2k": 2000, "3k5": 3500 });
+
+  // Jetty LNGBV
+  if (/\bjetty\b.*\blngbv\b|\blngbv\b.*\bjetty\b|\bjetty lngbv infrastructure\b|\bjetty\b.*\binfrastruktur\b.*\blngbv\b|\blngbv\b.*\binfrastruktur\b.*\bjetty\b/i.test(infraRaw)) {
+    if (Number.isFinite(volNum)) {
+      const chosen = pickNearestCapacity(volNum, [2000, 3500]);
+      return { group: "JETTY_LNGBV", variant: chosen === 3500 ? "3k5" : "2k" };
+    }
+    return { group: "JETTY_LNGBV", variant: "2k" };
   }
-  // Jetty for SPB
-  if (/jetty.*spb|spb.*jetty|dolphin.*spb/.test(infraRaw)) {
+  // Jetty SPB
+  if (/\bjetty\b.*\bspb\b|\bspb\b.*\bjetty\b|\bjetty spb infrastructure\b|dolphin.*spb|\bjetty\b.*\binfrastruktur\b.*\bspb\b|\bspb\b.*\binfrastruktur\b.*\bjetty\b/i.test(infraRaw)) {
     return { group: "JETTY_SPB", variant: "15k" };
   }
 
-  // Fallback ke LNGBV terdekat bila volume tersedia
+  // Fallback ke LNGBV berdasarkan volume
   if (Number.isFinite(volNum)) {
     const capacities = [5000, 10000, 15000];
     const chosen = pickNearestCapacity(volNum, capacities);
@@ -659,11 +645,9 @@ export function generatePreviewExcel({ projectDetails, currentVariant, resolved,
 const previewSlice = createSlice({
   name: "libraryPreview",
   initialState: {
-    // use the capacity-based catalog to enable nearest-volume resolution
     catalog,
     selectedProjectId: null,
     resolved: { group: null, variant: null },
-    // NEW: library-approved projects state
     approvedProjects: [],
     approvedLoading: false,
     approvedError: null,
@@ -680,7 +664,6 @@ const previewSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // NEW: reducers for approved library projects
     builder
       .addCase(fetchApprovedLibraryProjects.pending, (state) => {
         state.approvedLoading = true;
@@ -697,10 +680,9 @@ const previewSlice = createSlice({
       });
   },
 });
+/* eslint-enable no-unused-vars */
 
 export const { setSelectedProjectId, setResolved, resolveFromProject } = previewSlice.actions;
-
-// NEW: selectors (needed by LibraryPages, Preview, RecapModal)
 export const selectLibraryState = (s) => s.libraryPreview;
 export const selectCatalog = (s) => s.libraryPreview.catalog;
 export const selectResolved = (s) => s.libraryPreview.resolved;

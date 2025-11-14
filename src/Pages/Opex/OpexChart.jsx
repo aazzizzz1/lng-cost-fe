@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import Chart from "react-apexcharts";
 import { useSelector, useDispatch } from "react-redux";
 import { selectOpexInfra, selectOpexUI, selectActiveDataset, setActiveTab } from "../../Provider/Opex/OpexSlice";
+import { selectPlantDataset } from "../../Provider/Opex/PlantOpexSlice"; // NEW
 
 const Tab = ({ active, label, onClick, disabled, isEstimate }) => (
   <button
@@ -38,7 +39,11 @@ const OpexChart = () => {
   const dispatch = useDispatch();
   const infrastructures = useSelector(selectOpexInfra);
   const ui = useSelector(selectOpexUI);
-  const ds = useSelector(selectActiveDataset);
+
+  // CHANGED: pick vessel/other dataset from OpexSlice and plant dataset from PlantOpexSlice
+  const dsVesselOrOther = useSelector(selectActiveDataset);
+  const dsPlant = useSelector(selectPlantDataset);
+  const ds = ui.activeInfra === "onshore-lng-plant" ? dsPlant : dsVesselOrOther;
 
   // Use active infra instead of the first one
   const activeInfra = ui.activeInfra;
@@ -71,42 +76,57 @@ const OpexChart = () => {
     ];
   }, [ds]);
 
-  // Replace pie with tabular breakdown (values only, no percentages)
+  // CHANGED: derive safe flags and fallbacks
+  const isEstimate = !!ds?.isEstimate;
+  const isNonLNG = ui.activeInfra !== "lng-vessel";
+  const isPlant = ui.activeInfra === "onshore-lng-plant" && !!ds?.plantSummary;
+
+  // Replace pie with tabular breakdown (values only, no percentages) — SAFE for non-vessel
   const breakdownTable = useMemo(() => {
-    if (!ds) return { ages: [], rows: [], totals: [] };
-    const ages = ds.byAgeDaily.labels || [];
-    const rows = (ds.byAgeDaily.items || []).map((it) => ({ name: it.name, values: [...it.values] }));
-    const totals =
-      ds.byAgeDaily.totals && ds.byAgeDaily.totals.length
-        ? [...ds.byAgeDaily.totals]
-        : ages.map((_, colIdx) => rows.reduce((s, r) => s + (r.values[colIdx] || 0), 0));
+    if (!ds || !ds.byAgeDaily) return { ages: [], rows: [], totals: [] };
+    const byAge = ds.byAgeDaily || { labels: [], items: [], totals: [] };
+    const ages = Array.isArray(byAge.labels) ? [...byAge.labels] : [];
+    const rows = Array.isArray(byAge.items)
+      ? byAge.items.map((it) => ({ name: it.name, values: Array.isArray(it.values) ? [...it.values] : [] }))
+      : [];
+    const totals = Array.isArray(byAge.totals) && byAge.totals.length
+      ? [...byAge.totals]
+      : ages.map((_, colIdx) => rows.reduce((s, r) => s + (r.values[colIdx] || 0), 0));
     return { ages, rows, totals };
   }, [ds]);
 
+  // Index line — SAFE for non-vessel
   const indexLine = useMemo(() => {
-    if (!ds) return { categories: [], series: [] };
+    if (!ds || !ds.index) return { categories: [], series: [] };
+    const labels = Array.isArray(ds.index.labels) ? [...ds.index.labels] : [];
+    const values = Array.isArray(ds.index.values) ? [...ds.index.values] : [];
     return {
-      categories: [...ds.index.labels],
-      series: [{ name: "Operating Cost Index", data: [...ds.index.values] }],
+      categories: labels,
+      series: [{ name: "Operating Cost Index", data: values }],
     };
   }, [ds]);
 
+  // Category trends — SAFE for non-vessel
   const categoryTrends = useMemo(() => {
-    if (!ds) return { categories: [], series: [] };
-    return {
-      categories: [...ds.categoriesYoY.years],
-      // Deep clone each series object so ApexCharts can mutate safely
-      series: ds.categoriesYoY.series.map((s) => ({ name: s.name, data: [...s.data] })),
-    };
+    if (!ds || !ds.categoriesYoY) return { categories: [], series: [] };
+    const years = Array.isArray(ds.categoriesYoY.years) ? [...ds.categoriesYoY.years] : [];
+    const series = Array.isArray(ds.categoriesYoY.series)
+      ? ds.categoriesYoY.series.map((s) => ({ name: s.name, data: Array.isArray(s.data) ? [...s.data] : [] }))
+      : [];
+    return { categories: years, series };
   }, [ds]);
 
+  // Total YoY — SAFE for non-vessel
   const totalYoY = useMemo(() => {
-    if (!ds) return { categories: [], series: [] };
+    if (!ds || !ds.totalYoY) return { categories: [], series: [] };
+    const years = Array.isArray(ds.totalYoY.years) ? [...ds.totalYoY.years] : [];
+    const totals = Array.isArray(ds.totalYoY.totals) ? [...ds.totalYoY.totals] : [];
+    const pct = Array.isArray(ds.totalYoY.pctChange) ? [...ds.totalYoY.pctChange] : [];
     return {
-      categories: [...ds.totalYoY.years],
+      categories: years,
       series: [
-        { name: "Total Costs ($/day)", data: [...ds.totalYoY.totals] },
-        { name: "% Change y-o-y", data: [...ds.totalYoY.pctChange], type: "line" },
+        { name: "Total Costs ($/day)", data: totals },
+        { name: "% Change y-o-y", data: pct, type: "line" },
       ],
     };
   }, [ds]);
@@ -139,10 +159,6 @@ const OpexChart = () => {
     </div>
   );
 
-  const isEstimate = !!ds?.isEstimate;
-  // Show full charts only for LNG Carrier (LNGC)
-  const isNonLNG = ui.activeInfra !== "lng-carrier";
-
   if (!ds) {
     return (
       <div className="text-sm text-gray-600 dark:text-gray-300 py-4">
@@ -150,9 +166,6 @@ const OpexChart = () => {
       </div>
     );
   }
-
-  // const profile = ds.profile || {};
-  // const byAge = ds.byAgeDaily || { labels: [], items: [], totals: [] };
 
   return (
     <div className="space-y-6">
@@ -193,10 +206,79 @@ const OpexChart = () => {
       </div>
 
       {/* Non-LNG messages */}
-      {isNonLNG && (
+      {isNonLNG && !isPlant && (
         <div className="space-y-2">
           <div className="p-2 rounded bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs font-semibold border border-gray-200 dark:border-gray-600">
             Data not yet available.
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Onshore LNG Plant — compact summary + breakdown */}
+      {isPlant && (
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+            Onshore LNG Plant OPEX — 35 MMSCFD (Annual)
+          </h3>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Capacity</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{ds.plantSummary.capacityMMSCFD} MMSCFD</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Gas usage for engine</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{ds.plantSummary.gasUsageMMSCFD} MMSCFD</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">mmBTU per year</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{ds.plantSummary.mmBTUPerYear.toLocaleString()}</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Estimated CAPEX</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">${ds.plantSummary.capexUSD.toLocaleString()}</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">OPEX/year</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">${Math.round(ds.plantSummary.opexUSDPerYear).toLocaleString()}</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">OPEX per mmBTU</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">${ds.plantSummary.opexPerMMBTU}/mmBTU</p>
+            </div>
+            <div className="rounded-lg border border-gray-100 dark:border-gray-700 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 dark:text-gray-400">% OPEX vs CAPEX</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">{ds.plantSummary.opexPctOfCapex}%</p>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-xs">
+              <thead>
+                <tr className="text-left text-gray-600 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
+                  <th className="py-2 pr-3 font-semibold">No.</th>
+                  <th className="py-2 pr-3 font-semibold">Category</th>
+                  <th className="py-2 pr-3 font-semibold">Total (USD/year)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(ds.plantBreakdown || []).map((row, idx) => (
+                  <tr key={row.name} className="border-b border-gray-100 dark:border-gray-700">
+                    <td className="py-2 pr-3 text-gray-900 dark:text-white">{idx + 1}</td>
+                    <td className="py-2 pr-3 text-gray-900 dark:text-white">{row.name}</td>
+                    <td className="py-2 pr-3 text-gray-900 dark:text-white">
+                      ${Number(row.total || 0).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+                <tr className="bg-indigo-50/50 dark:bg-indigo-500/10">
+                  <td className="py-2 pr-3 font-semibold text-gray-900 dark:text-white"></td>
+                  <td className="py-2 pr-3 font-semibold text-gray-900 dark:text-white">TOTAL</td>
+                  <td className="py-2 pr-3 font-semibold text-gray-900 dark:text-white">
+                    ${Number(ds.plantSummary?.opexUSDPerYear || 0).toLocaleString()}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       )}

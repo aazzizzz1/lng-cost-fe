@@ -12,6 +12,7 @@ import unitPriceReducer from './HargaSatuan/unitPriceSlice'; // Tambahkan import
 import dashboardReducer from './dashboardSlice'; // Tambahkan import dashboardSlice
 import opexReducer from './Opex/OpexSlice'; // NEW: Opex slice
 import libraryPreviewReducer from './Library/PreviewSlice'; // NEW
+import plantOpexReducer from './Opex/PlantOpexSlice'; // NEW: Onshore LNG Plant OPEX
 
 export default configureStore({
   reducer: {
@@ -28,5 +29,6 @@ export default configureStore({
     dashboard: dashboardReducer, // Tambahkan ini
     opex: opexReducer, // NEW: Opex
     libraryPreview: libraryPreviewReducer, // NEW
+    plantOpex: plantOpexReducer, // NEW
   },
 });
