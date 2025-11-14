@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Onshore LNG Plant — 35 MMSCFD (annual, USD)
 const onshorePlant35 = {
   plantSummary: {
     capacityMMSCFD: 35,
@@ -25,7 +26,6 @@ const onshorePlant35 = {
 };
 
 const initialState = {
-  // single dataset for now; keyed by tab 'overview'
   datasets: { overview: onshorePlant35 },
 };
 
@@ -36,5 +36,4 @@ const plantOpexSlice = createSlice({
 });
 
 export const selectPlantDataset = (s) => s.plantOpex?.datasets?.overview || null;
-
 export default plantOpexSlice.reducer;
